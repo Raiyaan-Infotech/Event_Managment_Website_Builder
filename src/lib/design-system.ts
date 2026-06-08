@@ -1,0 +1,36 @@
+export const designTokens = {
+  colors: {
+    primary: "#2563EB",
+    primaryHover: "#1D4ED8",
+    accent: "#7C3AED",
+    accentHover: "#6D28D9",
+    sidebar: "#0F172A",
+    sidebarHover: "#1E293B",
+    success: "#22C55E",
+    warning: "#F59E0B",
+    danger: "#EF4444",
+    info: "#06B6D4",
+    background: "#F8FAFC",
+    card: "#FFFFFF",
+    border: "#E2E8F0",
+    text: "#0F172A",
+    textSecondary: "#64748B",
+    textMuted: "#94A3B8",
+  },
+  layout: {
+    sidebarWidth: "248px",
+    headerHeight: "72px",
+    contentPadding: "24px",
+    gap: "24px",
+  },
+  radius: {
+    card: "16px",
+    input: "12px",
+    button: "12px",
+    badge: "999px",
+  },
+  shadow: {
+    card: "0 1px 3px rgba(0,0,0,0.08)",
+    cardHover: "0 10px 25px rgba(0,0,0,0.08)",
+  },
+} as const;
