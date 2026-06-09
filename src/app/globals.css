@@ -195,8 +195,8 @@ button {
 }
 
 /* 3. Input Element Heights (Restores inputs to a neat, compact h-8 height) */
-.website-builder-form-panel input:not([type="file"]):not([type="checkbox"]):not([type="radio"]),
-.website-builder-sidebar-panel input:not([type="file"]):not([type="checkbox"]):not([type="radio"]),
+.website-builder-form-panel input:not([type="file"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+.website-builder-sidebar-panel input:not([type="file"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]),
 .website-builder-form-panel select,
 .website-builder-sidebar-panel select {
   height: 2rem !important; /* h-8 = 32px height for comfortable yet compact typing */
@@ -249,3 +249,130 @@ button {
 .website-builder-sidebar-panel button {
   font-size: 10px !important; /* Compact button text */
 }
+
+/* 6. Range Slider Custom Styling */
+.range-slider-input {
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+  border: none !important;
+  box-shadow: none !important;
+  height: 14px !important; /* Taller clickable area for easy mouse grabbing */
+  background: transparent !important; /* Keep input transparent so browser event dispatching works 100% */
+}
+
+/* Chrome, Safari, Opera, Edge */
+.range-slider-input::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  border: none;
+  background: var(--slider-track-bg, #cbd5e1) !important; /* Inherit dynamic gradient background */
+}
+
+.range-slider-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ffffff !important;
+  border: 2px solid var(--vendor-primary-btn, #2457d6) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.1s ease, border-color 0.1s ease;
+  margin-top: -3px !important; /* centers the 12px thumb on the 6px track runnable-track */
+}
+
+.range-slider-input::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+/* Firefox */
+.range-slider-input::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  border: none;
+  background: var(--slider-track-bg, #cbd5e1) !important;
+}
+
+.range-slider-input::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ffffff !important;
+  border: 2px solid var(--vendor-primary-btn, #2457d6) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.1s ease, border-color 0.1s ease;
+  border: none;
+}
+
+.range-slider-input::-moz-range-thumb:hover {
+  transform: scale(1.15);
+}
+
+/* 7. Highly dense form overrides for compact pages */
+.dense-builder-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px !important;
+}
+
+.dense-builder-form label:not(.cursor-pointer) {
+  font-size: 7.5px !important;
+  font-weight: 700 !important;
+  color: var(--vendor-text-muted) !important;
+}
+
+.dense-builder-form input:not([type="file"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+.dense-builder-form select,
+.dense-builder-form button[role="combobox"],
+.dense-builder-form .flex.items-center.gap-2.border {
+  height: 1.5rem !important; /* 24px height */
+  font-size: 8.5px !important;
+  padding-left: 0.25rem !important;
+  padding-right: 0.25rem !important;
+}
+
+.dense-builder-form textarea {
+  min-height: 2.25rem !important; /* 36px height */
+  font-size: 8.5px !important;
+  padding: 0.25rem !important;
+}
+
+/* Shrunk image upload dropzone in dense form */
+.dense-builder-form label.cursor-pointer.flex-col {
+  height: 2.5rem !important; /* 40px height */
+  padding: 0.125rem !important;
+  gap: 1px !important;
+}
+
+.dense-builder-form label.cursor-pointer.flex-col svg {
+  width: 12px !important;
+  height: 12px !important;
+}
+
+.dense-builder-form label.cursor-pointer.flex-col p {
+  font-size: 8px !important;
+  line-height: 1 !important;
+}
+
+.dense-builder-form h2 {
+  font-size: 9.5px !important;
+  margin: 0 !important;
+}
+
+.dense-builder-form h3 {
+  font-size: 8.5px !important;
+  margin: 0 !important;
+}
+
+.dense-builder-form .space-y-2.5 > :not([hidden]) ~ :not([hidden]),
+.dense-builder-form .space-y-2 > :not([hidden]) ~ :not([hidden]),
+.dense-builder-form .space-y-1.5 > :not([hidden]) ~ :not([hidden]),
+.dense-builder-form .space-y-1 > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 2px !important; /* Extremely tight margins */
+}
+
+
+

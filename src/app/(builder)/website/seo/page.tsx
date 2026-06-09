@@ -54,29 +54,29 @@ function SearchPreview({
   keywords: string[];
 }) {
   return (
-    <div className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-white p-5 shadow-sm">
-      <div className="mb-4 flex items-center gap-3">
-        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--vendor-primary-btn)]/10 text-[var(--vendor-primary-btn)]">
-          <CalendarDays className="h-5 w-5" />
+    <div className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-white p-3.5 shadow-sm">
+      <div className="mb-2 flex items-center gap-2">
+        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--vendor-primary-btn)]/10 text-[var(--vendor-primary-btn)]">
+          <CalendarDays className="h-4 w-4" />
         </span>
         <div>
-          <div className="flex items-center gap-2 text-[12px] font-semibold text-[var(--vendor-text)]">
+          <div className="flex items-center gap-1.5 text-[10.5px] font-semibold text-[var(--vendor-text)]">
             <span>https://www.eventify.com</span>
-            <span className="text-[10px]">⌄</span>
+            <span className="text-[8px]">⌄</span>
           </div>
         </div>
       </div>
 
-      <h3 className="text-[20px] font-black leading-6 text-[var(--vendor-primary-btn)]">
+      <h3 className="text-[15px] font-bold leading-5 text-[var(--vendor-primary-btn)]">
         {metaTitle}
       </h3>
-      <p className="mt-3 text-[14px] font-medium leading-6 text-[var(--vendor-text)]">
+      <p className="mt-1.5 text-[11px] font-medium leading-4 text-slate-600">
         {metaDescription}
       </p>
-      <div className="mt-4 flex flex-wrap gap-3 text-[13px] font-medium text-[var(--vendor-text-muted)]">
+      <div className="mt-2 flex flex-wrap gap-1.5 text-[10px] font-medium text-[var(--vendor-text-muted)]">
         {keywords.slice(2, 6).map((keyword, index) => (
           <React.Fragment key={keyword}>
-            {index > 0 ? <span>•</span> : null}
+            {index > 0 ? <span className="mx-1">•</span> : null}
             <span>{keyword.replace(/\b\w/g, (char) => char.toUpperCase())}</span>
           </React.Fragment>
         ))}
@@ -96,15 +96,15 @@ function OgPreview({
 }) {
   return (
     <div className="overflow-hidden rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-white shadow-sm">
-      <img src={ogImage} alt="Open graph preview" className="h-[250px] w-full object-cover" />
-      <div className="p-5">
-        <p className="text-[12px] font-bold uppercase tracking-wide text-[var(--vendor-text-muted)]">
+      <img src={ogImage} alt="Open graph preview" className="aspect-[1.91/1] w-full max-h-[145px] object-cover" />
+      <div className="p-3">
+        <p className="text-[9px] font-bold uppercase tracking-wide text-[var(--vendor-text-muted)]">
           EVENTIFY.COM
         </p>
-        <h3 className="mt-3 text-[20px] font-black leading-6 text-[var(--vendor-text)]">
+        <h3 className="mt-1 text-[13px] font-extrabold leading-4 text-[var(--vendor-text)]">
           {metaTitle}
         </h3>
-        <p className="mt-3 text-[14px] font-medium leading-6 text-[var(--vendor-text-muted)]">
+        <p className="mt-1 text-[10.5px] font-medium leading-4 text-[var(--vendor-text-muted)]">
           {metaDescription}
         </p>
       </div>
@@ -141,7 +141,7 @@ export default function SEOPage() {
   };
 
   const form = (
-    <div className="space-y-5">
+    <div className="space-y-2.5">
       <BuilderCountedInput
         label="Meta Title"
         value={metaTitle}
@@ -153,7 +153,7 @@ export default function SEOPage() {
         value={metaDescription}
         onChange={setMetaDescription}
         maxLength={160}
-        textareaClassName="min-h-[150px]"
+        textareaClassName="min-h-[64px]"
       />
       <MultiSelectPages
         label="Keywords"
@@ -165,9 +165,10 @@ export default function SEOPage() {
         customPlaceholder="Enter keyword"
         description="Add relevant keywords separated by commas or enter key and press enter."
       />
-      <div className="space-y-3">
+      <div className="space-y-2">
         <ImageUpload
           label="OG Image"
+          compact={true}
           title="Drag & drop your image here"
           browseText="or click to browse"
           hint="Recommended size: 1200 x 630px"
@@ -175,19 +176,19 @@ export default function SEOPage() {
           size="wide"
           onFileSelect={handleOgImageSelect}
         />
-        <div className="flex items-center justify-between rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-white p-3">
-          <div className="flex min-w-0 items-center gap-3">
-            <img src={ogImage} alt="OG image thumbnail" className="h-12 w-20 rounded object-cover" />
+        <div className="flex items-center justify-between rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-white p-2">
+          <div className="flex min-w-0 items-center gap-2">
+            <img src={ogImage} alt="OG image thumbnail" className="h-8 w-12 rounded object-cover" />
             <div className="min-w-0">
-              <p className="truncate text-[12px] font-black text-[var(--vendor-text)]">og-image.jpg</p>
-              <p className="mt-0.5 text-[11px] font-medium text-[var(--vendor-text-muted)]">
+              <p className="truncate text-[10px] font-bold text-[var(--vendor-text)]">og-image.jpg</p>
+              <p className="mt-0.5 text-[9px] font-medium text-[var(--vendor-text-muted)]">
                 1200 x 630px (245 KB)
               </p>
             </div>
           </div>
           <OutlineButton
             type="button"
-            size="icon-sm"
+            size="icon-xs"
             onClick={() => {
               if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
               objectUrlRef.current = null;
@@ -195,7 +196,7 @@ export default function SEOPage() {
             }}
             className="text-rose-500 hover:text-rose-600"
           >
-            <Trash2 className="h-3.5 w-3.5" />
+            <Trash2 className="h-3 w-3" />
           </OutlineButton>
         </div>
       </div>
@@ -203,10 +204,10 @@ export default function SEOPage() {
   );
 
   const preview = (
-    <div className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-white p-6">
+    <div className="space-y-4">
       <section>
-        <h2 className="text-[16px] font-black text-[var(--vendor-text)]">Google Search Preview</h2>
-        <div className="mt-5 max-w-[650px]">
+        <h2 className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">Google Search Preview</h2>
+        <div className="mt-1.5">
           <SearchPreview
             metaTitle={metaTitle}
             metaDescription={metaDescription}
@@ -215,11 +216,9 @@ export default function SEOPage() {
         </div>
       </section>
 
-      <div className="my-8 border-t border-[var(--vendor-border)]" />
-
       <section>
-        <h2 className="text-[16px] font-black text-[var(--vendor-text)]">Facebook / OG Preview</h2>
-        <div className="mt-5 max-w-[760px]">
+        <h2 className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">Facebook / OG Preview</h2>
+        <div className="mt-1.5">
           <OgPreview
             metaTitle={metaTitle}
             metaDescription={metaDescription}
@@ -244,6 +243,7 @@ export default function SEOPage() {
       previewSubtitle="See how your content will look in search engines and when shared on social media."
       saveLabel="Save Changes"
       contentClassName="xl:grid-cols-[minmax(360px,32fr)_minmax(0,68fr)]"
+      leftClassName="border-0 bg-transparent p-0 shadow-none"
     />
   );
 }

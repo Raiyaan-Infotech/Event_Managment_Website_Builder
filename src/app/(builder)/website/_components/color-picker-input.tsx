@@ -34,12 +34,12 @@ export function ColorPickerInput({
       ) : null}
       <div className={cn(
         "flex items-center gap-2 rounded-[var(--vendor-radius-control)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] shadow-xs",
-        compact ? "h-9 px-1.5" : "h-10 px-2"
+        compact ? "h-7 px-1.5" : "h-10 px-2"
       )}>
         <label
           className={cn(
             "relative shrink-0 cursor-pointer overflow-hidden rounded border border-[var(--vendor-border)]",
-            compact ? "h-5 w-5" : "h-6 w-6"
+            compact ? "h-4.5 w-4.5" : "h-6 w-6"
           )}
           style={{ backgroundColor: colorValue }}
           aria-label={label ? `Choose ${label}` : "Choose color"}
@@ -56,7 +56,7 @@ export function ColorPickerInput({
           value={value}
           disabled={disabled}
           maxLength={7}
-          className="h-full border-0 bg-transparent px-1 font-bold uppercase shadow-none focus-visible:ring-0 text-[10px]"
+          className="h-full border-0 bg-transparent px-1 font-bold uppercase shadow-none focus-visible:ring-0 text-[9px]"
           onChange={(event) => onChange(event.target.value.toUpperCase())}
           placeholder="#6C47FF"
         />

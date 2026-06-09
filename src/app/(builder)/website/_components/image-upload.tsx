@@ -51,7 +51,9 @@ export function ImageUpload({
   const previewSrc = value ?? localPreview;
   const sizeClass =
     size === "wide"
-      ? "h-32 w-full"
+      ? compact
+        ? "h-16 w-full"
+        : "h-32 w-full"
       : size === "md" && !compact
         ? "h-[112px] w-[112px]"
         : compact
