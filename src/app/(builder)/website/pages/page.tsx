@@ -353,7 +353,7 @@ function LegalPagePreview({
         <DesktopMobileToggle value={device} onChange={setDevice} />
       }
       saveLabel="Save Changes"
-      contentClassName="xl:grid-cols-[minmax(640px,55fr)_minmax(560px,45fr)]"
+      contentClassName="xl:grid-cols-[55fr_45fr]"
       leftClassName="border-0 bg-transparent p-0 shadow-none"
     />
   );

@@ -272,7 +272,6 @@ export default function SimpleSliderPage() {
         <ImageUpload
           label="Slide Image"
           hint="Recommended: 1920x800px (Max: 2MB)"
-          recommendedSize="Recommended: 1920x800px (Max: 2MB)"
         />
 
         {/* Status */}

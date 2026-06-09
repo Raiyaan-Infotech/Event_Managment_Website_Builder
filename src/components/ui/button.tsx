@@ -70,7 +70,7 @@ export function Button({ className, variant = "primary", size = "default", ...pr
 }
 
 export function PrimaryButton(props: Omit<ButtonProps, "variant">) {
-  return <Button {...props} variant="primary" className="text-sm" />;
+  return <Button {...props} variant="primary"  />;
 }
 
 export function OutlineButton(props: Omit<ButtonProps, "variant">) {

@@ -81,7 +81,7 @@ function FooterPreview({
 
   return (
     <footer className="rounded-[var(--vendor-radius-panel)] bg-[#061a39] px-10 py-10 text-white shadow-sm">
-      <div className="grid gap-10 lg:grid-cols-[1.3fr_0.85fr_1fr]">
+      <div className="grid gap-8 grid-cols-1 xl:grid-cols-[1.3fr_0.85fr_1fr]">
         <div>
           <div className="flex items-center gap-4">
             <div className="flex h-14 w-14 items-center justify-center rounded-[var(--vendor-radius-panel)] border border-white/20 bg-white/5">
@@ -291,20 +291,24 @@ export default function FooterPage() {
       ]}
       form={form}
       preview={
-        <FooterPreview
-          companyName={companyName}
-          shortDescription={shortDescription}
-          topListHeading={topListHeading}
-          selectedPages={selectedPages}
-          newsletterEnabled={newsletterEnabled}
-          mobile={mobile}
-          email={email}
-          address={address}
-          copyright={copyright}
-          poweredBy={poweredBy}
-          showSocialLinks={showSocialLinks}
-        />
-      }
+  <div className="overflow-hidden rounded-[var(--vendor-radius-panel)]">
+    <div style={{ transform: "scale(0.65)", transformOrigin: "top left", width: "153.8%", pointerEvents: "none" }}>
+      <FooterPreview
+        companyName={companyName}
+        shortDescription={shortDescription}
+        topListHeading={topListHeading}
+        selectedPages={selectedPages}
+        newsletterEnabled={newsletterEnabled}
+        mobile={mobile}
+        email={email}
+        address={address}
+        copyright={copyright}
+        poweredBy={poweredBy}
+        showSocialLinks={showSocialLinks}
+      />
+    </div>
+  </div>
+}
       previewTitle="Footer Preview"
       previewSubtitle="This is how your footer will appear on the website."
       saveLabel="Save Changes"

@@ -78,6 +78,8 @@ const initialSocialLinks: SocialLink[] = [
   },
 ];
 
+// ─── HeaderPreview ────────────────────────────────────────────────────────────
+
 function HeaderPreview({
   device,
   companyName,
@@ -95,160 +97,165 @@ function HeaderPreview({
   address: string;
   socialLinks: SocialLink[];
 }) {
-  const navItems = [
-    "Home",
-    "About Us",
-    "Services",
-    "Events",
-    "Gallery",
-    "Contact Us",
-  ];
+  const navItems = ["Home", "About Us", "Services", "Events", "Gallery", "Contact Us"];
   const isMobile = device === "mobile";
 
   return (
     <div className="overflow-hidden rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-white shadow-sm">
+      {/* Browser chrome bar */}
       <div className="flex items-center gap-2 border-b border-[var(--vendor-border)] bg-slate-50 px-3 py-2">
         <span className="h-2.5 w-2.5 rounded-full bg-rose-400" />
         <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
         <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
-        <div className="ml-3 flex-1 rounded bg-white px-3 py-1 text-[11px] font-semibold text-slate-500">
+        <div className="ml-3 flex-1 truncate rounded bg-white px-3 py-1 text-[11px] font-semibold text-slate-500">
           {companyName.toLowerCase().replace(/\s+/g, "")}.yourdomain.com
         </div>
       </div>
 
-      <div
-        className={
-          isMobile
-            ? "mx-auto max-w-[390px] border-x border-[var(--vendor-border)]"
-            : "origin-top-left scale-[0.78] w-[128%]"
-        }
-      >
-        {!isMobile ? (
-          <div className="flex items-center justify-between bg-[#101010] px-8 py-3 text-xs font-semibold text-white">
-            <div className="flex items-center gap-5">
-              <span className="inline-flex items-center gap-2">
-                <Phone className="h-3.5 w-3.5" />
-                {mobile}
-              </span>
-              <span className="h-4 w-px bg-white/30" />
-              <span className="inline-flex items-center gap-2">
-                <Mail className="h-3.5 w-3.5" />
-                {email}
-              </span>
-            </div>
-            <div className="flex items-center gap-4">
-              {socialLinks.slice(1).map((item) => {
-                const Icon = item.icon;
-                return <Icon key={item.id} className="h-4 w-4" />;
-              })}
-            </div>
-          </div>
-        ) : null}
-
-        <div className="flex items-center justify-between bg-white px-8 py-5">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-[var(--vendor-radius-control)] border border-[var(--vendor-primary-btn)]/20 bg-[var(--vendor-primary-btn)]/10 text-[var(--vendor-primary-btn)]">
-              <span className="text-lg font-black">
-                {companyName.slice(0, 2).toUpperCase()}
-              </span>
-            </div>
-            <div>
-              <p className="max-w-40 truncate text-base font-black tracking-tight text-slate-950">
-                {companyName}
-              </p>
-              <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-slate-500">
-                Events
-              </p>
-            </div>
-          </div>
-
-          {isMobile ? (
-            <button className="flex h-10 w-10 items-center justify-center rounded-[var(--vendor-radius-control)] border border-slate-200 text-slate-950">
-              <span className="text-xl leading-none">☰</span>
-            </button>
-          ) : (
-            <div className="flex min-w-0 items-center gap-5 text-sm font-bold text-slate-950">
-              {navItems.map((item, index) => (
-                <span
-                  key={item}
-                  className={`whitespace-nowrap ${index === 0 ? "text-[var(--vendor-primary-btn)]" : ""}`}
-                >
-                  {item}
+      <div className="overflow-hidden">
+        <div
+          className={
+            isMobile
+              ? "mx-auto max-w-[390px] border-x border-[var(--vendor-border)]"
+              : [
+                  "origin-top-left",
+                  // below xl: preview is full-width panel → use larger scale
+                  "scale-[0.62] w-[161%]",
+                  "sm:scale-[0.68] sm:w-[147%]",
+                  "md:scale-[0.74] md:w-[135%]",
+                  "lg:scale-[0.78] lg:w-[128%]",
+                  // xl+: preview is 45% right column → tighter, needs smaller scale
+                  "xl:scale-[0.62] xl:w-[161%]",
+                  "2xl:scale-[0.72] 2xl:w-[139%]",
+                ].join(" ")
+          }
+        >
+          {/* Desktop-only top bar */}
+          {!isMobile ? (
+            <div className="flex items-center justify-between bg-[#101010] px-8 py-3 text-xs font-semibold text-white">
+              <div className="flex items-center gap-5">
+                <span className="inline-flex items-center gap-2">
+                  <Phone className="h-3.5 w-3.5" />
+                  {mobile}
                 </span>
-              ))}
-              <Button className="h-11 px-5">Book Now</Button>
-            </div>
-          )}
-        </div>
-
-        <section className="relative min-h-[380px] overflow-hidden bg-slate-950">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_16%,rgba(255,255,255,0.22),transparent_22%),linear-gradient(120deg,rgba(7,10,18,0.92),rgba(7,10,18,0.58)),linear-gradient(135deg,#21101a,#7d2647_42%,#241016)]" />
-          <div className="absolute right-10 top-10 h-56 w-56 rounded-full bg-[var(--vendor-primary-btn)]/20 blur-3xl" />
-          <div className="relative flex min-h-[380px] items-center px-8 py-12">
-            <div className="max-w-xl text-white">
-              <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[var(--vendor-primary-btn)]">
-                We create memorable moments
-              </p>
-              <h2 className="mt-4 text-5xl font-black leading-tight tracking-tight">
-                Creating Unforgettable{" "}
-                <span className="text-[var(--vendor-primary-btn)]">
-                  Moments
+                <span className="h-4 w-px bg-white/30" />
+                <span className="inline-flex items-center gap-2">
+                  <Mail className="h-3.5 w-3.5" />
+                  {email}
                 </span>
-              </h2>
-              <p className="mt-5 max-w-lg text-base font-medium leading-8 text-white/85">
-                We create beautiful, memorable and perfect events that stay with
-                you forever.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-4">
-                <Button className="h-11 px-7">Book Consultation</Button>
-                <Button
-                  variant="outline"
-                  className="h-11 border-white/50 bg-transparent px-7 text-white hover:bg-white/10"
-                >
-                  Explore Events
-                </Button>
+              </div>
+              <div className="flex items-center gap-4">
+                {socialLinks.slice(1).map((item) => {
+                  const Icon = item.icon;
+                  return <Icon key={item.id} className="h-4 w-4" />;
+                })}
               </div>
             </div>
-          </div>
-        </section>
+          ) : null}
 
-        <div className="relative mx-5 -mt-9 grid grid-cols-2 gap-3 rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-white p-5 shadow-lg md:grid-cols-4">
-          {[
-            ["500+", "Events Completed"],
-            ["10+", "Years Experience"],
-            ["250+", "Happy Clients"],
-            ["50+", "Team Members"],
-          ].map(([value, label]) => (
-            <div key={label} className="text-center">
-              <Users className="mx-auto mb-2 h-5 w-5 text-[var(--vendor-primary-btn)]" />
-              <p className="text-lg font-black text-slate-950">{value}</p>
-              <p className="text-[11px] font-semibold text-slate-500">
-                {label}
-              </p>
+          {/* Logo + nav bar */}
+          <div className="flex items-center justify-between bg-white px-8 py-5">
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-[var(--vendor-radius-control)] border border-[var(--vendor-primary-btn)]/20 bg-[var(--vendor-primary-btn)]/10 text-[var(--vendor-primary-btn)]">
+                <span className="text-lg font-black">
+                  {companyName.slice(0, 2).toUpperCase()}
+                </span>
+              </div>
+              <div>
+                <p className="max-w-40 truncate text-base font-black tracking-tight text-slate-950">
+                  {companyName}
+                </p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-slate-500">
+                  Events
+                </p>
+              </div>
             </div>
-          ))}
-        </div>
 
-        <section className="grid gap-8 px-8 py-10 md:grid-cols-[0.8fr_1fr]">
-          <div>
-            <p className="text-[11px] font-black uppercase tracking-widest text-[var(--vendor-primary-btn)]">
-              About Us
-            </p>
-            <h3 className="mt-2 text-2xl font-black text-slate-950">
-              We Plan, You Celebrate
-            </h3>
-            <p className="mt-4 text-sm font-medium leading-7 text-slate-600">
-              {companyName} is a premier event planning company located in{" "}
-              {city}. {address}
-            </p>
-            <Button className="mt-6">Learn More</Button>
+            {isMobile ? (
+              <button className="flex h-10 w-10 items-center justify-center rounded-[var(--vendor-radius-control)] border border-slate-200 text-slate-950">
+                <span className="text-xl leading-none">☰</span>
+              </button>
+            ) : (
+              <div className="flex min-w-0 items-center gap-5 text-sm font-bold text-slate-950">
+                {navItems.map((item, index) => (
+                  <span
+                    key={item}
+                    className={`whitespace-nowrap ${index === 0 ? "text-[var(--vendor-primary-btn)]" : ""}`}
+                  >
+                    {item}
+                  </span>
+                ))}
+                <Button className="h-11 px-5">Book Now</Button>
+              </div>
+            )}
           </div>
-          <div className="min-h-48 rounded-[var(--vendor-radius-panel)] bg-[radial-gradient(circle_at_40%_20%,rgba(255,255,255,0.28),transparent_24%),linear-gradient(135deg,#3a1522,#a84455_48%,#1d1018)]" />
-        </section>
+
+          {/* Hero */}
+          <section className="relative min-h-[380px] overflow-hidden bg-slate-950">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_16%,rgba(255,255,255,0.22),transparent_22%),linear-gradient(120deg,rgba(7,10,18,0.92),rgba(7,10,18,0.58)),linear-gradient(135deg,#21101a,#7d2647_42%,#241016)]" />
+            <div className="absolute right-10 top-10 h-56 w-56 rounded-full bg-[var(--vendor-primary-btn)]/20 blur-3xl" />
+            <div className="relative flex min-h-[380px] items-center px-8 py-12">
+              <div className="max-w-xl text-white">
+                <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[var(--vendor-primary-btn)]">
+                  We create memorable moments
+                </p>
+                <h2 className="mt-4 text-5xl font-black leading-tight tracking-tight">
+                  Creating Unforgettable{" "}
+                  <span className="text-[var(--vendor-primary-btn)]">Moments</span>
+                </h2>
+                <p className="mt-5 max-w-lg text-base font-medium leading-8 text-white/85">
+                  We create beautiful, memorable and perfect events that stay with you forever.
+                </p>
+                <div className="mt-8 flex flex-wrap gap-4">
+                  <Button className="h-11 px-7">Book Consultation</Button>
+                  <Button
+                    variant="outline"
+                    className="h-11 border-white/50 bg-transparent px-7 text-white hover:bg-white/10"
+                  >
+                    Explore Events
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Stats */}
+          <div className="relative mx-5 -mt-9 grid grid-cols-2 gap-3 rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-white p-5 shadow-lg md:grid-cols-4">
+            {[
+              ["500+", "Events Completed"],
+              ["10+", "Years Experience"],
+              ["250+", "Happy Clients"],
+              ["50+", "Team Members"],
+            ].map(([value, label]) => (
+              <div key={label} className="text-center">
+                <Users className="mx-auto mb-2 h-5 w-5 text-[var(--vendor-primary-btn)]" />
+                <p className="text-lg font-black text-slate-950">{value}</p>
+                <p className="text-[11px] font-semibold text-slate-500">{label}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* About */}
+          <section className="grid gap-8 px-8 py-10 md:grid-cols-[0.8fr_1fr]">
+            <div>
+              <p className="text-[11px] font-black uppercase tracking-widest text-[var(--vendor-primary-btn)]">
+                About Us
+              </p>
+              <h3 className="mt-2 text-2xl font-black text-slate-950">We Plan, You Celebrate</h3>
+              <p className="mt-4 text-sm font-medium leading-7 text-slate-600">
+                {companyName} is a premier event planning company located in {city}. {address}
+              </p>
+              <Button className="mt-6">Learn More</Button>
+            </div>
+            <div className="min-h-48 rounded-[var(--vendor-radius-panel)] bg-[radial-gradient(circle_at_40%_20%,rgba(255,255,255,0.28),transparent_24%),linear-gradient(135deg,#3a1522,#a84455_48%,#1d1018)]" />
+          </section>
+        </div>
       </div>
     </div>
   );
 }
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function WebsiteHeaderPage() {
   const [device, setDevice] = React.useState<PreviewDevice>("desktop");
@@ -260,8 +267,7 @@ export default function WebsiteHeaderPage() {
   const [address, setAddress] = React.useState(
     "123, Wedding Avenue, Connaught Place, New Delhi - 110001",
   );
-  const [socialLinks, setSocialLinks] =
-    React.useState<SocialLink[]>(initialSocialLinks);
+  const [socialLinks, setSocialLinks] = React.useState<SocialLink[]>(initialSocialLinks);
 
   const updateSocialLink = (
     id: string,
@@ -274,22 +280,33 @@ export default function WebsiteHeaderPage() {
 
   const form = (
     <div className="space-y-4">
+
+      {/* ── Header Information ──────────────────────────────────────────────── */}
       <FormSection
         title="Header Information"
         subtitle="Manage the main website header details shown in your public website."
         className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-4 shadow-sm"
       >
-        <div className="grid items-start gap-4 md:grid-cols-[330px_150px_310px]">
+        {/*
+          3-col layout: [CompanyName] [Logo] [City]
+          The form column width varies by screen:
+            - mobile  → 1 col (stack everything)
+            - sm 640+ → 3 cols: [1fr auto 1fr]  (logo auto-sizes itself)
+          We deliberately DON'T use md/lg here because those are viewport breakpoints,
+          not form-column breakpoints. sm (640px) is a safe threshold — the two-panel
+          layout only activates at lg (1024px), so at sm the form still fills the full
+          content area which is wide enough for 3 columns.
+        */}
+        <div className="grid items-start gap-4 sm:grid-cols-[1fr_auto_1fr]">
           <BuilderCountedInput
             label="Company Name"
             required
             value={companyName}
             onChange={setCompanyName}
             maxLength={100}
-            className="w-[330px] max-w-full"
           />
           <ImageUpload
-            compact // ← smaller padding
+            compact
             label="Company Logo"
             hint="PNG, JPG, SVG (Max. 2MB)"
             recommendedSize="Recommended: 1920x800px"
@@ -300,11 +317,11 @@ export default function WebsiteHeaderPage() {
             value={city}
             onChange={setCity}
             maxLength={100}
-            className="w-[310px] max-w-full"
           />
         </div>
       </FormSection>
 
+      {/* ── Contact Information ─────────────────────────────────────────────── */}
       <FormSection
         title="Contact Information"
         className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-4 shadow-sm"
@@ -319,14 +336,19 @@ export default function WebsiteHeaderPage() {
           ]}
         />
 
-        <div className="grid items-start gap-4 md:grid-cols-[220px_270px_310px]">
+        {/*
+          3-col: [Mobile] [Email] [Address]
+          Same reasoning — sm (640px) is safe for 3 equal columns here.
+          On mobile: Mobile + Email sit side-by-side (sm:grid-cols-2),
+          Address spans both. At md+ all three are in one row.
+        */}
+        <div className="grid items-start gap-4 sm:grid-cols-2 md:grid-cols-3">
           <BuilderCountedInput
             label="Mobile"
             required
             value={mobile}
             onChange={setMobile}
             maxLength={20}
-            className="w-[220px] max-w-full"
           />
           <BuilderCountedInput
             label="Email"
@@ -334,36 +356,36 @@ export default function WebsiteHeaderPage() {
             value={email}
             onChange={setEmail}
             maxLength={100}
-            className="w-[270px] max-w-full"
           />
-          <BuilderCountedTextarea
-            label="Address"
-            required
-            value={address}
-            onChange={setAddress}
-            maxLength={200}
-            className="w-[310px] max-w-full"
-            textareaClassName="min-h-[68px]"
-          />
+          <div className="sm:col-span-2 md:col-span-1">
+            <BuilderCountedTextarea
+              label="Address"
+              required
+              value={address}
+              onChange={setAddress}
+              maxLength={200}
+              textareaClassName="min-h-[68px]"
+            />
+          </div>
         </div>
       </FormSection>
 
+      {/* ── Social Links ────────────────────────────────────────────────────── */}
       <FormSection
         title="Social Links"
         subtitle="These links appear in the header top bar and public website navigation."
         className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-4 shadow-sm"
       >
-        <div className="overflow-hidden rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)]">
-          <Table>
+        {/* overflow-x-auto keeps the table scrollable inside the panel on narrow screens */}
+        <div className="overflow-x-auto rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)]">
+          <Table className="min-w-[600px]">
             <TableHeader>
               <TableRow>
                 <TableHead className="h-9 text-[11px]">Icon</TableHead>
                 <TableHead className="h-9 text-[11px]">Icon Color</TableHead>
                 <TableHead className="h-9 text-[11px]">Label</TableHead>
                 <TableHead className="h-9 text-[11px]">URL</TableHead>
-                <TableHead className="h-9 text-right text-[11px]">
-                  Action
-                </TableHead>
+                <TableHead className="h-9 text-right text-[11px]">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -382,27 +404,23 @@ export default function WebsiteHeaderPage() {
                     <TableCell className="py-1.5">
                       <ColorPickerInput
                         value={item.color}
-                        onChange={(color) =>
-                          updateSocialLink(item.id, { color })
-                        }
-                        className="min-w-32"
+                        onChange={(color) => updateSocialLink(item.id, { color })}
+                        className="min-w-[8rem]"
                       />
                     </TableCell>
                     <TableCell className="py-1.5">
                       <Input
                         value={item.label}
-                        className="h-8 text-[12px] font-semibold"
+                        className="h-8 min-w-[6rem] text-[12px] font-semibold"
                         onChange={(event) =>
-                          updateSocialLink(item.id, {
-                            label: event.target.value,
-                          })
+                          updateSocialLink(item.id, { label: event.target.value })
                         }
                       />
                     </TableCell>
                     <TableCell className="py-1.5">
                       <Input
                         value={item.url}
-                        className="h-8 text-[12px] font-semibold"
+                        className="h-8 min-w-[12rem] text-[12px] font-semibold"
                         onChange={(event) =>
                           updateSocialLink(item.id, { url: event.target.value })
                         }
@@ -434,6 +452,7 @@ export default function WebsiteHeaderPage() {
             </TableBody>
           </Table>
         </div>
+
         <Button
           type="button"
           variant="outline"
@@ -478,11 +497,9 @@ export default function WebsiteHeaderPage() {
       }
       previewTitle="Live Website Preview"
       previewSubtitle="This is how your header will appear on your website."
-      previewActions={
-        <DesktopMobileToggle value={device} onChange={setDevice} />
-      }
+      previewActions={<DesktopMobileToggle value={device} onChange={setDevice} />}
       saveLabel="Save Changes"
-      contentClassName="xl:grid-cols-[minmax(640px,55fr)_minmax(560px,45fr)]"
+      contentClassName="xl:grid-cols-[minmax(0,55fr)_minmax(0,45fr)]"
       leftClassName="border-0 bg-transparent p-0 shadow-none"
     />
   );
