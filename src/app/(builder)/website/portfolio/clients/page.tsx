@@ -1,11 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { GripVertical, Plus, Trash2 } from "lucide-react";
+import { CloudUpload, X } from "lucide-react";
 import { WebsiteBuilderLayout } from "../../_components/website-builder-layout";
-import { ImageUpload } from "../../_components/image-upload";
-import { BuilderCountedInput } from "../../_components/builder-field";
-import { PrimaryButton, OutlineButton } from "@/components/ui/button";
 
 interface ClientLogo {
   id: string;
@@ -44,8 +41,7 @@ const initialClients: ClientLogo[] = [
 
 export default function PortfolioClientsPage() {
   const [clients, setClients] = React.useState<ClientLogo[]>(initialClients);
-  const [clientName, setClientName] = React.useState("");
-  const [draftLogo, setDraftLogo] = React.useState<string | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
   const objectUrlsRef = React.useRef<string[]>([]);
 
   React.useEffect(() => {
@@ -54,108 +50,93 @@ export default function PortfolioClientsPage() {
     };
   }, []);
 
-  const handleLogoSelect = (file: File) => {
-    if (draftLogo?.startsWith("blob:")) URL.revokeObjectURL(draftLogo);
-    const nextUrl = URL.createObjectURL(file);
-    objectUrlsRef.current.push(nextUrl);
-    setDraftLogo(nextUrl);
-  };
-
-  const addClient = () => {
-    const name = clientName.trim();
-    if (!name) return;
-    setClients((current) => [
-      ...current,
-      {
-        id: `${Date.now()}`,
-        name,
-        logoUrl: draftLogo ?? logoDataUrl(name, "#2563eb", "#7c3aed"),
-      },
-    ]);
-    setClientName("");
-    setDraftLogo(null);
+  const handleFiles = (files: FileList | null) => {
+    if (!files) return;
+    Array.from(files).forEach((file) => {
+      if (!file.type.startsWith("image/")) return;
+      const url = URL.createObjectURL(file);
+      objectUrlsRef.current.push(url);
+      setClients((current) => [
+        ...current,
+        { id: `${Date.now()}-${Math.random()}`, name: file.name.replace(/\.[^.]+$/, ""), logoUrl: url },
+      ]);
+    });
   };
 
   const removeClient = (id: string) => {
-    setClients((current) => current.filter((client) => client.id !== id));
+    setClients((current) => current.filter((c) => c.id !== id));
   };
 
   const form = (
-    <div className="space-y-6">
-      <section className="space-y-4">
-        <div>
-          <h2 className="text-[15px] font-black text-[var(--vendor-text)]">Add New Client</h2>
-        </div>
-        <ImageUpload
-          key={draftLogo ?? "empty-client-logo"}
-          value={draftLogo}
-          label="Upload Logo"
-          title="Drag & drop client logo here"
-          browseText="or click to browse"
-          hint="JPG, PNG, SVG or WebP"
-          recommendedSize="(Max. 2MB)"
-          size="wide"
-          dropzoneClassName="h-[170px]"
-          previewClassName="h-[170px]"
-          onFileSelect={handleLogoSelect}
-          onRemove={() => setDraftLogo(null)}
-        />
-        <BuilderCountedInput
-          label="Client Name"
-          value={clientName}
-          onChange={setClientName}
-          maxLength={100}
-          placeholder="Enter client name"
-        />
-        <div className="flex justify-end">
-          <PrimaryButton type="button" size="sm" onClick={addClient} className="h-9 px-5">
-            <Plus className="h-4 w-4" />
-            Add Client
-          </PrimaryButton>
-        </div>
-      </section>
+    <div className="space-y-4">
+      {/* Section header */}
+      <div>
+        <h2 className="text-[13px] font-black text-[var(--vendor-text)]">Client Logos</h2>
+        <p className="mt-0.5 text-[11px] text-[var(--vendor-text-muted)]">
+          Upload and manage client logos. These will be displayed on the website.
+        </p>
+      </div>
 
-      <section className="space-y-3">
-        <h2 className="text-[13px] font-black text-[var(--vendor-text)]">
-          Added Clients ({clients.length})
-        </h2>
-        <div className="space-y-2">
+      {/* Drag-and-drop upload zone */}
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={() => fileInputRef.current?.click()}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => { e.preventDefault(); handleFiles(e.dataTransfer.files); }}
+        onKeyDown={(e) => e.key === "Enter" && fileInputRef.current?.click()}
+        className="flex h-[140px] w-full cursor-pointer flex-col items-center justify-center gap-1 rounded-[var(--vendor-radius-panel)] border-2 border-dashed border-[var(--vendor-primary-btn)]/40 bg-white transition-colors hover:border-[var(--vendor-primary-btn)] hover:bg-[var(--vendor-primary-btn)]/5"
+      >
+        <CloudUpload className="h-7 w-7 text-[var(--vendor-primary-btn)]" />
+        <p className="text-[12px] font-semibold text-[var(--vendor-primary-btn)]">
+          Drag &amp; drop logo images here
+        </p>
+        <p className="text-[11px] text-[var(--vendor-text-muted)]">or click to browse</p>
+        <p className="text-[10px] text-[var(--vendor-text-muted)]">JPG, PNG, SVG or WebP (Max. 2MB each)</p>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          className="hidden"
+          onChange={(e) => { handleFiles(e.target.files); e.target.value = ""; }}
+        />
+      </div>
+
+      {/* Thumbnail grid */}
+      {clients.length > 0 && (
+        <div className="grid grid-cols-3 gap-2">
           {clients.map((client) => (
-            <div
-              key={client.id}
-              className="flex items-center gap-3 rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-white px-3 py-2 shadow-sm"
-            >
-              <GripVertical className="h-4 w-4 shrink-0 cursor-grab text-[var(--vendor-text-muted)]" />
-              <div className="flex h-9 w-16 shrink-0 items-center justify-center overflow-hidden rounded-[var(--vendor-radius-control)] border border-[var(--vendor-border)] bg-white p-1">
+            <div key={client.id} className="relative">
+              <div className="flex h-[72px] items-center justify-center overflow-hidden rounded-[var(--vendor-radius-control)] border border-[var(--vendor-border)] bg-white p-2">
                 <img src={client.logoUrl} alt={client.name} className="max-h-full max-w-full object-contain" />
               </div>
-              <p className="min-w-0 flex-1 truncate text-[12px] font-black text-[var(--vendor-text)]">
-                {client.name}
-              </p>
-              <OutlineButton
+              <button
                 type="button"
-                size="icon-xs"
                 onClick={() => removeClient(client.id)}
-                className="text-rose-500 hover:text-rose-600"
+                className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-slate-700 text-white shadow hover:bg-rose-500"
+                aria-label={`Remove ${client.name}`}
               >
-                <Trash2 className="h-3.5 w-3.5" />
-              </OutlineButton>
+                <X className="h-2.5 w-2.5" />
+              </button>
             </div>
           ))}
         </div>
-        <p className="text-[12px] font-medium text-[var(--vendor-text-muted)]">
-          You can upload up to 30 clients.
-        </p>
-      </section>
+      )}
+
+      {/* Footer hint */}
+      <p className="text-[11px] text-[var(--vendor-text-muted)]">
+        You can upload up to 30 logos.
+      </p>
     </div>
   );
 
   const preview = (
-    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid grid-cols-3 gap-4">
       {clients.map((client) => (
         <div
           key={client.id}
-          className="flex h-[190px] items-center justify-center rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-white p-8 shadow-sm"
+          className="flex h-[130px] items-center justify-center rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-white p-5 shadow-sm"
         >
           <img src={client.logoUrl} alt={client.name} className="max-h-full max-w-full object-contain" />
         </div>

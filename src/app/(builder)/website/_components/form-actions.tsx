@@ -37,7 +37,7 @@ export function FormActions({
       )}
     >
       {onCancel ? (
-        <OutlineButton type="button" size="sm" onClick={onCancel} className="h-9 ">
+        <OutlineButton type="button" size="sm" onClick={onCancel} className="h-9 text-[11px]">
           <X className="h-4 w-4" />
           {cancelLabel}
         </OutlineButton>
@@ -47,7 +47,7 @@ export function FormActions({
         size="sm"
         onClick={onSave}
         disabled={disableSave || isSaving}
-        className="h-9  shadow-sm whitespace-nowrap"
+        className="h-9 text-[11px] shadow-sm whitespace-nowrap"
       >
         <Save className="h-4 w-4" />
         {isSaving ? "Saving..." : saveLabel}

@@ -28,7 +28,7 @@ export function DesktopMobileToggle({
   return (
     <div
       className={cn(
-        "inline-flex items-center gap-2 rounded-[var(--vendor-radius-control)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-1 shadow-xs",
+        "inline-flex items-center gap-1 rounded-[var(--vendor-radius-control)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-0.5 shadow-xs",
         className,
       )}
       role="tablist"
@@ -46,13 +46,13 @@ export function DesktopMobileToggle({
             aria-selected={active}
             onClick={() => onChange(option.value)}
             className={cn(
-              "inline-flex h-9 items-center justify-center gap-2 rounded-[var(--vendor-radius-control)] px-4 text-[13px] font-black transition",
+              "inline-flex h-9 items-center justify-center gap-1.5 rounded-[var(--vendor-radius-control)] px-2.5 text-[11px] font-bold transition",
               active
                 ? "bg-[var(--vendor-primary-btn)] text-[var(--vendor-primary-btn-text)] shadow-sm"
                 : "text-[var(--vendor-text)] hover:bg-[var(--vendor-secondary-btn)] hover:text-[var(--vendor-secondary-btn-text)]",
             )}
           >
-            <Icon className="h-4 w-4" />
+            <Icon className="h-3.5 w-3.5" />
             {option.label}
           </button>
         );

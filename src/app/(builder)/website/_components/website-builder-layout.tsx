@@ -32,6 +32,7 @@ interface WebsiteBuilderLayoutProps {
   className?: string;
   sidebar?: React.ReactNode;
   sidebarClassName?: string;
+  hideHeader?: boolean;
 }
 
 export function WebsiteBuilderLayout({
@@ -55,36 +56,36 @@ export function WebsiteBuilderLayout({
   className,
   sidebar,
   sidebarClassName,
+  hideHeader = false,
 }: WebsiteBuilderLayoutProps) {
   return (
     <div
       className={cn(
-        "min-h-full bg-[var(--vendor-page-bg)] px-5 py-5 lg:px-7",
+        "flex flex-col overflow-hidden bg-[var(--vendor-page-bg)] px-3 py-1.5",
+        "h-full",
         className,
       )}
     >
-      <header className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+      {!hideHeader && (
+        <header className="mb-1.5 flex shrink-0 flex-col gap-1.5 lg:flex-row lg:items-start lg:justify-between">
         <div className="min-w-0">
-          <h1 className="text-2xl font-black tracking-tight text-[var(--vendor-text)]">
+          <h1 className="text-[15px] font-black leading-5 text-[var(--vendor-text)]">
             {title}
           </h1>
           {breadcrumbs.length > 0 ? (
-            <PageBreadcrumbs
-              overrides={breadcrumbs}
-              className="mt-2"
-            />
+            <PageBreadcrumbs overrides={breadcrumbs} className="mt-0.5" />
           ) : (
-            <PageBreadcrumbs className="mt-2" />
+            <PageBreadcrumbs className="mt-0.5" />
           )}
         </div>
 
-        <div className="flex shrink-0 flex-wrap items-center gap-3">
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
           {topActions}
           <OutlineButton
             type="button"
             size="sm"
             onClick={onHowItWorks}
-            className="h-10 px-5"
+            className="h-8 px-3 text-[12px]"
           >
             <HelpCircle className="h-4 w-4" />
             {howItWorksLabel}
@@ -94,67 +95,66 @@ export function WebsiteBuilderLayout({
             size="sm"
             onClick={onSave}
             disabled={disableSave || isSaving}
-            className="h-10 px-5 shadow-sm"
+            className="h-8 px-3 text-[12px] shadow-sm"
           >
             <Save className="h-4 w-4" />
             {isSaving ? "Saving..." : saveLabel}
           </PrimaryButton>
         </div>
       </header>
+      )}
       <div
         className={cn(
-          "grid min-h-[calc(100vh-190px)] grid-cols-1 gap-3",
+          "grid min-h-0 flex-1 grid-cols-1 gap-2 overflow-hidden",
           sidebar
-            ? "xl:grid-cols-[minmax(0,1fr)_minmax(0,0.55fr)]"
-            : "xl:grid-cols-[minmax(560px,0.52fr)_minmax(0,1fr)]",
+            ? "xl:grid-cols-[minmax(300px,350px)_minmax(170px,210px)_minmax(0,1fr)]"
+            : "xl:grid-cols-[minmax(0,0.52fr)_minmax(0,1fr)]",
           contentClassName,
         )}
       >
         <aside
           className={cn(
-            "rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-5 shadow-sm",
+            "flex min-h-0 flex-col overflow-hidden rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] shadow-sm website-builder-form-panel",
             leftClassName,
           )}
         >
-          {sidebar ? (
-            <div className="flex min-h-full divide-x divide-[var(--vendor-border)]">
-              <div className="min-w-0 flex-1 pr-5 space-y-4 overflow-auto">
-                {form}
-              </div>
-              <div
-                className={cn(
-                  "w-[240px] shrink-0 pl-5 space-y-4",
-                  sidebarClassName,
-                )}
-              >
-                {sidebar}
-              </div>
-            </div>
-          ) : (
-            form
-          )}
+          <div className="min-h-0 flex-1 overflow-y-auto p-2">
+            {form}
+          </div>
         </aside>
+        {sidebar ? (
+          <aside
+            className={cn(
+              "flex min-h-0 flex-col overflow-hidden rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] shadow-sm website-builder-sidebar-panel",
+              sidebarClassName,
+            )}
+          >
+            <div className="min-h-0 flex-1 overflow-y-auto p-3">
+              {sidebar}
+            </div>
+          </aside>
+        ) : null}
 
         {/* Preview col */}
         <section
           className={cn(
-            "rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-5 shadow-sm",
+            "flex min-h-0 flex-col overflow-hidden rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-3 shadow-sm",
             rightClassName,
           )}
         >
-          <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="mb-2 flex shrink-0 items-center justify-between gap-2">
             <div className="min-w-0">
               <div className="flex items-center gap-3">
                 <span
                   className="h-2.5 w-2.5 rounded-full bg-emerald-500"
                   aria-hidden="true"
                 />
-                <h2 className="text-[15px] font-black tracking-tight text-[var(--vendor-text)]">
+                <h2 className="text-[12px] font-black text-[var(--vendor-text)]">
                   {previewTitle}
                 </h2>
               </div>
               {previewSubtitle ? (
-                <p className="ml-5 mt-2 text-[13px] font-medium leading-5 text-[var(--vendor-text-muted)]">
+                <p className="ml-5 mt-0.5 text-[10px] font-medium text-[var(--vendor-text-muted)]">
                   {previewSubtitle}
                 </p>
               ) : null}
@@ -163,7 +163,7 @@ export function WebsiteBuilderLayout({
               <div className="shrink-0">{previewActions}</div>
             ) : null}
           </div>
-          {preview}
+          <div className="min-h-0 flex-1 overflow-auto">{preview}</div>
         </section>
       </div>
     </div>

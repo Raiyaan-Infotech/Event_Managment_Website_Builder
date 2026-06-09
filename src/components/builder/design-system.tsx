@@ -26,16 +26,16 @@ export function PageHeader({
   return (
     <div className={cn("flex items-center justify-between gap-4", className)}>
       <div>
-        <h1 className="text-[32px] font-bold leading-tight tracking-[-0.03em] text-[var(--color-text)]">
+        <h1 className="text-[18px] font-bold leading-6 text-[var(--color-text)]">
           {title}
         </h1>
         {subtitle ? (
-          <p className="mt-1 text-[14px] font-normal leading-5 text-[var(--color-text-secondary)]">
+          <p className="mt-0.5 text-[12px] font-normal leading-4 text-[var(--color-text-secondary)]">
             {subtitle}
           </p>
         ) : null}
       </div>
-      {actions ? <div className="flex items-center gap-3">{actions}</div> : null}
+      {actions ? <div className="flex items-center gap-2">{actions}</div> : null}
     </div>
   );
 }
@@ -57,17 +57,17 @@ export function SectionCard({
 }) {
   return (
     <Card className={className}>
-      <CardContent className={cn("p-4", contentClassName)}>
+      <CardContent className={cn("p-3", contentClassName)}>
         {(title || description || actions) ? (
-          <div className="mb-5 flex items-start justify-between gap-4">
+          <div className="mb-3 flex items-start justify-between gap-3">
             <div>
               {title ? (
-                <h2 className="text-[22px] font-semibold leading-7 tracking-[-0.02em] text-[var(--color-text)]">
+                <h2 className="text-[14px] font-semibold leading-5 text-[var(--color-text)]">
                   {title}
                 </h2>
               ) : null}
               {description ? (
-                <p className="mt-1 text-[14px] font-normal leading-5 text-[var(--color-text-secondary)]">
+                <p className="mt-0.5 text-[12px] font-normal leading-4 text-[var(--color-text-secondary)]">
                   {description}
                 </p>
               ) : null}
@@ -122,7 +122,7 @@ function FieldLabel({
 }) {
   if (!label) return null;
   return (
-    <label className="text-[14px] font-medium leading-5 tracking-[-0.01em] text-[var(--color-text)]">
+    <label className="text-[12px] font-medium leading-4 tracking-[-0.01em] text-[var(--color-text)]">
       {label}
       {required ? <span className="ml-1 text-[var(--color-danger)]">*</span> : null}
     </label>
@@ -170,14 +170,14 @@ export function FormSelect({
     <div className={cn("space-y-2", className)}>
       <FieldLabel label={label} required={required} />
       <select
-        className="h-11 w-full rounded-[var(--radius-input)] border border-[var(--color-border)] bg-white px-3 text-[14px] font-normal text-[var(--color-text)] outline-none transition duration-150 ease-in-out focus:border-[var(--color-primary)] focus:ring-4 focus:ring-[var(--color-primary)]/10"
+        className="h-9 w-full rounded-[var(--radius-input)] border border-[var(--color-border)] bg-white px-3 text-[12px] font-normal text-[var(--color-text)] outline-none transition duration-150 ease-in-out focus:border-[var(--color-primary)] focus:ring-4 focus:ring-[var(--color-primary)]/10"
         required={required}
         {...props}
       >
         {children}
       </select>
-      {helper ? <p className="text-[12px] font-medium text-[var(--color-text-secondary)]">{helper}</p> : null}
-      {error ? <p className="text-[12px] font-medium text-[var(--color-danger)]">{error}</p> : null}
+      {helper ? <p className="text-[11px] font-medium text-[var(--color-text-secondary)]">{helper}</p> : null}
+      {error ? <p className="text-[11px] font-medium text-[var(--color-danger)]">{error}</p> : null}
     </div>
   );
 }
@@ -223,14 +223,14 @@ export function UploadBox({
       type="button"
       className={cn(
         "flex w-full flex-col items-center justify-center rounded-[var(--radius-input)] border border-dashed border-[var(--color-accent)]/45 bg-white text-center transition duration-150 ease-in-out hover:bg-blue-50/40",
-        compact ? "min-h-[104px] p-4" : "min-h-[160px] p-6",
+        compact ? "min-h-[80px] p-3" : "min-h-[120px] p-4",
         className,
       )}
     >
-      <UploadCloud className="h-8 w-8 text-[var(--color-accent)]" />
-      <span className="mt-3 text-[14px] font-semibold text-[var(--color-primary)]">{title}</span>
-      <span className="mt-1 text-[13px] font-normal text-[var(--color-text-secondary)]">{description}</span>
-      {hint ? <span className="mt-2 text-[12px] font-medium text-[var(--color-text)]">{hint}</span> : null}
+      <UploadCloud className="h-6 w-6 text-[var(--color-accent)]" />
+      <span className="mt-2 text-[12px] font-semibold text-[var(--color-primary)]">{title}</span>
+      <span className="mt-0.5 text-[11px] font-normal text-[var(--color-text-secondary)]">{description}</span>
+      {hint ? <span className="mt-1.5 text-[10px] font-medium text-[var(--color-text)]">{hint}</span> : null}
     </button>
   );
 }

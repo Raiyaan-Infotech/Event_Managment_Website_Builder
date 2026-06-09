@@ -183,7 +183,7 @@ export default function FooterPage() {
 
   const form = (
     <div className="space-y-5">
-      <FormSection title="Company Information" divider>
+      <FormSection title="1. Company Information" divider>
         <BuilderCountedInput
           label="Company Name"
           value={companyName}
@@ -207,7 +207,7 @@ export default function FooterPage() {
         />
       </FormSection>
 
-      <FormSection title="Social Links" divider>
+      <FormSection title="7.1 Social Links" divider>
         <ToggleField
           label="Show Social Links"
           checked={showSocialLinks}
@@ -216,7 +216,7 @@ export default function FooterPage() {
         />
       </FormSection>
 
-      <FormSection title="Footer Top List" divider>
+      <FormSection title="7.2 Footer Top List" divider>
         <BuilderCountedInput
           label="Top List Heading"
           value={topListHeading}
@@ -232,7 +232,7 @@ export default function FooterPage() {
         />
       </FormSection>
 
-      <FormSection title="Newsletter" divider>
+      <FormSection title="7.3 Newsletter" divider>
         <label className="flex items-center gap-2 text-[12px] font-black text-[var(--vendor-text)]">
           <input
             type="checkbox"
@@ -244,7 +244,7 @@ export default function FooterPage() {
         </label>
       </FormSection>
 
-      <FormSection title="Contact Info" divider>
+      <FormSection title="7.4 Contact Info" divider>
         <BuilderSegmentedControl<ContactType>
           label="Contact Type"
           value={contactType}
@@ -266,7 +266,7 @@ export default function FooterPage() {
         />
       </FormSection>
 
-      <FormSection title="Footer Bottom">
+      <FormSection title="7.5 Footer Bottom">
         <div className="space-y-3">
           <div className="space-y-1.5">
             <p className="text-[10px] font-black uppercase tracking-wide text-slate-600">Copyright</p>

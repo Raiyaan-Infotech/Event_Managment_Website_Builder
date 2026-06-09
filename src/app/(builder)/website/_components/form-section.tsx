@@ -25,18 +25,18 @@ export function FormSection({
   return (
     <section
       className={cn(
-        "space-y-3",
-        divider && "border-b border-[var(--vendor-border)] pb-5",
+        "space-y-2",
+        divider && "border-b border-[var(--vendor-border)] pb-3",
         className,
       )}
     >
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h2 className="text-[13px] font-black tracking-tight text-[var(--vendor-text)]">
+          <h2 className="text-[11px] font-bold text-[var(--vendor-text)]">
             {title}
           </h2>
           {subtitle ? (
-            <p className="mt-1 text-[12px] font-medium leading-5 text-[var(--vendor-text-muted)]">
+            <p className="mt-0.5 text-[10px] font-medium leading-4 text-[var(--vendor-text-muted)]">
               {subtitle}
             </p>
           ) : null}
@@ -44,7 +44,7 @@ export function FormSection({
         {actions ? <div className="shrink-0">{actions}</div> : null}
       </div>
 
-      <div className={cn("space-y-3", contentClassName)}>{children}</div>
+      <div className={cn("space-y-2", contentClassName)}>{children}</div>
     </section>
   );
 }

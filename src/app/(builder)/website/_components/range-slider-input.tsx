@@ -39,19 +39,19 @@ export function RangeSliderInput({
   } as React.CSSProperties;
 
   return (
-    <div className={cn("space-y-2", className)}>
-      <div className="flex items-center justify-between gap-4">
+    <div className={cn("space-y-1.5", className)}>
+      <div className="flex items-center justify-between gap-2">
         <div>
-          <label className="text-[12px] font-black text-[var(--vendor-text)]">
+          <label className="text-[10px] font-bold text-[var(--vendor-text)]">
             {label}
           </label>
           {description ? (
-            <p className="mt-1 text-[11px] font-medium text-[var(--vendor-text-muted)]">
+            <p className="mt-0.5 text-[10px] font-medium text-[var(--vendor-text-muted)]">
               {description}
             </p>
           ) : null}
         </div>
-        <span className="min-w-12 rounded-[var(--vendor-radius-control)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] px-2 py-1 text-center text-[12px] font-black text-[var(--vendor-text)]">
+        <span className="min-w-10 rounded-[var(--vendor-radius-control)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] px-1.5 py-1 text-center text-[10px] font-bold text-[var(--vendor-text)]">
           {displayValue}
         </span>
       </div>
@@ -64,7 +64,7 @@ export function RangeSliderInput({
         value={value}
         disabled={disabled}
         style={trackStyle}
-        className="range-slider-input h-2 w-full cursor-pointer appearance-none rounded-full disabled:cursor-not-allowed"
+        className="range-slider-input h-1.5 w-full cursor-pointer appearance-none rounded-full disabled:cursor-not-allowed"
         onChange={(e) => onChange(Number(e.target.value))}
       />
     </div>

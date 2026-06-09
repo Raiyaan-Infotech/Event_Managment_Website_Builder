@@ -18,7 +18,7 @@ export function BuilderLabel({ children, required = false, className }: BuilderL
     <label
       className={cn(
         // Mobile: slightly bigger for legibility; md+ stays at 10px
-        "text-[11px] sm:text-[10px] font-black uppercase tracking-wide text-slate-600",
+        "text-[10px] font-semibold text-slate-600",
         className,
       )}
     >
@@ -54,7 +54,7 @@ export function BuilderCountedInput({
   labelClassName,
 }: CountedInputProps) {
   return (
-    <div className={cn("w-full space-y-1.5", className)}>
+    <div className={cn("w-full space-y-1", className)}>
       {label ? (
         <BuilderLabel className={labelClassName} required={required}>
           {label}
@@ -68,11 +68,11 @@ export function BuilderCountedInput({
           onChange={(event) => onChange(event.target.value)}
           className={cn(
             // Taller tap target on mobile, normal on md+
-            "h-10 sm:h-9 w-full pr-14 text-[13px] sm:text-[12px] font-semibold",
+            "h-10 sm:h-9 w-full pr-14 text-[11px] font-medium",
             inputClassName,
           )}
         />
-        <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-500">
+        <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[8px] font-bold text-slate-500">
           {value.length}/{maxLength}
         </span>
       </div>
@@ -104,7 +104,7 @@ export function BuilderCountedTextarea({
   textareaClassName,
 }: CountedTextareaProps) {
   return (
-    <div className={cn("w-full space-y-1.5", className)}>
+    <div className={cn("w-full space-y-1", className)}>
       {label ? <BuilderLabel required={required}>{label}</BuilderLabel> : null}
       <div className="relative w-full">
         <Textarea
@@ -113,11 +113,11 @@ export function BuilderCountedTextarea({
           placeholder={placeholder}
           onChange={(event) => onChange(event.target.value)}
           className={cn(
-            "min-h-[4.5rem] sm:min-h-16 w-full pb-6 text-[13px] sm:text-[12px] font-semibold leading-4",
+            "min-h-[4.5rem] sm:min-h-16 w-full pb-6 text-[11px] font-medium leading-4",
             textareaClassName,
           )}
         />
-        <span className="pointer-events-none absolute bottom-1.5 right-2.5 text-[9px] font-black text-slate-500">
+        <span className="pointer-events-none absolute bottom-1.5 right-2.5 text-[8px] font-bold text-slate-500">
           {value.length}/{maxLength}
         </span>
       </div>
@@ -184,7 +184,7 @@ export function BuilderSegmentedControl<T extends string>({
               className={cn(
                 // Full-width on smallest screens when using wrap layout; auto otherwise
                 "inline-flex h-9 sm:h-8 items-center justify-center rounded-[var(--vendor-radius-control)] border px-4",
-                "text-[12px] sm:text-[11px] font-black transition",
+                "text-[10px] font-bold transition",
                 layout === "wrap" && "min-w-[5.5rem] flex-1 sm:flex-none",
                 layout === "grid" && "w-full",
                 layout === "scroll" && "shrink-0 min-w-[5.5rem]",
@@ -247,7 +247,7 @@ export function BuilderIconOptionGroup<T extends string>({
   columns = "auto",
 }: BuilderIconOptionGroupProps<T>) {
   const gridClass = {
-    auto: "grid grid-cols-[repeat(auto-fill,minmax(64px,1fr))]",
+    auto: "grid grid-cols-[repeat(auto-fill,minmax(52px,1fr))]",
     "2": "grid grid-cols-2",
     "3": "grid grid-cols-2 sm:grid-cols-3",
     "4": "grid grid-cols-2 sm:grid-cols-4",
@@ -267,9 +267,9 @@ export function BuilderIconOptionGroup<T extends string>({
             className={cn(
               // Fluid card: icon centred, label below, equal height via aspect or min-h
               "flex w-full flex-col items-center gap-1.5 rounded-[var(--vendor-radius-control)] border",
-              "px-2 py-3 sm:px-3 sm:py-2.5",
-              "text-[11px] font-semibold transition-colors",
-              "min-h-[3.5rem] sm:min-h-0",
+              "px-1.5 py-1.5",
+              "text-[9px] font-medium transition-colors",
+              "min-h-0",
               // Touch-friendly: slightly larger tap area on mobile
               active
                 ? "border-[var(--vendor-primary-btn)] bg-[var(--vendor-primary-btn)]/8 text-[var(--vendor-primary-btn)]"

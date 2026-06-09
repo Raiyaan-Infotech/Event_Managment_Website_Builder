@@ -23,14 +23,14 @@ export function ToggleField({
   return (
     <div
       className={cn(
-        "flex items-center justify-between gap-4 rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-4",
+        "flex items-center justify-between gap-3 rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-3",
         className,
       )}
     >
       <div className="min-w-0">
-        <p className="text-[12px] font-black text-[var(--vendor-text)]">{label}</p>
+        <p className="text-[11px] font-bold text-[var(--vendor-text)]">{label}</p>
         {description ? (
-          <p className="mt-1 text-[12px] font-medium leading-5 text-[var(--vendor-text-muted)]">
+          <p className="mt-0.5 text-[10px] font-medium leading-4 text-[var(--vendor-text-muted)]">
             {description}
           </p>
         ) : null}

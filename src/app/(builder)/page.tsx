@@ -71,17 +71,17 @@ function SetupProgress() {
         <p className="text-[28px] font-bold leading-8 tracking-[-0.04em] text-[var(--color-primary)]">85%</p>
       </div>
 
-      <div className="mt-3.5 h-2 rounded-full bg-blue-50">
+      <div className="mt-3.5 h-2 rounded-full bg-slate-100">
         <div className="h-full w-[85%] rounded-full bg-[var(--color-primary)]" />
       </div>
 
-      <div className="mt-4 grid grid-cols-7 gap-2">
+      <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-7">
         {steps.map(([label, status], index) => {
           const done = status === "Completed";
           return (
-            <div key={label} className="relative text-center">
+            <div key={label} className="relative rounded-[var(--radius-input)] bg-slate-50 px-2 py-2 text-center lg:bg-transparent lg:px-0">
               {index < steps.length - 1 ? (
-                <div className="absolute left-1/2 top-[18px] h-px w-full border-t border-dashed border-blue-200" />
+                <div className="absolute left-1/2 top-[18px] hidden h-px w-full border-t border-dashed border-blue-200 lg:block" />
               ) : null}
               <div
                 className={`relative mx-auto flex h-9 w-9 items-center justify-center rounded-full ${
@@ -113,15 +113,15 @@ function AnalyticsChart() {
       contentClassName="p-4"
     >
       <div className="grid items-center gap-5 lg:grid-cols-[280px_minmax(0,1fr)]">
-        <div className="grid h-[210px] grid-cols-2 gap-3">
+        <div className="grid gap-2 sm:grid-cols-2 lg:h-[210px]">
           {metricCards.map(([label, value, growth, Icon, tone]) => (
-            <Card key={label} className="flex h-full items-center p-3.5">
+            <Card key={label} className="flex min-h-[96px] items-center p-3.5">
               <div className="flex items-center gap-3">
                 <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-input)] ${toneClasses[tone]}`}>
                   <Icon className="h-5 w-5" />
                 </span>
                 <span className="min-w-0">
-                  <p className="text-[12px] font-medium leading-4 text-[var(--color-text-secondary)]">{label}</p>
+                  <p className="text-[11px] font-medium leading-4 text-[var(--color-text-secondary)]">{label}</p>
                   <p className="mt-0.5 text-[17px] font-bold leading-5 tracking-[-0.02em]">{value}</p>
                   <p className="text-[12px] font-medium text-[var(--color-success)]">up {growth}</p>
                 </span>
@@ -130,7 +130,7 @@ function AnalyticsChart() {
           ))}
         </div>
 
-        <div className="min-w-0 rounded-[var(--radius-card)] bg-gradient-to-b from-blue-50 to-purple-50 p-4">
+        <div className="min-w-0 rounded-[var(--radius-card)] border border-[var(--color-border)] bg-white p-4">
           <div className="grid h-[210px] grid-cols-[40px_minmax(0,1fr)] grid-rows-[1fr_24px]">
             <div className="flex flex-col justify-between pb-6 pr-3 text-right text-[12px] font-medium text-[var(--color-text-secondary)]">
               {yAxisLabels.map((label) => <span key={label}>{label}</span>)}
@@ -142,9 +142,9 @@ function AnalyticsChart() {
                     <stop offset="0%" stopColor="#2563EB" stopOpacity="0.24" />
                     <stop offset="100%" stopColor="#2563EB" stopOpacity="0.03" />
                   </linearGradient>
-                  <linearGradient id="areaPurple" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0%" stopColor="#7C3AED" stopOpacity="0.2" />
-                    <stop offset="100%" stopColor="#7C3AED" stopOpacity="0.03" />
+                  <linearGradient id="areaTeal" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stopColor="#0F9F8F" stopOpacity="0.18" />
+                    <stop offset="100%" stopColor="#0F9F8F" stopOpacity="0.03" />
                   </linearGradient>
                 </defs>
                 {[16, 64, 112, 160, 208].map((y) => (
@@ -152,8 +152,8 @@ function AnalyticsChart() {
                 ))}
                 <path d="M0 165 C58 148 80 95 128 90 C174 85 176 165 228 151 C280 136 276 90 326 96 C378 102 368 54 424 72 C478 92 470 130 530 110 C584 90 594 16 680 42" fill="none" stroke="#2563EB" strokeWidth="3" vectorEffect="non-scaling-stroke" />
                 <path d="M0 165 C58 148 80 95 128 90 C174 85 176 165 228 151 C280 136 276 90 326 96 C378 102 368 54 424 72 C478 92 470 130 530 110 C584 90 594 16 680 42 L680 220 L0 220 Z" fill="url(#areaBlue)" />
-                <path d="M0 198 C58 178 82 138 128 140 C178 142 180 176 230 158 C282 140 280 126 332 122 C384 118 378 98 430 114 C482 130 474 144 532 132 C586 118 596 86 680 94" fill="none" stroke="#7C3AED" strokeWidth="2.5" vectorEffect="non-scaling-stroke" />
-                <path d="M0 198 C58 178 82 138 128 140 C178 142 180 176 230 158 C282 140 280 126 332 122 C384 118 378 98 430 114 C482 130 474 144 532 132 C586 118 596 86 680 94 L680 220 L0 220 Z" fill="url(#areaPurple)" />
+                <path d="M0 198 C58 178 82 138 128 140 C178 142 180 176 230 158 C282 140 280 126 332 122 C384 118 378 98 430 114 C482 130 474 144 532 132 C586 118 596 86 680 94" fill="none" stroke="#0F9F8F" strokeWidth="2.5" vectorEffect="non-scaling-stroke" />
+                <path d="M0 198 C58 178 82 138 128 140 C178 142 180 176 230 158 C282 140 280 126 332 122 C384 118 378 98 430 114 C482 130 474 144 532 132 C586 118 596 86 680 94 L680 220 L0 220 Z" fill="url(#areaTeal)" />
               </svg>
             </div>
             <div />
@@ -189,7 +189,7 @@ function StatusPanel() {
         </button>
       </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-4 border-t border-[var(--color-border)] pt-4">
+        <div className="mt-4 grid grid-cols-1 gap-3 border-t border-[var(--color-border)] pt-4 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
         {[
           ["Visitors Today", "124"],
           ["Leads Generated", "12"],
@@ -242,12 +242,12 @@ function RecentActivity() {
     <SectionCard title="Recent Activity" contentClassName="p-4">
       <div className="divide-y divide-[var(--color-border)]">
         {activities.map(([title, desc, time, Icon, tone]) => (
-          <div key={title} className="flex items-center justify-between py-2.5">
-            <div className="flex items-center gap-3">
+          <div key={title} className="flex flex-col gap-2 py-2.5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex min-w-0 items-center gap-3">
               <span className={`flex h-9 w-9 items-center justify-center rounded-full ${toneClasses[tone]}`}>
                 <Icon className="h-5 w-5" />
               </span>
-              <div>
+              <div className="min-w-0">
                 <p className="text-[14px] font-semibold leading-5 tracking-[-0.01em]">{title}</p>
                 <p className="text-[12px] font-normal leading-4 text-[var(--color-text-secondary)]">{desc}</p>
               </div>
@@ -286,7 +286,7 @@ export default function DashboardPage() {
   return (
       <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_320px]">
         <div className="space-y-3">
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <StatCard title="Total Bookings" value="48" growth="18%" icon={Calendar} />
             <StatCard title="Leads" value="126" growth="22%" icon={Users} tone="purple" />
             <StatCard title="Customers" value="89" growth="15%" icon={Users} tone="teal" />

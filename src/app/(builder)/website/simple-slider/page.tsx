@@ -25,6 +25,7 @@ import {
 import {
   ChevronLeft,
   ChevronRight,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { FormActions } from "../_components/form-actions";
@@ -192,41 +193,41 @@ export default function SimpleSliderPage() {
 
   // ── Left form ──────────────────────────────────────────────────────────────
   const form = (
-    <div className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] shadow-sm">
-      {/* Slider Title */}
-      <div className="border-b border-[var(--vendor-border)] p-4">
-        {/* <p className="mb-1.5 text-[12px] font-semibold uppercase tracking-wide text-slate-500">
-          Slider Title
+    <div className="space-y-2">
+      {/* Header */}
+      <div>
+        <h2 className="text-[13px] font-black text-[var(--vendor-text)]">Slide Settings</h2>
+        <p className="mt-0.5 text-[11px] text-[var(--vendor-text-muted)]">
+          Add and edit slide information for the homepage slider.
         </p>
-        <Input
-          value={sliderTitle}
-          onChange={(e) => setSliderTitle(e.target.value)}
-          className="h-9 text-[13px] font-semibold"
-        /> */}
+      </div>
+
+      {/* Slider Title & Slide Title side-by-side */}
+      <div className="grid grid-cols-2 gap-3">
         <BuilderCountedInput
           label="Slider Title"
           value={sliderTitle}
           onChange={(v) => setSliderTitle(v)}
           maxLength={100}
-          labelClassName=" text-[12px] font-semibold uppercase tracking-wide text-slate-500"
         />
-      </div>
-
-      {/* Slide fields */}
-      <div className="space-y-4 p-4">
         <BuilderCountedInput
           label="Slide Title"
           value={editing.title}
           onChange={(v) => updateEditing({ title: v })}
           maxLength={100}
         />
-        <BuilderCountedTextarea
-          label="Slide Description"
-          value={editing.description}
-          onChange={(v) => updateEditing({ description: v })}
-          maxLength={200}
-          textareaClassName="min-h-[90px]"
-        />
+      </div>
+
+      {/* Slide Description */}
+      <BuilderCountedTextarea
+        label="Slide Description"
+        value={editing.description}
+        onChange={(v) => updateEditing({ description: v })}
+        maxLength={200}
+      />
+
+      {/* Button Label & Page */}
+      <div className="grid grid-cols-2 gap-3">
         <BuilderCountedInput
           label="Button Label"
           value={editing.buttonLabel}
@@ -234,16 +235,15 @@ export default function SimpleSliderPage() {
           maxLength={30}
         />
 
-        {/* Button Page */}
-        <div>
-          <p className="mb-1.5 text-[12px] font-semibold text-slate-700">
+        <div className="space-y-1">
+          <p className="text-[10px] font-semibold text-[var(--vendor-text)]">
             Button Page
           </p>
           <Select
             value={editing.buttonPage}
             onValueChange={(v) => updateEditing({ buttonPage: v })}
           >
-            <SelectTrigger className="h-9 w-full text-[13px] font-semibold">
+            <SelectTrigger className="h-9 w-full text-[11px] px-2 font-semibold">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -256,10 +256,12 @@ export default function SimpleSliderPage() {
             </SelectContent>
           </Select>
         </div>
+      </div>
 
-        {/* Button Color */}
-        <div>
-          <p className="mb-1.5 text-[12px] font-semibold text-slate-700">
+      {/* Button Color & Status */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-1">
+          <p className="text-[10px] font-semibold text-[var(--vendor-text)]">
             Button Color
           </p>
           <ColorPickerInput
@@ -268,24 +270,49 @@ export default function SimpleSliderPage() {
           />
         </div>
 
-        {/* Slide Image */}
-        <ImageUpload
-          label="Slide Image"
-          hint="Recommended: 1920x800px (Max: 2MB)"
-        />
-
-        {/* Status */}
         <ToggleField
           label="Status"
-          description="Enable or disable this slide."
+          description="Enable/disable slide"
           checked={editing.status}
           onCheckedChange={(v) => updateEditing({ status: v })}
-          className="border-0 bg-transparent p-0"
+          className="border-0 bg-transparent p-0 flex items-center justify-between h-9 mt-4"
         />
       </div>
 
+      {/* Slide Image - side-by-side uploader and preview */}
+      <div className="space-y-1">
+        <p className="text-[10px] font-semibold text-[var(--vendor-text)]">Slide Image</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="relative h-[74px] w-[92px] overflow-hidden rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-slate-100 flex items-center justify-center">
+            {editing.imageUrl ? (
+              <>
+                <img src={editing.imageUrl} alt="Slide preview" className="h-full w-full object-cover" />
+                <button
+                  type="button"
+                  onClick={() => updateEditing({ imageUrl: "" })}
+                  className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-slate-900/80 text-white hover:bg-rose-500"
+                >
+                  <X className="h-2.5 w-2.5" />
+                </button>
+              </>
+            ) : (
+              <span className="text-[9px] text-slate-400 font-semibold">No Image</span>
+            )}
+          </div>
+          <ImageUpload
+            compact
+            size="sm"
+            onFileSelect={(file) => {
+              const url = URL.createObjectURL(file);
+              updateEditing({ imageUrl: url });
+            }}
+            onRemove={() => updateEditing({ imageUrl: "" })}
+          />
+        </div>
+      </div>
+
       {/* Footer actions */}
-      <div className="border-t border-[var(--vendor-border)] p-4">
+      <div className="pt-2">
         <FormActions
           saveLabel="Update Slide"
           onCancel={() => setEditingIndex(0)}

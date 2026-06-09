@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { OutlineButton, PrimaryButton } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -185,7 +186,7 @@ function HeaderPreview({
                     {item}
                   </span>
                 ))}
-                <Button className="h-11 px-5">Book Now</Button>
+                <PrimaryButton className="h-11 px-5">Book Now</PrimaryButton>
               </div>
             )}
           </div>
@@ -207,13 +208,12 @@ function HeaderPreview({
                   We create beautiful, memorable and perfect events that stay with you forever.
                 </p>
                 <div className="mt-8 flex flex-wrap gap-4">
-                  <Button className="h-11 px-7">Book Consultation</Button>
-                  <Button
-                    variant="outline"
+                  <PrimaryButton className="h-11 px-7">Book Consultation</PrimaryButton>
+                  <OutlineButton
                     className="h-11 border-white/50 bg-transparent px-7 text-white hover:bg-white/10"
                   >
                     Explore Events
-                  </Button>
+                  </OutlineButton>
                 </div>
               </div>
             </div>
@@ -245,7 +245,7 @@ function HeaderPreview({
               <p className="mt-4 text-sm font-medium leading-7 text-slate-600">
                 {companyName} is a premier event planning company located in {city}. {address}
               </p>
-              <Button className="mt-6">Learn More</Button>
+              <PrimaryButton className="mt-6">Learn  More</PrimaryButton>
             </div>
             <div className="min-h-48 rounded-[var(--vendor-radius-panel)] bg-[radial-gradient(circle_at_40%_20%,rgba(255,255,255,0.28),transparent_24%),linear-gradient(135deg,#3a1522,#a84455_48%,#1d1018)]" />
           </section>
@@ -279,13 +279,21 @@ export default function WebsiteHeaderPage() {
   };
 
   const form = (
-    <div className="space-y-4">
+    <div className="space-y-2">
+      {/* Page Title to match mockup design */}
+      <div className="mb-0.5 px-1">
+        <h1 className="text-[14px] font-black leading-tight text-[var(--vendor-text)]">
+          Basic Information
+        </h1>
+        <p className="mt-0.5 text-[9px] font-medium text-[var(--vendor-text-muted)]">
+          Manage your website basic information
+        </p>
+      </div>
 
       {/* ── Header Information ──────────────────────────────────────────────── */}
       <FormSection
         title="Header Information"
-        subtitle="Manage the main website header details shown in your public website."
-        className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-4 shadow-sm"
+        className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-2 shadow-sm"
       >
         {/*
           3-col layout: [CompanyName] [Logo] [City]
@@ -297,7 +305,7 @@ export default function WebsiteHeaderPage() {
           layout only activates at lg (1024px), so at sm the form still fills the full
           content area which is wide enough for 3 columns.
         */}
-        <div className="grid items-start gap-4 sm:grid-cols-[1fr_auto_1fr]">
+        <div className="grid items-start gap-2 sm:grid-cols-[1fr_auto_1fr]">
           <BuilderCountedInput
             label="Company Name"
             required
@@ -324,7 +332,7 @@ export default function WebsiteHeaderPage() {
       {/* ── Contact Information ─────────────────────────────────────────────── */}
       <FormSection
         title="Contact Information"
-        className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-4 shadow-sm"
+        className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-2 shadow-sm"
       >
         <BuilderSegmentedControl
           label="Type"
@@ -342,7 +350,7 @@ export default function WebsiteHeaderPage() {
           On mobile: Mobile + Email sit side-by-side (sm:grid-cols-2),
           Address spans both. At md+ all three are in one row.
         */}
-        <div className="grid items-start gap-4 sm:grid-cols-2 md:grid-cols-3">
+        <div className="grid items-start gap-2 sm:grid-cols-2 md:grid-cols-3">
           <BuilderCountedInput
             label="Mobile"
             required
@@ -358,13 +366,12 @@ export default function WebsiteHeaderPage() {
             maxLength={100}
           />
           <div className="sm:col-span-2 md:col-span-1">
-            <BuilderCountedTextarea
+            <BuilderCountedInput
               label="Address"
               required
               value={address}
               onChange={setAddress}
               maxLength={200}
-              textareaClassName="min-h-[68px]"
             />
           </div>
         </div>
@@ -373,19 +380,18 @@ export default function WebsiteHeaderPage() {
       {/* ── Social Links ────────────────────────────────────────────────────── */}
       <FormSection
         title="Social Links"
-        subtitle="These links appear in the header top bar and public website navigation."
-        className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-4 shadow-sm"
+        className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-2 shadow-sm"
       >
         {/* overflow-x-auto keeps the table scrollable inside the panel on narrow screens */}
         <div className="overflow-x-auto rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)]">
           <Table className="min-w-[600px]">
             <TableHeader>
               <TableRow>
-                <TableHead className="h-9 text-[11px]">Icon</TableHead>
-                <TableHead className="h-9 text-[11px]">Icon Color</TableHead>
-                <TableHead className="h-9 text-[11px]">Label</TableHead>
-                <TableHead className="h-9 text-[11px]">URL</TableHead>
-                <TableHead className="h-9 text-right text-[11px]">Action</TableHead>
+                <TableHead className="h-8 text-[9px] px-2.5">Icon</TableHead>
+                <TableHead className="h-8 text-[9px] px-2.5">Icon Color</TableHead>
+                <TableHead className="h-8 text-[9px] px-2.5">Label</TableHead>
+                <TableHead className="h-8 text-[9px] px-2.5">URL</TableHead>
+                <TableHead className="h-8 text-right text-[9px] px-2.5">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -393,48 +399,49 @@ export default function WebsiteHeaderPage() {
                 const Icon = item.icon;
                 return (
                   <TableRow key={item.id}>
-                    <TableCell className="py-1.5">
+                    <TableCell className="py-0.5 px-2">
                       <span
-                        className="flex h-8 w-8 items-center justify-center rounded-[var(--vendor-radius-control)] text-white"
+                        className="flex h-7 w-7 items-center justify-center rounded-[var(--vendor-radius-control)] text-white"
                         style={{ backgroundColor: item.color }}
                       >
-                        <Icon className="h-4 w-4" />
+                        <Icon className="h-3.5 w-3.5" />
                       </span>
                     </TableCell>
-                    <TableCell className="py-1.5">
+                    <TableCell className="py-0.5 px-2">
                       <ColorPickerInput
                         value={item.color}
                         onChange={(color) => updateSocialLink(item.id, { color })}
-                        className="min-w-[8rem]"
+                        className="min-w-[7rem]"
+                        compact
                       />
                     </TableCell>
-                    <TableCell className="py-1.5">
+                    <TableCell className="py-0.5 px-2">
                       <Input
                         value={item.label}
-                        className="h-8 min-w-[6rem] text-[12px] font-semibold"
+                        className="h-7 min-w-[6rem] text-[10px] font-semibold px-2"
                         onChange={(event) =>
                           updateSocialLink(item.id, { label: event.target.value })
                         }
                       />
                     </TableCell>
-                    <TableCell className="py-1.5">
+                    <TableCell className="py-0.5 px-2">
                       <Input
                         value={item.url}
-                        className="h-8 min-w-[12rem] text-[12px] font-semibold"
+                        className="h-7 min-w-[12rem] text-[10px] font-semibold px-2"
                         onChange={(event) =>
                           updateSocialLink(item.id, { url: event.target.value })
                         }
                       />
                     </TableCell>
-                    <TableCell className="py-1.5 text-right">
-                      <div className="inline-flex gap-2">
-                        <Button type="button" variant="outline" size="icon-sm">
-                          <Edit2 className="h-4 w-4" />
+                    <TableCell className="py-0.5 px-2 text-right">
+                      <div className="inline-flex gap-1">
+                        <Button type="button" variant="outline" size="icon-xs">
+                          <Edit2 className="h-3.5 w-3.5" />
                         </Button>
                         <Button
                           type="button"
                           variant="outline"
-                          size="icon-sm"
+                          size="icon-xs"
                           className="text-rose-500 hover:text-rose-600"
                           onClick={() =>
                             setSocialLinks((current) =>
@@ -442,7 +449,7 @@ export default function WebsiteHeaderPage() {
                             )
                           }
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-3.5 w-3.5" />
                         </Button>
                       </div>
                     </TableCell>
@@ -453,10 +460,9 @@ export default function WebsiteHeaderPage() {
           </Table>
         </div>
 
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
+        <PrimaryButton
+          size="xs"
+          className="h-7 text-[10px] px-2.5"
           onClick={() =>
             setSocialLinks((current) => [
               ...current,
@@ -471,11 +477,11 @@ export default function WebsiteHeaderPage() {
           }
         >
           Add Social Link
-        </Button>
+        </PrimaryButton>
       </FormSection>
 
-      <div className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-4 shadow-sm">
-        <FormActions layout="end" />
+      <div className="flex justify-center pt-0.5">
+        <FormActions layout="end" className="justify-center" />
       </div>
     </div>
   );
@@ -483,6 +489,7 @@ export default function WebsiteHeaderPage() {
   return (
     <WebsiteBuilderLayout
       title="Header"
+      hideHeader={true}
       form={form}
       preview={
         <HeaderPreview

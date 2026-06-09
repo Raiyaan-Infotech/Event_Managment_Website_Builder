@@ -19,11 +19,11 @@ export function RadioGroup({
   className,
 }: RadioGroupProps) {
   return (
-    <div className={`space-y-3 ${className ?? ""}`}>
+    <div className={`space-y-2.5 ${className ?? ""}`}>
       {options.map((opt) => (
         <label
           key={opt.value}
-          className="flex cursor-pointer items-center gap-3"
+          className="flex cursor-pointer items-center gap-2.5"
           onClick={() => onChange(opt.value)}
         >
           <span
@@ -38,7 +38,7 @@ export function RadioGroup({
             )}
           </span>
           <span
-            className={`text-[13px] font-semibold transition-colors ${
+            className={`text-[11px] font-semibold transition-colors ${
               value === opt.value
                 ? "text-slate-900"
                 : "text-slate-600"

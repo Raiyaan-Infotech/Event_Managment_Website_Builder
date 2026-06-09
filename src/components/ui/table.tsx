@@ -33,14 +33,14 @@ export function TableRow({ className, ...props }: React.HTMLAttributes<HTMLTable
 export function TableHead({ className, ...props }: React.ThHTMLAttributes<HTMLTableCellElement>) {
   return (
     <th
-      className={cn("h-10 px-3 text-[12px] font-semibold text-[var(--color-text-secondary)]", className)}
+      className={cn("h-7 px-2.5 text-[10px] font-semibold text-[var(--color-text-secondary)]", className)}
       {...props}
     />
   );
 }
 
 export function TableCell({ className, ...props }: React.TdHTMLAttributes<HTMLTableCellElement>) {
-  return <td className={cn("px-3 py-3 text-[14px]", className)} {...props} />;
+  return <td className={cn("px-2.5 py-1.5 text-[11px]", className)} {...props} />;
 }
 
 export function TableCaption({ className, ...props }: React.HTMLAttributes<HTMLTableCaptionElement>) {

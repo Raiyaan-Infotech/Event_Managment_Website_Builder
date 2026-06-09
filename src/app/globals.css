@@ -1,30 +1,30 @@
 @import "tailwindcss";
 
 :root {
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-accent: #7c3aed;
-  --color-accent-hover: #6d28d9;
+  --color-primary: #2457d6;
+  --color-primary-hover: #1e46b5;
+  --color-accent: #0f9f8f;
+  --color-accent-hover: #0b8074;
   --color-sidebar: #0f172a;
   --color-sidebar-hover: #1e293b;
   --color-success: #22c55e;
   --color-warning: #f59e0b;
   --color-danger: #ef4444;
-  --color-info: #06b6d4;
-  --color-background: #f8fafc;
+  --color-info: #0891b2;
+  --color-background: #f6f8fb;
   --color-card: #ffffff;
   --color-border: #e2e8f0;
   --color-text: #0f172a;
   --color-text-secondary: #64748b;
   --color-text-muted: #94a3b8;
-  --radius-card: 20px;
-  --radius-input: 10px;
-  --radius-button: 12px;
-  --radius-sidebar-item: 10px;
+  --radius-card: 8px;
+  --radius-input: 7px;
+  --radius-button: 7px;
+  --radius-sidebar-item: 7px;
   --radius-badge: 999px;
-  --button-height: 44px;
+  --button-height: 36px;
   --button-radius: var(--radius-button);
-  --button-text-size: 14px;
+  --button-text-size: 13px;
   --button-primary-bg: var(--color-primary);
   --button-primary-hover: var(--color-primary-hover);
   --button-primary-text: #ffffff;
@@ -32,13 +32,13 @@
   --button-outline-border: var(--color-border);
   --button-outline-text: var(--color-primary);
   --button-outline-hover-bg: #f8fafc;
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08);
-  --shadow-card-hover: 0 10px 25px rgba(0, 0, 0, 0.08);
-  --sidebar-width: 220px;
-  --header-height: 64px;
-  --content-padding: 14px;
+  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.06);
+  --shadow-card-hover: 0 12px 24px rgb(15 23 42 / 0.08);
+  --sidebar-width: 200px;
+  --header-height: 52px;
+  --content-padding: 10px;
   --content-max-width: 1200px;
-  --layout-gap: 16px;
+  --layout-gap: 12px;
   --vendor-page-bg: hsl(225 15% 96%);
   --vendor-panel-bg: hsl(0 0% 100%);
   --vendor-border: hsl(214.3 32% 91%);
@@ -82,17 +82,22 @@
   box-sizing: border-box;
 }
 
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
 html {
-  min-height: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
 body {
-  min-height: 100%;
   margin: 0;
-  background: var(--color-background);
+  background:
+    linear-gradient(180deg, #eef3ff 0, rgba(238, 243, 255, 0) 220px),
+    var(--color-background);
   color: var(--color-text);
   font-family: var(--font-inter), Inter, system-ui, sans-serif;
 }
@@ -106,4 +111,141 @@ textarea {
 
 button {
   cursor: pointer;
+}
+
+/* Premium thin scrollbar styles */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Firefox scrollbar styling */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+/* Centralized Compact Spacing & Typography for Builder Input/Settings Panels */
+
+/* Centralized Compact Spacing & Typography for Builder Input/Settings Panels */
+
+/* 1. Spacing & Gaps (Tighten vertical spacing and margins aggressively) */
+.website-builder-form-panel,
+.website-builder-sidebar-panel {
+  padding: 4px !important;
+}
+
+.website-builder-form-panel > div,
+.website-builder-sidebar-panel > div {
+  padding: 4px !important;
+  /* Hide scrollbars completely to eliminate visual layout gaps, keeping them scrollable via wheel/swipe */
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE and Edge */
+}
+
+.website-builder-form-panel > div::-webkit-scrollbar,
+.website-builder-sidebar-panel > div::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari, and Opera */
+}
+
+/* Force sibling elements to stack tightly */
+.website-builder-form-panel :not(span):not(td):not(th) + :not(span):not(td):not(th),
+.website-builder-sidebar-panel :not(span):not(td):not(th) + :not(span):not(td):not(th) {
+  margin-top: 4px !important; /* Compresses gap between vertically stacked elements to 4px */
+}
+
+/* Close gap between labels and inputs specifically */
+.website-builder-form-panel label + div,
+.website-builder-sidebar-panel label + div,
+.website-builder-form-panel label + input,
+.website-builder-sidebar-panel label + input {
+  margin-top: 2px !important;
+}
+
+/* Grid gap overrides */
+.website-builder-form-panel :is(.gap-3, .gap-4),
+.website-builder-sidebar-panel :is(.gap-3, .gap-4) {
+  gap: 6px !important;
+}
+
+.website-builder-form-panel .gap-2,
+.website-builder-sidebar-panel .gap-2 {
+  gap: 4px !important;
+}
+
+/* 2. Container Padding (Tighten paddings inside panels and cards) */
+.website-builder-form-panel section,
+.website-builder-sidebar-panel section {
+  padding: 6px 8px !important; /* Compact card padding: 6px top/bottom, 8px left/right */
+  margin-top: 4px !important; /* 4px margin between cards */
+  margin-bottom: 0px !important;
+}
+
+/* 3. Input Element Heights (Restores inputs to a neat, compact h-8 height) */
+.website-builder-form-panel input:not([type="file"]):not([type="checkbox"]):not([type="radio"]),
+.website-builder-sidebar-panel input:not([type="file"]):not([type="checkbox"]):not([type="radio"]),
+.website-builder-form-panel select,
+.website-builder-sidebar-panel select {
+  height: 2rem !important; /* h-8 = 32px height for comfortable yet compact typing */
+  padding-left: 0.5rem !important;
+  padding-right: 0.5rem !important;
+}
+
+.website-builder-form-panel textarea,
+.website-builder-sidebar-panel textarea {
+  min-height: 3.5rem !important; /* Compact textarea min-height */
+}
+
+/* 4. Table padding overrides */
+.website-builder-form-panel table th,
+.website-builder-form-panel table td {
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+  padding-left: 6px !important;
+  padding-right: 6px !important;
+}
+
+/* 5. Typography (Reduces font sizes globally, keeps layout compact) */
+.website-builder-form-panel label,
+.website-builder-sidebar-panel label {
+  font-size: 9px !important; /* Smaller labels */
+  font-weight: 600 !important;
+}
+
+.website-builder-form-panel input,
+.website-builder-sidebar-panel input,
+.website-builder-form-panel select,
+.website-builder-sidebar-panel select,
+.website-builder-form-panel textarea,
+.website-builder-sidebar-panel textarea {
+  font-size: 10px !important; /* Compact text inside controls */
+}
+
+.website-builder-form-panel :is(h1, h2),
+.website-builder-sidebar-panel :is(h1, h2) {
+  font-size: 11px !important; /* Compact titles */
+  font-weight: 800 !important;
+}
+
+.website-builder-form-panel p,
+.website-builder-sidebar-panel p {
+  font-size: 9px !important; /* Compact description/caption texts */
+}
+
+.website-builder-form-panel button,
+.website-builder-sidebar-panel button {
+  font-size: 10px !important; /* Compact button text */
 }

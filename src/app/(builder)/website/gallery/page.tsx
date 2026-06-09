@@ -119,15 +119,16 @@ export default function GalleryPage() {
   };
 
   const form = (
-    <div className="rounded-[var(--vendor-radius-panel)] bg-[var(--vendor-panel-bg)]">
-      <div className="border-b border-[var(--vendor-border)] px-5 py-4">
-        <h2 className="text-[16px] font-black text-[var(--vendor-text)]">Gallery Information</h2>
-        <p className="mt-0.5 text-[12px] font-medium text-[var(--vendor-text-muted)]">
+    <div className="space-y-3">
+      {/* Header */}
+      <div>
+        <h2 className="text-[13px] font-black text-[var(--vendor-text)]">Gallery Information</h2>
+        <p className="mt-0.5 text-[11px] text-[var(--vendor-text-muted)]">
           Add details about the event gallery.
         </p>
       </div>
 
-      <div className="space-y-5 p-5">
+      <div className="grid grid-cols-2 gap-3">
         <BuilderCountedInput
           label="Event Name"
           value={eventName}
@@ -140,23 +141,25 @@ export default function GalleryPage() {
           onChange={setEventType}
           maxLength={100}
         />
-        <BuilderCountedInput
-          label="City"
-          value={city}
-          onChange={setCity}
-          maxLength={100}
-        />
-        <MultiImageUpload
-          label="Gallery Images"
-          items={galleryImages}
-          onAdd={addImages}
-          onRemove={removeImage}
-          maxItems={20}
-          tileSize={92}
-        />
       </div>
 
-      <div className="flex gap-3 border-t border-[var(--vendor-border)] p-5">
+      <BuilderCountedInput
+        label="City"
+        value={city}
+        onChange={setCity}
+        maxLength={100}
+      />
+
+      <MultiImageUpload
+        label="Gallery Images"
+        items={galleryImages}
+        onAdd={addImages}
+        onRemove={removeImage}
+        maxItems={20}
+        tileSize={74}
+      />
+
+      <div className="flex gap-3 border-t border-[var(--vendor-border)] pt-3">
         <PrimaryButton type="button" className="flex-1">
           Save Gallery
         </PrimaryButton>

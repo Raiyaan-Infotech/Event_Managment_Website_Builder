@@ -10,6 +10,7 @@ interface ColorPickerInputProps {
   label?: string;
   disabled?: boolean;
   className?: string;
+  compact?: boolean;
 }
 
 const HEX_COLOR_PATTERN = /^#[0-9A-Fa-f]{6}$/;
@@ -20,17 +21,26 @@ export function ColorPickerInput({
   label,
   disabled = false,
   className,
+  compact = false,
 }: ColorPickerInputProps) {
   const colorValue = HEX_COLOR_PATTERN.test(value) ? value : "#000000";
 
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className={cn(compact ? "space-y-0.5" : "space-y-2", className)}>
       {label ? (
-        <label className="text-[12px] font-black text-[var(--vendor-text)]">{label}</label>
+        <label className={cn(compact ? "text-[10px]" : "text-[12px]", "font-black text-[var(--vendor-text)]")}>
+          {label}
+        </label>
       ) : null}
-      <div className="flex h-10 items-center gap-2 rounded-[var(--vendor-radius-control)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] px-2 shadow-xs">
+      <div className={cn(
+        "flex items-center gap-2 rounded-[var(--vendor-radius-control)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] shadow-xs",
+        compact ? "h-9 px-1.5" : "h-10 px-2"
+      )}>
         <label
-          className="relative h-6 w-6 shrink-0 cursor-pointer overflow-hidden rounded border border-[var(--vendor-border)]"
+          className={cn(
+            "relative shrink-0 cursor-pointer overflow-hidden rounded border border-[var(--vendor-border)]",
+            compact ? "h-5 w-5" : "h-6 w-6"
+          )}
           style={{ backgroundColor: colorValue }}
           aria-label={label ? `Choose ${label}` : "Choose color"}
         >
@@ -46,7 +56,7 @@ export function ColorPickerInput({
           value={value}
           disabled={disabled}
           maxLength={7}
-          className="h-8 border-0 bg-transparent px-1 font-bold uppercase shadow-none focus-visible:ring-0"
+          className="h-full border-0 bg-transparent px-1 font-bold uppercase shadow-none focus-visible:ring-0 text-[10px]"
           onChange={(event) => onChange(event.target.value.toUpperCase())}
           placeholder="#6C47FF"
         />

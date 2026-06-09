@@ -374,70 +374,73 @@ export default function TestimonialsPage() {
   };
 
   const form = (
-    <div className="rounded-[var(--vendor-radius-panel)] bg-[var(--vendor-panel-bg)]">
-      <div className="border-b border-[var(--vendor-border)] px-5 py-4">
-        <h2 className="text-[16px] font-black text-[var(--vendor-text)]">Testimonial Information</h2>
-        <p className="mt-0.5 text-[12px] font-medium text-[var(--vendor-text-muted)]">
+    <div className="space-y-3">
+      {/* Header */}
+      <div>
+        <h2 className="text-[13px] font-black text-[var(--vendor-text)]">Testimonial Information</h2>
+        <p className="mt-0.5 text-[11px] text-[var(--vendor-text-muted)]">
           Add customer testimonial and feedback.
         </p>
       </div>
 
-      <div className="space-y-5 p-5">
+      <div className="grid grid-cols-2 gap-3">
         <BuilderCountedInput
           label="Customer Name"
           value={editing.customerName}
           onChange={(value) => updateEditing({ customerName: value })}
           maxLength={100}
         />
-
-        <div className="space-y-2">
-          <p className="text-[12px] font-semibold text-[var(--vendor-text)]">Customer Photo</p>
-          <div className="flex items-start gap-4">
-            <img
-              src={editing.photoUrl}
-              alt={editing.customerName}
-              className="h-[112px] w-[112px] rounded-[var(--vendor-radius-panel)] object-cover"
-            />
-            <ImageUpload
-              key={`${editing.id}-${editing.photoUrl}`}
-              value={null}
-              title="Click to upload"
-              browseText="or drag and drop"
-              hint="JPG, PNG up to 2MB"
-              recommendedSize=""
-              size="md"
-              onFileSelect={handlePhotoSelect}
-            />
-          </div>
-        </div>
-
         <BuilderCountedInput
           label="Event Name"
           value={editing.eventName}
           onChange={(value) => updateEditing({ eventName: value })}
           maxLength={100}
         />
-
-        <WebsiteRichTextEditor
-          label="Feedback"
-          value={editing.feedback}
-          onChange={(value) => updateEditing({ feedback: value })}
-          height="150px"
-          showWordCount={false}
-          showCharCount
-          maxChars={1000}
-        />
-
-        <ToggleField
-          label="Show/Hide Testimonial"
-          description="Choose whether to show this testimonial on the website."
-          checked={editing.status}
-          onCheckedChange={(status) => updateEditing({ status })}
-          className="border-0 bg-transparent p-0"
-        />
       </div>
 
-      <div className="border-t border-[var(--vendor-border)] p-5">
+      {/* Customer Photo - Side-by-side & Compact */}
+      <div className="space-y-1">
+        <p className="text-[10px] font-semibold text-[var(--vendor-text)]">Customer Photo</p>
+        <div className="flex items-center gap-3">
+          <img
+            src={editing.photoUrl}
+            alt={editing.customerName}
+            className="h-[64px] w-[64px] rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] object-cover"
+          />
+          <ImageUpload
+            key={`${editing.id}-${editing.photoUrl}`}
+            value={null}
+            title="Click to upload"
+            browseText=""
+            hint="JPG, PNG"
+            recommendedSize=""
+            size="sm"
+            onFileSelect={handlePhotoSelect}
+            className="space-y-0 h-[64px]"
+            dropzoneClassName="h-[64px] p-1 w-[92px]"
+          />
+        </div>
+      </div>
+
+      <WebsiteRichTextEditor
+        label="Feedback"
+        value={editing.feedback}
+        onChange={(value) => updateEditing({ feedback: value })}
+        height="80px"
+        showWordCount={false}
+        showCharCount
+        maxChars={1000}
+      />
+
+      <ToggleField
+        label="Show/Hide Testimonial"
+        description="Show testimonial on website"
+        checked={editing.status}
+        onCheckedChange={(status) => updateEditing({ status })}
+        className="border-0 bg-transparent p-0 flex items-center justify-between h-8"
+      />
+
+      <div className="border-t border-[var(--vendor-border)] pt-3">
         <FormActions
           saveLabel="Update Testimonial"
           onCancel={() => setEditingId(initialTestimonials[0].id)}

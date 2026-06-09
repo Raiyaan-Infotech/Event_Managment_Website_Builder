@@ -20,18 +20,18 @@ const tones = {
 
 export function StatCard({ title, value, growth, icon: Icon, tone = "blue" }: StatCardProps) {
   return (
-    <Card className="flex h-[96px] items-center gap-3.5 p-4 transition duration-150 ease-in-out hover:shadow-[var(--shadow-card-hover)]">
-      <div className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-input)]", tones[tone])}>
-        <Icon className="h-5 w-5" strokeWidth={2} />
+    <Card className="flex h-[76px] items-center gap-2.5 px-3 py-2 transition duration-150 ease-in-out hover:shadow-[var(--shadow-card-hover)]">
+      <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-input)]", tones[tone])}>
+        <Icon className="h-4 w-4" strokeWidth={2} />
       </div>
       <div className="min-w-0">
-        <p className="truncate text-[14px] font-medium leading-5 tracking-[-0.01em] text-[var(--color-text-secondary)]">
+        <p className="truncate text-[11px] font-medium leading-4 tracking-[-0.01em] text-[var(--color-text-secondary)]">
           {title}
         </p>
-        <p className="mt-0.5 text-[24px] font-bold leading-7 tracking-[-0.03em] text-[var(--color-text)]">
+        <p className="mt-0.5 text-[18px] font-bold leading-6 tracking-[-0.03em] text-[var(--color-text)]">
           {value}
         </p>
-        <p className="mt-0.5 text-[12px] font-medium leading-4 text-[var(--color-success)]">
+        <p className="mt-0.5 text-[10px] font-medium leading-3 text-[var(--color-success)]">
           up {growth} this month
         </p>
       </div>

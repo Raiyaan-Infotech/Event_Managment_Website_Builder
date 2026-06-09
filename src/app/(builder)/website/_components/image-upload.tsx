@@ -54,7 +54,9 @@ export function ImageUpload({
       ? "h-32 w-full"
       : size === "md" && !compact
         ? "h-[112px] w-[112px]"
-        : "h-[92px] w-[92px]";
+        : compact
+          ? "h-[54px] w-[76px]"
+          : "h-[74px] w-[92px]";
 
   React.useEffect(() => {
     return () => {
@@ -82,9 +84,9 @@ export function ImageUpload({
   };
 
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className={cn("space-y-1", className)}>
       {label ? (
-        <label className="text-[12px] font-semibold text-[var(--vendor-text)]" htmlFor={id}>
+        <label className="text-[10px] font-semibold text-[var(--vendor-text)]" htmlFor={id}>
           {label}
         </label>
       ) : null}
@@ -119,7 +121,7 @@ export function ImageUpload({
           onDragLeave={() => setIsDragging(false)}
           onDrop={handleDrop}
           className={cn(
-            "flex cursor-pointer flex-col items-center justify-center gap-1 rounded-[var(--vendor-radius-panel)] border border-dashed p-2 text-center transition-colors",
+            "flex cursor-pointer flex-col items-center justify-center gap-0.5 rounded-[var(--vendor-radius-panel)] border border-dashed p-1 text-center transition-colors",
             sizeClass,
             isDragging
               ? "border-[var(--vendor-primary-btn)] bg-[var(--vendor-primary-btn)]/5"
@@ -128,29 +130,31 @@ export function ImageUpload({
             dropzoneClassName,
           )}
         >
-          <CloudUpload className="h-5 w-5 text-[var(--vendor-primary-btn)]" />
+          <CloudUpload className={cn(compact ? "h-3.5 w-3.5" : "h-4 w-4", "text-[var(--vendor-primary-btn)]")} />
           <div>
             <p className="text-[9px] font-black leading-tight text-[var(--vendor-primary-btn)]">
               {title}
             </p>
-            {browseText ? (
+            {browseText && !compact ? (
               <p className="mt-0.5 text-[8px] font-medium leading-tight text-[var(--vendor-text-muted)]">
                 {browseText}
               </p>
             ) : null}
           </div>
-          <div>
-            {hint ? (
-              <p className="text-[8px] font-semibold leading-tight text-[var(--vendor-text-muted)]">
-                {hint}
-              </p>
-            ) : null}
-            {recommendedSize ? (
-              <p className="text-[8px] font-semibold leading-tight text-[var(--vendor-text-muted)]">
-                {recommendedSize}
-              </p>
-            ) : null}
-          </div>
+          {!compact && (
+            <div>
+              {hint ? (
+                <p className="text-[8px] font-semibold leading-tight text-[var(--vendor-text-muted)]">
+                  {hint}
+                </p>
+              ) : null}
+              {recommendedSize ? (
+                <p className="text-[8px] font-semibold leading-tight text-[var(--vendor-text-muted)]">
+                  {recommendedSize}
+                </p>
+              ) : null}
+            </div>
+          )}
 
           <input
             id={id}

@@ -233,48 +233,54 @@ const updatePage = (patch: Partial<Pick<LegalPage, "title" | "content">>) => {
     );
   };
 const form = (
-  <div className="space-y-0 rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] shadow-sm overflow-hidden">
-    {/* Tab selector */}
-    <div className="flex border-b border-[var(--vendor-border)]">
-      {pages.map((page) => (
-        <button
-          key={page.id}
-          type="button"
-          onClick={() => setActivePage(page.id)}
-          className={cn(
-            "flex-1 px-4 py-3 text-[13px] font-bold transition-colors",
-            activePage === page.id
-              ? "border-b-2 border-[var(--vendor-primary-btn)] bg-[var(--vendor-primary-btn)]/5 text-[var(--vendor-primary-btn)]"
-              : "text-[var(--vendor-text-muted)] hover:bg-[var(--vendor-border)]/30 hover:text-[var(--vendor-text)]",
-          )}
-        >
-          {page.label}
-        </button>
-      ))}
+  <div className="flex flex-col overflow-hidden rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] shadow-sm">
+    {/* "Select Legal Page" label */}
+    <div className="shrink-0 border-b border-[var(--vendor-border)] px-4 pt-3 pb-0">
+      <p className="mb-2 text-[11px] font-semibold text-[var(--vendor-text-muted)]">Select Legal Page</p>
+      {/* Tab selector */}
+      <div className="flex">
+        {pages.map((page) => (
+          <button
+            key={page.id}
+            type="button"
+            onClick={() => setActivePage(page.id)}
+            className={cn(
+              "flex-1 px-2 py-2 text-[12px] font-bold transition-colors",
+              activePage === page.id
+                ? "border-b-2 border-[var(--vendor-primary-btn)] text-[var(--vendor-primary-btn)]"
+                : "text-[var(--vendor-text-muted)] hover:text-[var(--vendor-text)]",
+            )}
+          >
+            {page.label}
+          </button>
+        ))}
+      </div>
     </div>
 
-    <div className="space-y-5 p-5">
-      {/* Page Title */}
-      <BuilderCountedInput
-        label="Page Title"
-        value={currentPage.title}
-        onChange={(v) => updatePage({ title: v })}
-        maxLength={100}
-      />
+    <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="space-y-4 p-4">
+        {/* Page Title */}
+        <BuilderCountedInput
+          label="Page Title"
+          value={currentPage.title}
+          onChange={(v) => updatePage({ title: v })}
+          maxLength={100}
+        />
 
-      {/* Page Content */}
-      <WebsiteRichTextEditor
-        label="Page Content"
-        value={currentPage.content}
-        onChange={(v) => updatePage({ content: v })}
-        height="420px"
-        showWordCount
-        showCharCount={false}
-      />
+        {/* Page Content */}
+        <WebsiteRichTextEditor
+          label="Page Content"
+          value={currentPage.content}
+          onChange={(v) => updatePage({ content: v })}
+          height="360px"
+          showWordCount
+          showCharCount={false}
+        />
+      </div>
     </div>
 
     {/* Footer actions */}
-    <div className="border-t border-[var(--vendor-border)] p-5">
+    <div className="shrink-0 border-t border-[var(--vendor-border)] px-4 py-3">
       <FormActions cancelLabel="Reset" layout="default" />
     </div>
   </div>
@@ -338,7 +344,12 @@ function LegalPagePreview({
 }
   return (
     <WebsiteBuilderLayout
-      title="Pages"
+      title="Legal Pages"
+      breadcrumbs={[
+        { label: "Dashboard", href: "/dashboard" },
+        { label: "Settings", href: "/website" },
+        { label: "Legal Pages" },
+      ]}
       form={form}
       preview={
         <LegalPagePreview
@@ -347,8 +358,8 @@ function LegalPagePreview({
           content={currentPage.content}
         />
       }
-      previewTitle="Live Website Preview"
-      previewSubtitle="This is how your pages will appear on your website."
+      previewTitle="Live Preview"
+      previewSubtitle="This is how the page appears on your website."
       previewActions={
         <DesktopMobileToggle value={device} onChange={setDevice} />
       }
