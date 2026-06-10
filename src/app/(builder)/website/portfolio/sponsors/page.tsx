@@ -3,6 +3,7 @@
 import * as React from "react";
 import { GripVertical, Trash2 } from "lucide-react";
 import { WebsiteBuilderLayout } from "../../_components/website-builder-layout";
+import { FormSection } from "../../_components/form-section";
 import { ImageUpload } from "../../_components/image-upload";
 import { BuilderCountedInput } from "../../_components/builder-field";
 import { PrimaryButton } from "@/components/ui/button";
@@ -80,84 +81,73 @@ export default function PortfolioSponsorsPage() {
   };
 
   const form = (
-    <div className="space-y-3">
-      {/* Add New Sponsor section */}
-      <h2 className="text-[13px] font-black text-[var(--vendor-text)]">Add New Sponsor</h2>
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+      <div className="lg:col-span-4 space-y-5">
+        <FormSection title="Add New Sponsor">
+          <ImageUpload
+            key={draftLogo ?? "empty-sponsor-logo"}
+            value={draftLogo}
+            label="Upload Logo"
+            title="Drag & drop sponsor logo here"
+            browseText="or click to browse"
+            hint="JPG, PNG, SVG or WebP · Max 2MB"
+            recommendedSize=""
+            size="wide"
+            dropzoneClassName="h-[130px]"
+            previewClassName="h-[130px]"
+            onFileSelect={handleLogoSelect}
+            onRemove={() => setDraftLogo(null)}
+          />
 
-      <ImageUpload
-        key={draftLogo ?? "empty-sponsor-logo"}
-        value={draftLogo}
-        label="Upload Logo"
-        title="Drag & drop sponsor logo here"
-        browseText="or click to browse"
-        hint="JPG, PNG, SVG or WebP · Max 2MB"
-        recommendedSize=""
-        size="wide"
-        dropzoneClassName="h-[130px]"
-        previewClassName="h-[130px]"
-        onFileSelect={handleLogoSelect}
-        onRemove={() => setDraftLogo(null)}
-      />
+          <BuilderCountedInput
+            label="Sponsor Name"
+            value={sponsorName}
+            onChange={setSponsorName}
+            maxLength={100}
+            placeholder="Enter sponsor name"
+          />
 
-      <BuilderCountedInput
-        label="Sponsor Name"
-        value={sponsorName}
-        onChange={setSponsorName}
-        maxLength={100}
-        placeholder="Enter sponsor name"
-      />
-
-      <PrimaryButton type="button" onClick={addSponsor} className="w-full justify-center">
-        + Add Sponsor
-      </PrimaryButton>
-
-      {/* Divider */}
-      <div className="border-t border-[var(--vendor-border)]" />
-
-      {/* Added Sponsors list */}
-      <div className="space-y-1">
-        <h2 className="text-[13px] font-black text-[var(--vendor-text)]">
-          Added Sponsors ({sponsors.length})
-        </h2>
-
-        <div className="divide-y divide-[var(--vendor-border)]">
-          {sponsors.map((sponsor) => (
-            <div key={sponsor.id} className="flex items-center gap-3 py-2">
-              <GripVertical className="h-4 w-4 shrink-0 cursor-grab text-[var(--vendor-text-muted)]" />
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded border border-[var(--vendor-border)] bg-white p-0.5">
-                <img src={sponsor.logoUrl} alt={sponsor.name} className="max-h-full max-w-full object-contain" />
-              </div>
-              <p className="min-w-0 flex-1 truncate text-[12px] font-semibold text-[var(--vendor-text)]">
-                {sponsor.name}
-              </p>
-              <button
-                type="button"
-                onClick={() => removeSponsor(sponsor.id)}
-                className="shrink-0 text-rose-500 transition-colors hover:text-rose-600"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
-            </div>
-          ))}
-        </div>
-
-        <p className="pt-1 text-[11px] text-[var(--vendor-text-muted)]">
-          You can upload up to 30 sponsors.
-        </p>
+          <PrimaryButton type="button" onClick={addSponsor} className="w-full justify-center mt-2">
+            + Add Sponsor
+          </PrimaryButton>
+        </FormSection>
       </div>
-    </div>
-  );
 
-  const preview = (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-      {sponsors.map((sponsor) => (
-        <div
-          key={sponsor.id}
-          className="flex h-[130px] items-center justify-center rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-white p-6"
-        >
-          <img src={sponsor.logoUrl} alt={sponsor.name} className="max-h-full max-w-full object-contain" />
-        </div>
-      ))}
+      <div className="lg:col-span-8 space-y-5">
+        <FormSection title={`Added Sponsors (${sponsors.length})`}>
+          {sponsors.length > 0 ? (
+            <div className="divide-y divide-[var(--vendor-border)]">
+              {sponsors.map((sponsor) => (
+                <div key={sponsor.id} className="flex items-center gap-3 py-3">
+                  <GripVertical className="h-4 w-4 shrink-0 cursor-grab text-[var(--vendor-text-muted)]" />
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-[var(--vendor-radius-control)] border border-[var(--vendor-border)] bg-white p-1">
+                    <img src={sponsor.logoUrl} alt={sponsor.name} className="max-h-full max-w-full object-contain" />
+                  </div>
+                  <p className="min-w-0 flex-1 truncate text-[13px] font-bold text-[var(--vendor-text)]">
+                    {sponsor.name}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => removeSponsor(sponsor.id)}
+                    className="shrink-0 text-rose-500 transition-colors hover:text-rose-600 p-1.5 rounded-md hover:bg-rose-50"
+                    aria-label={`Delete ${sponsor.name}`}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex h-[180px] flex-col items-center justify-center rounded-[var(--vendor-radius-panel)] border border-dashed border-[var(--vendor-border)] bg-slate-50/50 p-6 text-center">
+              <p className="text-[12px] font-bold text-[var(--vendor-text-muted)]">No sponsors added yet</p>
+              <p className="text-[11px] text-[var(--vendor-text-muted)] mt-1">Use the panel on the left to add sponsor details and logos.</p>
+            </div>
+          )}
+          <p className="pt-2 text-[10px] text-[var(--vendor-text-muted)]">
+            You can upload up to 30 sponsors.
+          </p>
+        </FormSection>
+      </div>
     </div>
   );
 
@@ -170,10 +160,7 @@ export default function PortfolioSponsorsPage() {
         { label: "Sponsors" },
       ]}
       form={form}
-      preview={preview}
-      previewTitle="Live Preview"
       saveLabel="Save Changes"
-      contentClassName="xl:grid-cols-[minmax(340px,32fr)_minmax(0,68fr)]"
     />
   );
 }

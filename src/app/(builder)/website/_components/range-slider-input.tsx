@@ -64,7 +64,6 @@ export function RangeSliderInput({
           disabled={disabled}
           style={inlineStyle}
           className="range-slider-input w-full cursor-pointer appearance-none rounded-full disabled:cursor-not-allowed"
-          onInput={(e) => onChange(Number(e.currentTarget.value))}
           onChange={(e) => onChange(Number(e.target.value))}
         />
       </div>

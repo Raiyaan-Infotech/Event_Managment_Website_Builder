@@ -18,7 +18,7 @@
   --color-text-secondary: #64748b;
   --color-text-muted: #94a3b8;
   --radius-card: 8px;
-  --radius-input: 7px;
+  --radius-input: 4px;
   --radius-button: 7px;
   --radius-sidebar-item: 7px;
   --radius-badge: 999px;
@@ -162,9 +162,9 @@ button {
 }
 
 /* Force sibling elements to stack tightly */
-.website-builder-form-panel :not(span):not(td):not(th) + :not(span):not(td):not(th),
-.website-builder-sidebar-panel :not(span):not(td):not(th) + :not(span):not(td):not(th) {
-  margin-top: 4px !important; /* Compresses gap between vertically stacked elements to 4px */
+.website-builder-form-panel :not(span):not(td):not(th):not(button):not(div) + :not(span):not(td):not(th):not(button):not(div),
+.website-builder-sidebar-panel :not(span):not(td):not(th):not(button):not(div) + :not(span):not(td):not(th):not(button):not(div) {
+  margin-top: 4px !important;
 }
 
 /* Close gap between labels and inputs specifically */
@@ -186,11 +186,11 @@ button {
   gap: 4px !important;
 }
 
-/* 2. Container Padding (Tighten paddings inside panels and cards) */
+/* 2. Container Padding (Spacious card paddings for wide layout) */
 .website-builder-form-panel section,
 .website-builder-sidebar-panel section {
-  padding: 6px 8px !important; /* Compact card padding: 6px top/bottom, 8px left/right */
-  margin-top: 4px !important; /* 4px margin between cards */
+  padding: 10px 10px !important;
+  margin-top: 8px !important;
   margin-bottom: 0px !important;
 }
 
@@ -206,22 +206,22 @@ button {
 
 .website-builder-form-panel textarea,
 .website-builder-sidebar-panel textarea {
-  min-height: 3.5rem !important; /* Compact textarea min-height */
+  min-height: 2rem !important; /* Spacious textarea min-height */
 }
 
 /* 4. Table padding overrides */
 .website-builder-form-panel table th,
 .website-builder-form-panel table td {
-  padding-top: 2px !important;
-  padding-bottom: 2px !important;
-  padding-left: 6px !important;
-  padding-right: 6px !important;
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+  padding-left: 8px !important;
+  padding-right: 8px !important;
 }
 
-/* 5. Typography (Reduces font sizes globally, keeps layout compact) */
+/* 5. Typography (Slightly relaxed for wide layout readability) */
 .website-builder-form-panel label,
 .website-builder-sidebar-panel label {
-  font-size: 9px !important; /* Smaller labels */
+  font-size: 10px !important; /* Clean readable labels */
   font-weight: 600 !important;
 }
 
@@ -231,23 +231,23 @@ button {
 .website-builder-sidebar-panel select,
 .website-builder-form-panel textarea,
 .website-builder-sidebar-panel textarea {
-  font-size: 10px !important; /* Compact text inside controls */
+  font-size: 11px !important; /* Clean text inside controls */
 }
 
 .website-builder-form-panel :is(h1, h2),
 .website-builder-sidebar-panel :is(h1, h2) {
-  font-size: 11px !important; /* Compact titles */
+  font-size: 13px !important; /* Clean section titles */
   font-weight: 800 !important;
 }
 
 .website-builder-form-panel p,
 .website-builder-sidebar-panel p {
-  font-size: 9px !important; /* Compact description/caption texts */
+  font-size: 10px !important; /* Clean description/caption texts */
 }
 
 .website-builder-form-panel button,
 .website-builder-sidebar-panel button {
-  font-size: 10px !important; /* Compact button text */
+  font-size: 11px !important; /* Clean button text */
 }
 
 /* 6. Range Slider Custom Styling */
@@ -257,12 +257,16 @@ button {
   outline: none;
   border: none !important;
   box-shadow: none !important;
-  height: 14px !important; /* Taller clickable area for easy mouse grabbing */
+  height: 12px !important; /* Matches the thumb height exactly so no part is clipped or unclickable */
+  padding: 0 !important; /* Crucial: padding breaks Chrome drag coordinate math */
+  margin: 0 !important;
   background: transparent !important; /* Keep input transparent so browser event dispatching works 100% */
+  width: 100% !important;
 }
 
 /* Chrome, Safari, Opera, Edge */
 .range-slider-input::-webkit-slider-runnable-track {
+  width: 100% !important;
   height: 6px;
   border-radius: 999px;
   border: none;
@@ -280,7 +284,7 @@ button {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   cursor: pointer;
   transition: transform 0.1s ease, border-color 0.1s ease;
-  margin-top: -3px !important; /* centers the 12px thumb on the 6px track runnable-track */
+  margin-top: -3px !important; /* centers the 12px thumb on the 6px track (3px - 6px = -3px) */
 }
 
 .range-slider-input::-webkit-slider-thumb:hover {
@@ -289,6 +293,7 @@ button {
 
 /* Firefox */
 .range-slider-input::-moz-range-track {
+  width: 100% !important;
   height: 6px;
   border-radius: 999px;
   border: none;
@@ -304,7 +309,6 @@ button {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   cursor: pointer;
   transition: transform 0.1s ease, border-color 0.1s ease;
-  border: none;
 }
 
 .range-slider-input::-moz-range-thumb:hover {
@@ -372,6 +376,15 @@ button {
 .dense-builder-form .space-y-1.5 > :not([hidden]) ~ :not([hidden]),
 .dense-builder-form .space-y-1 > :not([hidden]) ~ :not([hidden]) {
   margin-top: 2px !important; /* Extremely tight margins */
+}
+
+/* Fix grid cells overflowing column boundaries */
+.website-builder-form-panel section {
+  overflow: visible  !important;
+}
+
+.website-builder-form-panel .grid > * {
+  min-width: 0 !important;
 }
 
 

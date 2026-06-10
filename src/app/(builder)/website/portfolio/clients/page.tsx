@@ -3,6 +3,7 @@
 import * as React from "react";
 import { CloudUpload, X } from "lucide-react";
 import { WebsiteBuilderLayout } from "../../_components/website-builder-layout";
+import { FormSection } from "../../_components/form-section";
 
 interface ClientLogo {
   id: string;
@@ -68,79 +69,67 @@ export default function PortfolioClientsPage() {
   };
 
   const form = (
-    <div className="space-y-4">
-      {/* Section header */}
-      <div>
-        <h2 className="text-[13px] font-black text-[var(--vendor-text)]">Client Logos</h2>
-        <p className="mt-0.5 text-[11px] text-[var(--vendor-text-muted)]">
-          Upload and manage client logos. These will be displayed on the website.
-        </p>
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+      <div className="lg:col-span-4 space-y-5">
+        <FormSection title="Upload Client Logos">
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => fileInputRef.current?.click()}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => { e.preventDefault(); handleFiles(e.dataTransfer.files); }}
+            onKeyDown={(e) => e.key === "Enter" && fileInputRef.current?.click()}
+            className="flex h-[180px] w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-[var(--vendor-radius-panel)] border-2 border-dashed border-[var(--vendor-primary-btn)]/40 bg-white transition-all hover:border-[var(--vendor-primary-btn)] hover:bg-[var(--vendor-primary-btn)]/5"
+          >
+            <CloudUpload className="h-8 w-8 text-[var(--vendor-primary-btn)]" />
+            <p className="text-[12px] font-black text-[var(--vendor-primary-btn)] text-center px-4">
+              Drag &amp; drop logo images here
+            </p>
+            <p className="text-[10px] text-[var(--vendor-text-muted)]">or click to browse</p>
+            <p className="text-[9px] text-[var(--vendor-text-muted)]">JPG, PNG, SVG or WebP (Max. 2MB)</p>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={(e) => { handleFiles(e.target.files); e.target.value = ""; }}
+            />
+          </div>
+          <p className="text-[10px] text-[var(--vendor-text-muted)] mt-1.5">
+            You can upload up to 30 logos.
+          </p>
+        </FormSection>
       </div>
 
-      {/* Drag-and-drop upload zone */}
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={() => fileInputRef.current?.click()}
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={(e) => { e.preventDefault(); handleFiles(e.dataTransfer.files); }}
-        onKeyDown={(e) => e.key === "Enter" && fileInputRef.current?.click()}
-        className="flex h-[140px] w-full cursor-pointer flex-col items-center justify-center gap-1 rounded-[var(--vendor-radius-panel)] border-2 border-dashed border-[var(--vendor-primary-btn)]/40 bg-white transition-colors hover:border-[var(--vendor-primary-btn)] hover:bg-[var(--vendor-primary-btn)]/5"
-      >
-        <CloudUpload className="h-7 w-7 text-[var(--vendor-primary-btn)]" />
-        <p className="text-[12px] font-semibold text-[var(--vendor-primary-btn)]">
-          Drag &amp; drop logo images here
-        </p>
-        <p className="text-[11px] text-[var(--vendor-text-muted)]">or click to browse</p>
-        <p className="text-[10px] text-[var(--vendor-text-muted)]">JPG, PNG, SVG or WebP (Max. 2MB each)</p>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          multiple
-          className="hidden"
-          onChange={(e) => { handleFiles(e.target.files); e.target.value = ""; }}
-        />
-      </div>
-
-      {/* Thumbnail grid */}
-      {clients.length > 0 && (
-        <div className="grid grid-cols-3 gap-2">
-          {clients.map((client) => (
-            <div key={client.id} className="relative">
-              <div className="flex h-[72px] items-center justify-center overflow-hidden rounded-[var(--vendor-radius-control)] border border-[var(--vendor-border)] bg-white p-2">
-                <img src={client.logoUrl} alt={client.name} className="max-h-full max-w-full object-contain" />
-              </div>
-              <button
-                type="button"
-                onClick={() => removeClient(client.id)}
-                className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-slate-700 text-white shadow hover:bg-rose-500"
-                aria-label={`Remove ${client.name}`}
-              >
-                <X className="h-2.5 w-2.5" />
-              </button>
+      <div className="lg:col-span-8 space-y-5">
+        <FormSection title="Client Logo Directory">
+          {clients.length > 0 ? (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+              {clients.map((client) => (
+                <div key={client.id} className="relative group">
+                  <div className="flex h-[110px] items-center justify-center overflow-hidden rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-white p-4 transition-all group-hover:shadow-sm">
+                    <img src={client.logoUrl} alt={client.name} className="max-h-full max-w-full object-contain" />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeClient(client.id)}
+                    className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-slate-800 text-white shadow-md hover:bg-rose-500 transition-colors"
+                    aria-label={`Remove ${client.name}`}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      )}
-
-      {/* Footer hint */}
-      <p className="text-[11px] text-[var(--vendor-text-muted)]">
-        You can upload up to 30 logos.
-      </p>
-    </div>
-  );
-
-  const preview = (
-    <div className="grid grid-cols-3 gap-4">
-      {clients.map((client) => (
-        <div
-          key={client.id}
-          className="flex h-[130px] items-center justify-center rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-white p-5 shadow-sm"
-        >
-          <img src={client.logoUrl} alt={client.name} className="max-h-full max-w-full object-contain" />
-        </div>
-      ))}
+          ) : (
+            <div className="flex h-[180px] flex-col items-center justify-center rounded-[var(--vendor-radius-panel)] border border-dashed border-[var(--vendor-border)] bg-slate-50/50 p-6 text-center">
+              <p className="text-[12px] font-bold text-[var(--vendor-text-muted)]">No client logos uploaded yet</p>
+              <p className="text-[11px] text-[var(--vendor-text-muted)] mt-1">Use the upload box on the left to add your first client logos.</p>
+            </div>
+          )}
+        </FormSection>
+      </div>
     </div>
   );
 
@@ -153,11 +142,7 @@ export default function PortfolioClientsPage() {
         { label: "Clients" },
       ]}
       form={form}
-      preview={preview}
-      previewTitle="Live Preview"
-      previewSubtitle="This is how the client logo wall will appear on the website."
       saveLabel="Save Changes"
-      contentClassName="xl:grid-cols-[minmax(340px,32fr)_minmax(0,68fr)]"
     />
   );
 }

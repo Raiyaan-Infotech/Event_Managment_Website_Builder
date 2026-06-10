@@ -13,7 +13,11 @@ interface BuilderLabelProps {
   className?: string;
 }
 
-export function BuilderLabel({ children, required = false, className }: BuilderLabelProps) {
+export function BuilderLabel({
+  children,
+  required = false,
+  className,
+}: BuilderLabelProps) {
   return (
     <label
       className={cn(
@@ -182,11 +186,10 @@ export function BuilderSegmentedControl<T extends string>({
               type="button"
               onClick={() => onChange(option.value)}
               className={cn(
-                // Full-width on smallest screens when using wrap layout; auto otherwise
-                "inline-flex h-9 sm:h-8 items-center justify-center rounded-[var(--vendor-radius-control)] border px-4",
+                "inline-flex h-8 items-center justify-center rounded-[var(--vendor-radius-control)] border px-4 box-border",
                 "text-[10px] font-bold transition",
                 layout === "wrap" && "min-w-[5.5rem] flex-1 sm:flex-none",
-                layout === "grid" && "w-full",
+                layout === "grid" && "w-full min-w-0",
                 layout === "scroll" && "shrink-0 min-w-[5.5rem]",
                 active
                   ? "border-[var(--vendor-primary-btn)] bg-[var(--vendor-primary-btn)]/10 text-[var(--vendor-primary-btn)]"
@@ -277,7 +280,9 @@ export function BuilderIconOptionGroup<T extends string>({
               optionClassName,
             )}
           >
-            <span className="flex items-center justify-center">{option.icon}</span>
+            <span className="flex items-center justify-center">
+              {option.icon}
+            </span>
             <span className="text-center leading-tight">{option.label}</span>
           </button>
         );

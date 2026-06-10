@@ -41,128 +41,22 @@ const socialPreviewItems = [
   { label: "YouTube", icon: Youtube },
 ];
 
+// ─── Locked read-only input ───────────────────────────────────────────────────
+
 function LockedInput({ value }: { value: string }) {
   return (
     <div className="relative">
-      <Input value={value} readOnly className="h-9 bg-slate-50 pr-9 text-[11px]" />
-      <Lock className="absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+      <Input
+        value={value}
+        readOnly
+        className="h-7 bg-slate-50 pr-8 text-[10px] text-slate-500"
+      />
+      <Lock className="absolute right-2.5 top-1/2 h-3 w-3 -translate-y-1/2 text-slate-400" />
     </div>
   );
 }
 
-function FooterPreview({
-  companyName,
-  shortDescription,
-  topListHeading,
-  selectedPages,
-  newsletterEnabled,
-  mobile,
-  email,
-  address,
-  copyright,
-  poweredBy,
-  showSocialLinks,
-}: {
-  companyName: string;
-  shortDescription: string;
-  topListHeading: string;
-  selectedPages: string[];
-  newsletterEnabled: boolean;
-  mobile: string;
-  email: string;
-  address: string;
-  copyright: string;
-  poweredBy: string;
-  showSocialLinks: boolean;
-}) {
-  const links = selectedPages
-    .map((value) => pageOptions.find((option) => option.value === value)?.label)
-    .filter(Boolean) as string[];
-
-  return (
-    <footer className="rounded-[var(--vendor-radius-panel)] bg-[#061a39] px-10 py-10 text-white shadow-sm">
-      <div className="grid gap-8 grid-cols-1 xl:grid-cols-[1.3fr_0.85fr_1fr]">
-        <div>
-          <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-[var(--vendor-radius-panel)] border border-white/20 bg-white/5">
-              <span className="text-lg font-black">{companyName.slice(0, 2).toUpperCase()}</span>
-            </div>
-            <h2 className="text-[28px] font-black tracking-tight">{companyName}</h2>
-          </div>
-
-          <p className="mt-7 max-w-sm text-[15px] font-medium leading-7 text-white/85">
-            {shortDescription}
-          </p>
-
-          <div className="mt-8 space-y-5 text-[15px] font-medium text-white/90">
-            <p className="flex items-start gap-4">
-              <MapPin className="mt-1 h-5 w-5 shrink-0" />
-              <span>{address}</span>
-            </p>
-            <p className="flex items-center gap-4">
-              <Phone className="h-5 w-5" />
-              <span>{mobile}</span>
-            </p>
-            <p className="flex items-center gap-4">
-              <Mail className="h-5 w-5" />
-              <span>{email}</span>
-            </p>
-          </div>
-
-          {showSocialLinks ? (
-            <div className="mt-8 flex gap-4">
-              {socialPreviewItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <span
-                    key={item.label}
-                    className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white"
-                  >
-                    <Icon className="h-5 w-5" />
-                  </span>
-                );
-              })}
-            </div>
-          ) : null}
-        </div>
-
-        <div className="border-l border-white/20 pl-10">
-          <h3 className="text-[17px] font-black uppercase tracking-wide">{topListHeading}</h3>
-          <div className="mt-7 space-y-5 text-[15px] font-medium text-white/85">
-            {(links.length ? links : ["Sample Page", "Terms & Conditions", "Privacy Policy"]).map((link) => (
-              <p key={link}>{link}</p>
-            ))}
-          </div>
-        </div>
-
-        <div className="border-l border-white/20 pl-10">
-          <h3 className="text-[17px] font-black uppercase tracking-wide">Newsletter</h3>
-          <p className="mt-7 text-[15px] font-medium leading-7 text-white/85">
-            Subscribe to our newsletter for the latest updates and exclusive offers.
-          </p>
-          {newsletterEnabled ? (
-            <div className="mt-7 space-y-4">
-              <div className="h-14 rounded-[var(--vendor-radius-control)] border border-white/20 bg-white/5 px-5 text-[15px] leading-[3.5rem] text-white/55">
-                Enter your email
-              </div>
-              <button
-                type="button"
-                className="h-14 w-full rounded-[var(--vendor-radius-control)] bg-[var(--vendor-primary-btn)] text-[15px] font-black text-white"
-              >
-                Subscribe
-              </button>
-            </div>
-          ) : null}
-        </div>
-      </div>
-
-      <div className="mt-12 flex flex-col gap-4 border-t border-white/20 pt-7 text-[15px] font-medium text-white/85 lg:flex-row lg:items-center lg:justify-between">
-        <p>{copyright}</p>
-        <p>{poweredBy}</p>
-      </div>
-    </footer>
-  );
-}
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function FooterPage() {
   const [companyName, setCompanyName] = React.useState("Eventify");
@@ -171,113 +65,182 @@ export default function FooterPage() {
   );
   const [showSocialLinks, setShowSocialLinks] = React.useState(true);
   const [topListHeading, setTopListHeading] = React.useState("Quick Links");
-  const [selectedPages, setSelectedPages] = React.useState(["sample-page", "terms", "privacy"]);
+  const [selectedPages, setSelectedPages] = React.useState([
+    "sample-page",
+    "terms",
+    "privacy",
+  ]);
   const [newsletterEnabled, setNewsletterEnabled] = React.useState(true);
   const [contactType, setContactType] = React.useState<ContactType>("default");
   const [mobile, setMobile] = React.useState("+1 234 567 8900");
   const [email, setEmail] = React.useState("hello@eventify.com");
-  const [address, setAddress] = React.useState("123 Celebration Street, Event City, New York, NY 10001, USA");
+  const [address, setAddress] = React.useState(
+    "123 Celebration Street, Event City, New York, NY 10001, USA",
+  );
 
   const copyright = "© 2026 EventCraft Pro. All rights reserved.";
   const poweredBy = "Powered by Raiyaan Infotech";
 
   const form = (
-    <div className="space-y-5">
-      <FormSection title="1. Company Information" divider>
-        <BuilderCountedInput
-          label="Company Name"
-          value={companyName}
-          onChange={setCompanyName}
-          maxLength={100}
-        />
-        <BuilderCountedTextarea
-          label="Short Description"
-          value={shortDescription}
-          onChange={setShortDescription}
-          maxLength={200}
-          textareaClassName="min-h-20"
-        />
-        <ImageUpload
-          label="Company Logo"
-          title="Drag & drop your logo here"
-          browseText="or click to browse"
-          hint="PNG, JPG, SVG"
-          recommendedSize="(Max. 2MB)"
-          size="wide"
-        />
-      </FormSection>
+    <div className="grid h-full grid-cols-3 gap-2.5">
 
-      <FormSection title="7.1 Social Links" divider>
-        <ToggleField
-          label="Show Social Links"
-          checked={showSocialLinks}
-          onCheckedChange={setShowSocialLinks}
-          className="border-0 bg-transparent p-0"
-        />
-      </FormSection>
+      {/* ── Column 1: Company Info ── */}
+      <div className="flex flex-col gap-2 min-h-0 overflow-y-auto pr-0.5">
 
-      <FormSection title="7.2 Footer Top List" divider>
-        <BuilderCountedInput
-          label="Top List Heading"
-          value={topListHeading}
-          onChange={setTopListHeading}
-          maxLength={80}
-        />
-        <MultiSelectPages
-          label="Add Pages"
-          value={selectedPages}
-          options={pageOptions}
-          onChange={setSelectedPages}
-          placeholder="Add page"
-        />
-      </FormSection>
-
-      <FormSection title="7.3 Newsletter" divider>
-        <label className="flex items-center gap-2 text-[12px] font-black text-[var(--vendor-text)]">
-          <input
-            type="checkbox"
-            checked={newsletterEnabled}
-            onChange={(event) => setNewsletterEnabled(event.target.checked)}
-            className="h-4 w-4 accent-[var(--vendor-primary-btn)]"
+        {/* Company Information */}
+        <FormSection
+          title="Company Information"
+          className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-2.5 shadow-sm space-y-2"
+        >
+          <BuilderCountedInput
+            label="Company Name"
+            value={companyName}
+            onChange={setCompanyName}
+            maxLength={100}
+            inputClassName="!h-7 text-[10px]"
           />
-          Enable Newsletter
-        </label>
-      </FormSection>
 
-      <FormSection title="7.4 Contact Info" divider>
-        <BuilderSegmentedControl<ContactType>
-          label="Contact Type"
-          value={contactType}
-          onChange={setContactType}
-          options={[
-            { label: "Default", value: "default" },
-            { label: "Alternative", value: "alternative" },
-          ]}
-          className="[&>div]:grid [&>div]:grid-cols-2"
-        />
-        <BuilderCountedInput label="Mobile" value={mobile} onChange={setMobile} maxLength={30} />
-        <BuilderCountedInput label="Email" value={email} onChange={setEmail} maxLength={100} />
-        <BuilderCountedTextarea
-          label="Address"
-          value={address}
-          onChange={setAddress}
-          maxLength={200}
-          textareaClassName="min-h-20"
-        />
-      </FormSection>
+          <BuilderCountedTextarea
+            label="Short Description"
+            value={shortDescription}
+            onChange={setShortDescription}
+            maxLength={200}
+            textareaClassName="!min-h-[2.25rem] !max-h-[2.25rem] text-[10px]"
+          />
 
-      <FormSection title="7.5 Footer Bottom">
-        <div className="space-y-3">
-          <div className="space-y-1.5">
-            <p className="text-[10px] font-black uppercase tracking-wide text-slate-600">Copyright</p>
+          {/* Logo upload — extra compact */}
+          <div className="space-y-1">
+            <p className="text-[9px] font-semibold text-slate-600">Company Logo</p>
+            <ImageUpload
+              compact
+              hint="JPG, PNG, SVG"
+              recommendedSize="Max 2MB"
+              browseText=""
+              title="Upload Logo"
+              size="sm"
+              dropzoneClassName="h-10 w-full"
+              className="space-y-0"
+            />
+          </div>
+        </FormSection>
+
+        {/* Footer Bottom — kept in col 1 but super compact */}
+        <FormSection
+          title="Footer Bottom"
+          className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-2.5 shadow-sm space-y-1.5"
+        >
+          <div className="space-y-1">
+            <p className="text-[9px] font-black uppercase tracking-wide text-slate-500">
+              Copyright
+            </p>
             <LockedInput value={copyright} />
           </div>
-          <div className="space-y-1.5">
-            <p className="text-[10px] font-black uppercase tracking-wide text-slate-600">Powered By</p>
+          <div className="space-y-1">
+            <p className="text-[9px] font-black uppercase tracking-wide text-slate-500">
+              Powered By
+            </p>
             <LockedInput value={poweredBy} />
           </div>
-        </div>
-      </FormSection>
+        </FormSection>
+      </div>
+
+      {/* ── Column 2: Footer Settings ── */}
+      <div className="flex flex-col gap-2 min-h-0 overflow-y-auto pr-0.5">
+        <FormSection
+          title="Footer Settings"
+          className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-2.5 shadow-sm space-y-2"
+        >
+          <BuilderCountedInput
+            label="Top List Heading"
+            value={topListHeading}
+            onChange={setTopListHeading}
+            maxLength={80}
+            inputClassName="!h-7 text-[10px]"
+          />
+
+          <MultiSelectPages
+            label="Add Pages"
+            value={selectedPages}
+            options={pageOptions}
+            onChange={setSelectedPages}
+            placeholder="Add page"
+          />
+
+          {/* Newsletter checkbox — inline compact */}
+          <label className="flex cursor-pointer items-center gap-2 rounded-[var(--vendor-radius-control)] border border-[var(--vendor-border)] bg-slate-50/60 px-2.5 py-2">
+            <input
+              type="checkbox"
+              checked={newsletterEnabled}
+              onChange={(e) => setNewsletterEnabled(e.target.checked)}
+              className="h-3.5 w-3.5 accent-[var(--vendor-primary-btn)]"
+            />
+            <div>
+              <p className="text-[10px] font-bold text-[var(--vendor-text)]">
+                Enable Newsletter
+              </p>
+              <p className="text-[9px] font-medium text-[var(--vendor-text-muted)]">
+                Allow visitors to subscribe to your newsletter.
+              </p>
+            </div>
+          </label>
+
+          {/* Show Social Links toggle — compact */}
+          <ToggleField
+            label="Show Social Links"
+            description="Display social media links in footer."
+            checked={showSocialLinks}
+            onCheckedChange={setShowSocialLinks}
+            className="border border-[var(--vendor-border)] bg-slate-50/60 px-2.5 py-2 rounded-[var(--vendor-radius-control)]"
+          />
+        </FormSection>
+      </div>
+
+      {/* ── Column 3: Contact Info ── */}
+      <div className="flex flex-col gap-2 min-h-0 overflow-y-auto pr-0.5">
+        <FormSection
+          title="Contact Info"
+          className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-2.5 shadow-sm space-y-2"
+        >
+          {/* Contact type segmented control */}
+          <BuilderSegmentedControl<ContactType>
+            label="Contact Type"
+            value={contactType}
+            onChange={setContactType}
+            options={[
+              { label: "Default", value: "default" },
+              { label: "Alternative", value: "alternative" },
+            ]}
+            layout="grid"
+          />
+
+          {/* Mobile + Email side-by-side */}
+          <div className="grid grid-cols-2 gap-2">
+            <BuilderCountedInput
+              label="Mobile"
+              value={mobile}
+              onChange={setMobile}
+              maxLength={30}
+              inputClassName="!h-7 text-[10px]"
+            />
+            <BuilderCountedInput
+              label="Email"
+              value={email}
+              onChange={setEmail}
+              maxLength={100}
+              inputClassName="!h-7 text-[10px]"
+            />
+          </div>
+
+          {/* Address textarea */}
+          <BuilderCountedTextarea
+            label="Address"
+            value={address}
+            onChange={setAddress}
+            maxLength={200}
+            textareaClassName="!min-h-[3rem] !max-h-[3rem] text-[10px]"
+          />
+        </FormSection>
+      </div>
     </div>
   );
 
@@ -290,29 +253,7 @@ export default function FooterPage() {
         { label: "Footer Settings" },
       ]}
       form={form}
-      preview={
-  <div className="overflow-hidden rounded-[var(--vendor-radius-panel)]">
-    <div style={{ transform: "scale(0.65)", transformOrigin: "top left", width: "153.8%", pointerEvents: "none" }}>
-      <FooterPreview
-        companyName={companyName}
-        shortDescription={shortDescription}
-        topListHeading={topListHeading}
-        selectedPages={selectedPages}
-        newsletterEnabled={newsletterEnabled}
-        mobile={mobile}
-        email={email}
-        address={address}
-        copyright={copyright}
-        poweredBy={poweredBy}
-        showSocialLinks={showSocialLinks}
-      />
-    </div>
-  </div>
-}
-      previewTitle="Footer Preview"
-      previewSubtitle="This is how your footer will appear on the website."
       saveLabel="Save Changes"
-      contentClassName="xl:grid-cols-[minmax(360px,32fr)_minmax(0,68fr)]"
     />
   );
 }

@@ -2,170 +2,126 @@
 
 import * as React from "react";
 import { WebsiteBuilderLayout } from "../_components/website-builder-layout";
+import { FormSection } from "../_components/form-section";
+import { BuilderCountedInput } from "../_components/builder-field";
+import { MultiImageUpload, type MultiImageUploadItem } from "../_components/multi-image-upload";
+import { Image as ImageIcon, Info, Sparkles } from "lucide-react";
 import {
-  DesktopMobileToggle,
-  type PreviewDevice,
-} from "../_components/desktop-mobile-toggle";
-import {
-  BuilderCountedInput,
-} from "../_components/builder-field";
-import {
-  MultiImageUpload,
-  type MultiImageUploadItem,
-} from "../_components/multi-image-upload";
-import { OutlineButton, PrimaryButton } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 
-const galleryFilters = ["All", "Wedding", "Corporate", "Birthday", "Conference", "Exhibition", "Other"];
-
-function GalleryPreview({
-  images,
-  activeFilter,
-  onFilterChange,
-}: {
-  images: MultiImageUploadItem[];
-  activeFilter: string;
-  onFilterChange: (value: string) => void;
-}) {
-  return (
-    <div className="space-y-5">
-      <div className="flex flex-wrap gap-2">
-        {galleryFilters.map((filter) => (
-          <button
-            key={filter}
-            type="button"
-            onClick={() => onFilterChange(filter)}
-            className={cn(
-              "h-9 rounded-[var(--vendor-radius-control)] border px-5 text-[12px] font-bold transition-colors",
-              activeFilter === filter
-                ? "border-[var(--vendor-primary-btn)] bg-[var(--vendor-primary-btn)] text-white"
-                : "border-[var(--vendor-border)] bg-white text-[var(--vendor-text)] hover:border-[var(--vendor-primary-btn)] hover:text-[var(--vendor-primary-btn)]",
-            )}
-          >
-            {filter}
-          </button>
-        ))}
-      </div>
-
-      {images.length ? (
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
-          {images.map((image, index) => (
-            <div
-              key={image.id}
-              className={cn(
-                "overflow-hidden rounded-[var(--vendor-radius-panel)] bg-slate-100",
-                index === 3 || index === 4 ? "sm:col-span-1" : "",
-              )}
-            >
-              <img
-                src={image.imageUrl}
-                alt={image.alt ?? "Gallery preview image"}
-                className="h-48 w-full object-cover"
-              />
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="flex min-h-[320px] items-center justify-center rounded-[var(--vendor-radius-panel)] border border-dashed border-[var(--vendor-border)] bg-slate-50 text-center">
-          <div>
-            <p className="text-[15px] font-black text-[var(--vendor-text)]">No Gallery Images</p>
-            <p className="mt-1 text-[12px] font-medium text-[var(--vendor-text-muted)]">
-              Upload images from the left panel to preview the gallery.
-            </p>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
+const card = "rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-3 shadow-sm";
 
 export default function GalleryPage() {
-  const [device, setDevice] = React.useState<PreviewDevice>("desktop");
   const [eventName, setEventName] = React.useState("Sarah & Michael Wedding");
   const [eventType, setEventType] = React.useState("Wedding");
   const [city, setCity] = React.useState("New York, USA");
-  const [activeFilter, setActiveFilter] = React.useState("All");
   const [galleryImages, setGalleryImages] = React.useState<MultiImageUploadItem[]>([]);
   const objectUrlsRef = React.useRef<string[]>([]);
 
   React.useEffect(() => {
-    return () => {
-      objectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
-    };
+    return () => { objectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url)); };
   }, []);
 
   const addImages = (files: File[]) => {
-    const createdImages = files.map((file, index) => {
+    const created = files.map((file, i) => {
       const imageUrl = URL.createObjectURL(file);
       objectUrlsRef.current.push(imageUrl);
-
-      return {
-        id: `${file.name}-${file.lastModified}-${index}-${Date.now()}`,
-        imageUrl,
-        alt: file.name,
-      };
+      return { id: `${file.name}-${Date.now()}-${i}`, imageUrl, alt: file.name };
     });
-
-    setGalleryImages((current) => [...current, ...createdImages]);
+    setGalleryImages((prev) => [...prev, ...created]);
   };
 
   const removeImage = (item: MultiImageUploadItem) => {
     if (item.imageUrl.startsWith("blob:")) {
       URL.revokeObjectURL(item.imageUrl);
-      objectUrlsRef.current = objectUrlsRef.current.filter((url) => url !== item.imageUrl);
+      objectUrlsRef.current = objectUrlsRef.current.filter((u) => u !== item.imageUrl);
     }
-
-    setGalleryImages((current) => current.filter((image) => image.id !== item.id));
+    setGalleryImages((prev) => prev.filter((img) => img.id !== item.id));
   };
 
   const form = (
-    <div className="space-y-3">
-      {/* Header */}
-      <div>
-        <h2 className="text-[13px] font-black text-[var(--vendor-text)]">Gallery Information</h2>
-        <p className="mt-0.5 text-[11px] text-[var(--vendor-text-muted)]">
-          Add details about the event gallery.
-        </p>
+    <div className="grid h-full min-h-0 gap-3" style={{ gridTemplateColumns: "380px 1fr" }}>
+
+      {/* ── Left: Gallery Info (fixed, no scroll) ── */}
+      <div className="dense-builder-form flex flex-col gap-3 min-h-0 min-w-0">
+
+        <FormSection
+          title="Gallery Information"
+          icon={<ImageIcon className="h-4 w-4" />}
+          subtitle="Add details about the gallery."
+          className={`${card} space-y-2`}
+        >
+          <BuilderCountedInput
+            label="Event Name"
+            required
+            value={eventName}
+            onChange={setEventName}
+            maxLength={100}
+            className="space-y-0.5"
+          />
+
+          <div className="space-y-0.5">
+            <label className="block">Event Type <span className="text-rose-500">*</span></label>
+            <Select value={eventType} onValueChange={setEventType}>
+              <SelectTrigger className="h-6 w-full text-[9px] px-2 font-semibold">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Wedding">Wedding</SelectItem>
+                <SelectItem value="Corporate">Corporate</SelectItem>
+                <SelectItem value="Birthday">Birthday</SelectItem>
+                <SelectItem value="Conference">Conference</SelectItem>
+                <SelectItem value="Exhibition">Exhibition</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <BuilderCountedInput
+            label="City"
+            required
+            value={city}
+            onChange={setCity}
+            maxLength={100}
+            className="space-y-0.5"
+          />
+        </FormSection>
+
+        {/* Note card */}
+        <div className={`${card} flex items-start gap-2.5`}>
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[8px] bg-[hsl(228_64%_96%)] text-[#2457d6]">
+            <Info className="h-3.5 w-3.5" />
+          </div>
+          <div>
+            <p className="text-[11px] font-bold text-[var(--vendor-text)]">Note:</p>
+            <p className="mt-0.5 text-[10px] text-[var(--vendor-text-muted)]">
+              This information will be used to organize and display your gallery.
+            </p>
+          </div>
+        </div>
+
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <BuilderCountedInput
-          label="Event Name"
-          value={eventName}
-          onChange={setEventName}
-          maxLength={100}
-        />
-        <BuilderCountedInput
-          label="Event Type"
-          value={eventType}
-          onChange={setEventType}
-          maxLength={100}
-        />
-      </div>
+      {/* ── Right: Gallery Images (scrollable when many images) ── */}
+      <div className="dense-builder-form flex flex-col min-h-0 min-w-0 overflow-y-auto">
 
-      <BuilderCountedInput
-        label="City"
-        value={city}
-        onChange={setCity}
-        maxLength={100}
-      />
+        <FormSection
+          title="Gallery Images"
+          icon={<Sparkles className="h-4 w-4" />}
+          subtitle="Upload and manage images for this gallery."
+          className={`${card} space-y-2 h-full`}
+        >
+          <MultiImageUpload
+            label="Gallery Images"
+            items={galleryImages}
+            onAdd={addImages}
+            onRemove={removeImage}
+            maxItems={20}
+            tileSize={120}
+          />
+        </FormSection>
 
-      <MultiImageUpload
-        label="Gallery Images"
-        items={galleryImages}
-        onAdd={addImages}
-        onRemove={removeImage}
-        maxItems={20}
-        tileSize={74}
-      />
-
-      <div className="flex gap-3 border-t border-[var(--vendor-border)] pt-3">
-        <PrimaryButton type="button" className="flex-1">
-          Save Gallery
-        </PrimaryButton>
-        <OutlineButton type="button" className="flex-1">
-          Cancel
-        </OutlineButton>
       </div>
     </div>
   );
@@ -179,18 +135,8 @@ export default function GalleryPage() {
         { label: "Gallery" },
       ]}
       form={form}
-      preview={
-        <GalleryPreview
-          images={galleryImages}
-          activeFilter={activeFilter}
-          onFilterChange={setActiveFilter}
-        />
-      }
-      previewTitle="Gallery Preview"
-      previewSubtitle="This is how your gallery will appear on the website."
-      previewActions={<DesktopMobileToggle value={device} onChange={setDevice} />}
       saveLabel="Save Gallery"
-      contentClassName="xl:grid-cols-[minmax(360px,35fr)_minmax(0,65fr)]"
+      leftClassName="border-0 bg-transparent p-0 shadow-none"
     />
   );
 }
