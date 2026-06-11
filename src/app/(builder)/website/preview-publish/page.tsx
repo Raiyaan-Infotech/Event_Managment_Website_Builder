@@ -1,4 +1,4 @@
-﻿import { ComingSoon } from "../_components/coming-soon";
+import { ComingSoon } from "../_components/coming-soon";
 import { Send } from "lucide-react";
 
 export default function PreviewPublishPage() {

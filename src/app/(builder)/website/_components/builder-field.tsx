@@ -238,7 +238,7 @@ interface BuilderIconOptionGroupProps<T extends string> {
    * "2"    – force 2 columns always
    * "3"    – 2 cols on mobile, 3 on sm+
    * "4"    – 2 cols on mobile, 4 on sm+
-   * "5"    – 3 cols on mobile, 5 on sm+
+   * "5"    – 2 cols on mobile, 5 on sm+
    */
   columns?: "auto" | "2" | "3" | "4" | "5";
 }
@@ -256,11 +256,11 @@ export function BuilderIconOptionGroup<T extends string>({
     "2": "grid grid-cols-2",
     "3": "grid grid-cols-2 sm:grid-cols-3",
     "4": "grid grid-cols-2 sm:grid-cols-4",
-    "5": "grid grid-cols-3 sm:grid-cols-5",
+    "5": "grid grid-cols-2 sm:grid-cols-5",
   }[columns];
 
   return (
-    <div className={cn(gridClass, "gap-1.5 sm:gap-2", className)}>
+    <div className={cn(gridClass, "min-w-0 gap-1.5 sm:gap-2", className)}>
       {options.map((option) => {
         const active = value === option.value;
 

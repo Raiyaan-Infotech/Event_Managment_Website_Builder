@@ -140,7 +140,7 @@ export function WebsiteBuilderLayout({
 
       <div
         className={cn(
-          "grid min-h-0 flex-1 grid-cols-1 gap-2 overflow-hidden",
+          "grid min-h-0 min-w-0 flex-1 grid-cols-1 gap-2 overflow-hidden",
           sidebar &&
             "xl:grid-cols-[minmax(0,1fr)_minmax(240px,280px)]",
           contentClassName,
@@ -149,11 +149,11 @@ export function WebsiteBuilderLayout({
         {/* Main form panel */}
         <aside
           className={cn(
-            "flex h-full max-h-full flex-col overflow-hidden rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] shadow-sm website-builder-form-panel",
+            "flex h-full max-h-full min-w-0 max-w-full flex-col overflow-hidden rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] shadow-sm website-builder-form-panel",
             leftClassName,
           )}
         >
-          <div className="builder-form-scroll min-h-0 flex-1 overflow-y-auto p-2 sm:p-3 h-full">
+          <div className="builder-form-scroll h-full min-h-0 min-w-0 max-w-full flex-1 overflow-x-hidden overflow-y-auto p-2 sm:p-3">
             {form}
           </div>
         </aside>
@@ -162,7 +162,7 @@ export function WebsiteBuilderLayout({
         {sidebar ? (
           <aside
             className={cn(
-              "flex h-full max-h-full flex-col overflow-hidden rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] shadow-sm website-builder-sidebar-panel",
+              "flex h-full max-h-full min-w-0 max-w-full flex-col overflow-hidden rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] shadow-sm website-builder-sidebar-panel",
               sidebarClassName,
             )}
           >

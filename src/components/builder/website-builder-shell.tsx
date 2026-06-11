@@ -27,6 +27,7 @@ export function WebsiteBuilderShell({
   const [device, setDevice] = useState<"desktop" | "mobile">("desktop");
   const [collapsed, setCollapsed] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -42,7 +43,16 @@ export function WebsiteBuilderShell({
     setCollapsed(localStorage.getItem("wb-sidebar-collapsed") === "1");
   }, []);
 
+  useEffect(() => {
+    setMobileSidebarOpen(false);
+  }, [pathname]);
+
   function toggleSidebar() {
+    if (window.matchMedia("(max-width: 639px)").matches) {
+      setMobileSidebarOpen((prev) => !prev);
+      return;
+    }
+
     setCollapsed((prev) => {
       const next = !prev;
       localStorage.setItem("wb-sidebar-collapsed", next ? "1" : "0");
@@ -66,7 +76,7 @@ export function WebsiteBuilderShell({
           <button
             type="button"
             onClick={toggleSidebar}
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label={mobileSidebarOpen || !collapsed ? "Close navigation" : "Open navigation"}
             className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[var(--radius-button)] border border-[var(--color-border)] bg-white text-gray-500 transition-colors hover:bg-gray-100 hover:text-[var(--color-text)]"
           >
             <PanelLeft className="h-3.5 w-3.5" />
@@ -172,7 +182,21 @@ export function WebsiteBuilderShell({
         actually clips and the scroll container inside works correctly.
       */}
       <div className="flex min-h-0 flex-1 overflow-hidden">
-        <Sidebar pathname={pathname} collapsed={collapsed} />
+        <button
+          type="button"
+          aria-label="Close navigation"
+          onClick={() => setMobileSidebarOpen(false)}
+          className={cn(
+            "fixed inset-x-0 bottom-0 top-[var(--header-height)] z-20 bg-transparent sm:hidden",
+            mobileSidebarOpen ? "block" : "hidden",
+          )}
+        />
+        <Sidebar
+          pathname={pathname}
+          collapsed={collapsed}
+          mobileOpen={mobileSidebarOpen}
+          onNavigate={() => setMobileSidebarOpen(false)}
+        />
 
         {/*
           This <main> is the ONE true scroll container for page content.
