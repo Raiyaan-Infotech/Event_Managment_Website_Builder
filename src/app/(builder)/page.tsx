@@ -58,7 +58,7 @@ const toneClasses = {
 
 function SetupProgress() {
   return (
-    <SectionCard contentClassName="p-4">
+    <SectionCard contentClassName="p-4 sm:p-5">
       <div className="flex items-start justify-between">
         <div>
           <h2 className="text-[18px] font-semibold leading-6 tracking-[-0.02em] text-[var(--color-text)]">
@@ -75,7 +75,7 @@ function SetupProgress() {
         <div className="h-full w-[85%] rounded-full bg-[var(--color-primary)]" />
       </div>
 
-      <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-7">
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-7">
         {steps.map(([label, status], index) => {
           const done = status === "Completed";
           return (
@@ -110,9 +110,9 @@ function AnalyticsChart() {
     <SectionCard
       title="Website Analytics"
       actions={<ActionButton variant="outline" className="h-9 px-4 text-[13px]">Last 30 Days</ActionButton>}
-      contentClassName="p-4"
+      contentClassName="p-4 sm:p-5"
     >
-      <div className="grid items-center gap-5 lg:grid-cols-[280px_minmax(0,1fr)]">
+      <div className="grid items-center gap-4 sm:gap-5 lg:grid-cols-[280px_minmax(0,1fr)]">
         <div className="grid gap-2 sm:grid-cols-2 lg:h-[210px]">
           {metricCards.map(([label, value, growth, Icon, tone]) => (
             <Card key={label} className="flex min-h-[96px] items-center p-3.5">
@@ -130,9 +130,9 @@ function AnalyticsChart() {
           ))}
         </div>
 
-        <div className="min-w-0 rounded-[var(--radius-card)] border border-[var(--color-border)] bg-white p-4">
-          <div className="grid h-[210px] grid-cols-[40px_minmax(0,1fr)] grid-rows-[1fr_24px]">
-            <div className="flex flex-col justify-between pb-6 pr-3 text-right text-[12px] font-medium text-[var(--color-text-secondary)]">
+        <div className="min-w-0 overflow-x-auto rounded-[var(--radius-card)] border border-[var(--color-border)] bg-white p-3 sm:overflow-visible sm:p-4">
+          <div className="grid h-[190px] min-w-[560px] grid-cols-[36px_minmax(500px,1fr)] grid-rows-[1fr_24px] sm:h-[210px] sm:min-w-0 sm:grid-cols-[40px_minmax(0,1fr)]">
+            <div className="flex flex-col justify-between pb-6 pr-2 text-right text-[10px] font-medium text-[var(--color-text-secondary)] sm:pr-3 sm:text-[12px]">
               {yAxisLabels.map((label) => <span key={label}>{label}</span>)}
             </div>
             <div className="min-w-0 overflow-hidden">
@@ -157,7 +157,7 @@ function AnalyticsChart() {
               </svg>
             </div>
             <div />
-            <div className="flex items-end justify-between text-[12px] font-medium text-[var(--color-text-secondary)]">
+            <div className="flex items-end justify-between text-[10px] font-medium text-[var(--color-text-secondary)] sm:text-[12px]">
               {xAxisLabels.map((label) => <span key={label}>{label}</span>)}
             </div>
           </div>
@@ -169,7 +169,7 @@ function AnalyticsChart() {
 
 function StatusPanel() {
   return (
-    <SectionCard contentClassName="p-4">
+    <SectionCard contentClassName="p-4 sm:p-5">
       <div className="flex items-center justify-between">
         <h2 className="text-[18px] font-semibold leading-6 tracking-[-0.02em]">Website Status</h2>
         <StatusBadge status="draft">Draft</StatusBadge>
@@ -216,20 +216,20 @@ function StatusPanel() {
 
 function QuickActions() {
   return (
-    <SectionCard title="Quick Actions" contentClassName="p-4">
-      <div className="space-y-1">
+    <SectionCard title="Quick Actions" contentClassName="p-4 sm:p-5">
+      <div className="space-y-3">
         {quickActions.map(([label, Icon]) => (
           <button
             key={label}
-            className="flex h-10 w-full items-center justify-between rounded-[var(--radius-input)] px-2 text-left text-[14px] font-medium transition duration-150 ease-in-out hover:bg-slate-50"
+            className="flex min-h-12 w-full items-center justify-between gap-4 rounded-[var(--radius-input)] px-3 text-left text-[14px] font-medium transition duration-150 ease-in-out hover:bg-slate-50 sm:px-3.5"
           >
-            <span className="flex items-center gap-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-input)] bg-blue-50 text-[var(--color-primary)]">
+            <span className="flex min-w-0 items-center gap-3.5">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-input)] bg-blue-50 text-[var(--color-primary)]">
                 <Icon className="h-5 w-5" />
               </span>
-              {label}
+              <span className="truncate">{label}</span>
             </span>
-            <span className="text-[var(--color-text-secondary)]">-&gt;</span>
+            <span className="ml-3 shrink-0 text-[var(--color-text-secondary)]">-&gt;</span>
           </button>
         ))}
       </div>
@@ -239,7 +239,7 @@ function QuickActions() {
 
 function RecentActivity() {
   return (
-    <SectionCard title="Recent Activity" contentClassName="p-4">
+    <SectionCard title="Recent Activity" contentClassName="p-4 sm:p-5">
       <div className="divide-y divide-[var(--color-border)]">
         {activities.map(([title, desc, time, Icon, tone]) => (
           <div key={title} className="flex flex-col gap-2 py-2.5 sm:flex-row sm:items-center sm:justify-between">
@@ -267,7 +267,7 @@ function RecentActivity() {
 
 function NeedHelpCard() {
   return (
-    <SectionCard contentClassName="flex items-center gap-3 p-4">
+    <SectionCard contentClassName="flex items-center gap-3 p-4 sm:p-5">
       <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-50 text-[var(--color-primary)]">
         <Headphones className="h-6 w-6" />
       </div>
@@ -284,9 +284,9 @@ function NeedHelpCard() {
 
 export default function DashboardPage() {
   return (
-      <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="space-y-3">
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-5 p-4 sm:p-5 xl:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="space-y-5">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
             <StatCard title="Total Bookings" value="48" growth="18%" icon={Calendar} />
             <StatCard title="Leads" value="126" growth="22%" icon={Users} tone="purple" />
             <StatCard title="Customers" value="89" growth="15%" icon={Users} tone="teal" />
@@ -297,7 +297,7 @@ export default function DashboardPage() {
           <RecentActivity />
         </div>
 
-        <div className="w-full space-y-3 xl:w-[320px]">
+        <div className="w-full space-y-5 xl:w-[320px]">
           <StatusPanel />
           <QuickActions />
           <NeedHelpCard />

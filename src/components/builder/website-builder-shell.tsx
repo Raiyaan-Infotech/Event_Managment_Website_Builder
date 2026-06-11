@@ -71,8 +71,8 @@ export function WebsiteBuilderShell({
       style={{ height: "100dvh" }}
     >
       {/* ── Header ─────────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-30 grid h-[var(--header-height)] shrink-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-b border-[var(--color-border)] bg-white/95 px-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/80 sm:px-4">
-        <div className="flex min-w-0 items-center gap-2">
+      <header className="sticky top-0 z-30 grid h-[var(--header-height)] shrink-0 grid-cols-[auto_auto] items-center justify-between gap-1.5 border-b border-[var(--color-border)] bg-white/95 px-2 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/80 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:gap-3 sm:px-4">
+        <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
           <button
             type="button"
             onClick={toggleSidebar}
@@ -81,7 +81,7 @@ export function WebsiteBuilderShell({
           >
             <PanelLeft className="h-3.5 w-3.5" />
           </button>
-          <div className="flex min-w-0 items-center gap-1.5">
+          <div className="flex min-w-0 items-center gap-1 sm:gap-1.5">
             <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[var(--radius-button)] bg-[var(--color-primary)] text-white">
               <Globe className="h-3.5 w-3.5" />
             </div>
@@ -96,7 +96,7 @@ export function WebsiteBuilderShell({
           </div>
         </div>
 
-        <div className="flex min-w-0 items-center justify-center gap-2">
+        <div className="hidden min-w-0 items-center justify-center gap-1 sm:flex sm:gap-2">
           <button className="hidden min-w-0 items-center gap-1.5 rounded-[var(--radius-button)] border border-[var(--color-border)] bg-white px-2.5 py-1 text-[12px] font-semibold text-[var(--color-text)] transition-colors hover:bg-gray-50 sm:flex">
             <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded bg-[var(--color-primary)] text-[8px] font-bold text-white">
               RM
@@ -131,16 +131,16 @@ export function WebsiteBuilderShell({
           </div>
         </div>
 
-        <div className="flex min-w-0 items-center justify-end gap-2 overflow-x-auto">
-          <Button variant="outline" size="sm" className="h-7 shrink-0 gap-1.5 px-2 text-[12px] font-medium sm:px-2.5">
+        <div className="flex min-w-max items-center justify-end gap-1 overflow-visible sm:min-w-0 sm:gap-2 sm:overflow-x-auto">
+          <Button variant="outline" size="sm" className="hidden h-7 shrink-0 gap-1.5 px-2 text-[12px] font-medium sm:inline-flex sm:px-2.5">
             <Save className="h-3 w-3" />
             <span className="hidden lg:inline">Save Draft</span>
           </Button>
-          <Button variant="outline" size="sm" className="h-7 shrink-0 gap-1.5 border-[var(--color-primary)]/30 px-2 text-[12px] font-medium text-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 sm:px-2.5">
+          <Button variant="outline" size="sm" className="hidden h-7 shrink-0 gap-1.5 border-[var(--color-primary)]/30 px-2 text-[12px] font-medium text-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 sm:inline-flex sm:px-2.5">
             <Eye className="h-3 w-3" />
             <span className="hidden lg:inline">Preview Website</span>
           </Button>
-          <Button size="sm" className="h-7 shrink-0 gap-1.5 bg-[var(--color-primary)] px-2 text-[12px] font-semibold hover:bg-[var(--color-primary)]/90 sm:px-3">
+          <Button size="sm" className="hidden h-7 shrink-0 gap-1.5 bg-[var(--color-primary)] px-2 text-[12px] font-semibold hover:bg-[var(--color-primary)]/90 sm:inline-flex sm:px-3">
             <Globe className="h-3 w-3" />
             <span className="hidden lg:inline">Publish Website</span>
           </Button>
@@ -172,6 +172,21 @@ export function WebsiteBuilderShell({
           </div>
         </div>
       </header>
+
+      <div className="grid shrink-0 gap-2 border-b border-[var(--color-border)] bg-white/95 p-2 shadow-sm sm:hidden">
+        <Button variant="outline" size="sm" className="h-9 w-full justify-start gap-2 px-3 text-[12px] font-medium">
+          <Save className="h-3.5 w-3.5" />
+          Save Draft
+        </Button>
+        <Button variant="outline" size="sm" className="h-9 w-full justify-start gap-2 border-[var(--color-primary)]/30 px-3 text-[12px] font-medium text-[var(--color-primary)] hover:bg-[var(--color-primary)]/5">
+          <Eye className="h-3.5 w-3.5" />
+          Preview Website
+        </Button>
+        <Button size="sm" className="h-9 w-full justify-start gap-2 bg-[var(--color-primary)] px-3 text-[12px] font-semibold hover:bg-[var(--color-primary)]/90">
+          <Globe className="h-3.5 w-3.5" />
+          Publish Website
+        </Button>
+      </div>
 
       {/* ── Body row ───────────────────────────────────────────────────── */}
       {/*
