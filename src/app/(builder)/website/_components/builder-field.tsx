@@ -21,7 +21,6 @@ export function BuilderLabel({
   return (
     <label
       className={cn(
-        // Mobile: slightly bigger for legibility; md+ stays at 10px
         "text-[10px] font-semibold text-slate-600",
         className,
       )}
@@ -71,12 +70,13 @@ export function BuilderCountedInput({
           placeholder={placeholder}
           onChange={(event) => onChange(event.target.value)}
           className={cn(
-            // Taller tap target on mobile, normal on md+
-            "h-10 sm:h-9 w-full pr-14 text-[11px] font-medium",
+            // h-8 on mobile (32px), h-9 on sm+ — fits the compact panel
+            "h-8 sm:h-9 w-full pr-12 text-[11px] font-medium",
             inputClassName,
           )}
         />
-        <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[8px] font-bold text-slate-500">
+        {/* Character counter — stays inside the input on the right */}
+        <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[8px] font-bold text-slate-400 tabular-nums">
           {value.length}/{maxLength}
         </span>
       </div>
@@ -117,11 +117,13 @@ export function BuilderCountedTextarea({
           placeholder={placeholder}
           onChange={(event) => onChange(event.target.value)}
           className={cn(
-            "min-h-[4.5rem] sm:min-h-16 w-full pb-6 text-[11px] font-medium leading-4",
+            // Slightly taller on mobile for comfortable typing
+            "min-h-[4rem] sm:min-h-16 w-full pb-5 text-[11px] font-medium leading-4",
             textareaClassName,
           )}
         />
-        <span className="pointer-events-none absolute bottom-1.5 right-2.5 text-[8px] font-bold text-slate-500">
+        {/* Counter anchored to bottom-right of textarea */}
+        <span className="pointer-events-none absolute bottom-1.5 right-2 text-[8px] font-bold text-slate-400 tabular-nums">
           {value.length}/{maxLength}
         </span>
       </div>
@@ -144,8 +146,8 @@ interface BuilderSegmentedControlProps<T extends string> {
   label?: string;
   className?: string;
   /**
-   * "wrap"  – buttons wrap to the next row when space is tight (default)
-   * "grid"  – buttons fill a uniform grid; each option gets equal width
+   * "wrap"   – buttons wrap to the next row when space is tight (default)
+   * "grid"   – buttons fill a uniform grid; each option gets equal width
    * "scroll" – single row, horizontally scrollable (good for many options)
    */
   layout?: "wrap" | "grid" | "scroll";
@@ -160,12 +162,11 @@ export function BuilderSegmentedControl<T extends string>({
   layout = "wrap",
 }: BuilderSegmentedControlProps<T>) {
   const containerClass = {
-    wrap: "flex flex-wrap gap-2",
-    grid: "grid gap-2",
-    scroll: "flex gap-2 overflow-x-auto pb-1 scrollbar-none",
+    wrap: "flex flex-wrap gap-1.5",
+    grid: "grid gap-1.5",
+    scroll: "flex gap-1.5 overflow-x-auto pb-1 scrollbar-none",
   }[layout];
 
-  // For grid layout derive columns: ≤3 options → fill equally; 4+ → 2 cols on mobile, 3 on sm+
   const gridCols =
     layout === "grid"
       ? options.length <= 3
@@ -186,11 +187,12 @@ export function BuilderSegmentedControl<T extends string>({
               type="button"
               onClick={() => onChange(option.value)}
               className={cn(
-                "inline-flex h-8 items-center justify-center rounded-[var(--vendor-radius-control)] border px-4 box-border",
+                // h-8 everywhere; min-w keeps labels readable on mobile
+                "inline-flex h-8 items-center justify-center rounded-[var(--vendor-radius-control)] border px-3 box-border",
                 "text-[10px] font-bold transition",
-                layout === "wrap" && "min-w-[5.5rem] flex-1 sm:flex-none",
+                layout === "wrap" && "min-w-[4.5rem] flex-1 sm:flex-none sm:min-w-[5.5rem]",
                 layout === "grid" && "w-full min-w-0",
-                layout === "scroll" && "shrink-0 min-w-[5.5rem]",
+                layout === "scroll" && "shrink-0 min-w-[4.5rem]",
                 active
                   ? "border-[var(--vendor-primary-btn)] bg-[var(--vendor-primary-btn)]/10 text-[var(--vendor-primary-btn)]"
                   : "border-[var(--vendor-border)] text-slate-600 hover:bg-slate-50",
@@ -201,7 +203,7 @@ export function BuilderSegmentedControl<T extends string>({
               ) : (
                 <span
                   className={cn(
-                    "mr-2 h-3 w-3 shrink-0 rounded-full border",
+                    "mr-1.5 h-2.5 w-2.5 shrink-0 rounded-full border",
                     active
                       ? "border-[var(--vendor-primary-btn)] bg-[var(--vendor-primary-btn)]"
                       : "border-slate-300",
@@ -232,11 +234,11 @@ interface BuilderIconOptionGroupProps<T extends string> {
   className?: string;
   optionClassName?: string;
   /**
-   * "auto"  – Tailwind auto-fills columns with min 64px cells (default)
-   * "2"     – force 2 columns always
-   * "3"     – 2 cols on mobile, 3 on sm+
-   * "4"     – 2 cols on mobile, 4 on sm+
-   * "5"     – 3 cols on mobile, 5 on sm+
+   * "auto" – auto-fills columns with min 52px cells (default)
+   * "2"    – force 2 columns always
+   * "3"    – 2 cols on mobile, 3 on sm+
+   * "4"    – 2 cols on mobile, 4 on sm+
+   * "5"    – 3 cols on mobile, 5 on sm+
    */
   columns?: "auto" | "2" | "3" | "4" | "5";
 }
@@ -258,7 +260,7 @@ export function BuilderIconOptionGroup<T extends string>({
   }[columns];
 
   return (
-    <div className={cn(gridClass, "gap-2", className)}>
+    <div className={cn(gridClass, "gap-1.5 sm:gap-2", className)}>
       {options.map((option) => {
         const active = value === option.value;
 
@@ -268,12 +270,12 @@ export function BuilderIconOptionGroup<T extends string>({
             type="button"
             onClick={() => onChange(option.value)}
             className={cn(
-              // Fluid card: icon centred, label below, equal height via aspect or min-h
-              "flex w-full flex-col items-center gap-1.5 rounded-[var(--vendor-radius-control)] border",
-              "px-1.5 py-1.5",
+              "flex w-full flex-col items-center gap-1 rounded-[var(--vendor-radius-control)] border",
+              // Slightly more padding on mobile for easier tapping
+              "px-1 py-1.5 sm:px-1.5 sm:py-1.5",
               "text-[9px] font-medium transition-colors",
-              "min-h-0",
-              // Touch-friendly: slightly larger tap area on mobile
+              // Ensure tap target is at least 36px tall
+              "min-h-[36px]",
               active
                 ? "border-[var(--vendor-primary-btn)] bg-[var(--vendor-primary-btn)]/8 text-[var(--vendor-primary-btn)]"
                 : "border-[var(--vendor-border)] bg-white text-slate-500 hover:border-slate-300",

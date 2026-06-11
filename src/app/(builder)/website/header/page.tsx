@@ -131,15 +131,17 @@ export default function WebsiteHeaderPage() {
         </p>
       </div>
 
-      {/* ── Top row: Company Info + Contact Info ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+      {/* ── Top row: Company Info + Contact Info ──
+          Single column on mobile/tablet, 2-col on lg+
+          Using minmax(0,1fr) so neither column can overflow its track. */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:items-start">
 
         {/* ── 1. Company Information ── */}
         <FormSection
           title="Company Information"
-          icon={<Camera className="h-[18px] w-[18px]" />}
+          icon={<Camera className="h-[16px] w-[16px] sm:h-[18px] sm:w-[18px]" />}
           subtitle="Update your company details and logo."
-          className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-4 shadow-sm space-y-3"
+          className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-3 shadow-sm space-y-3 sm:p-4"
         >
           <ImageUpload
             compact
@@ -172,9 +174,9 @@ export default function WebsiteHeaderPage() {
         {/* ── 2. Contact Information ── */}
         <FormSection
           title="Contact Information"
-          icon={<Phone className="h-[18px] w-[18px]" />}
+          icon={<Phone className="h-[16px] w-[16px] sm:h-[18px] sm:w-[18px]" />}
           subtitle="Update how your customers can reach you."
-          className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-4 shadow-sm space-y-3"
+          className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-3 shadow-sm space-y-3 sm:p-4"
         >
           <BuilderSegmentedControl
             label="Contact Type"
@@ -186,7 +188,8 @@ export default function WebsiteHeaderPage() {
             ]}
           />
 
-          <div className="grid grid-cols-2 gap-3">
+          {/* Mobile + Email: stack on xs, side-by-side on sm+ */}
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <BuilderCountedInput
               label="Mobile"
               required
@@ -220,19 +223,19 @@ export default function WebsiteHeaderPage() {
       {/* ── 3. Social Media Links ── */}
       <FormSection
         title="Social Media Links"
-        subtitle="Add and manage your social media profiles. These will appear in your website header/footer."
-        icon={<Share2 className="h-[18px] w-[18px]" />}
+        subtitle="Add and manage your social media profiles."
+        icon={<Share2 className="h-[16px] w-[16px] sm:h-[18px] sm:w-[18px]" />}
         actions={
           <PrimaryButton
             type="button"
             size="sm"
             onClick={addSocialLink}
-            className="h-8 px-3 text-[11px] gap-1"
+            className="h-7 px-2.5 text-[10px] gap-1 sm:h-8 sm:px-3 sm:text-[11px]"
           >
             + Add Link
           </PrimaryButton>
         }
-        className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-4 shadow-sm space-y-3"
+        className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-3 shadow-sm space-y-3 sm:p-4"
       >
         {/* Social link rows */}
         <div className="rounded-[var(--vendor-radius-control)] border border-[var(--vendor-border)] divide-y divide-[var(--vendor-border)]">
@@ -246,35 +249,55 @@ export default function WebsiteHeaderPage() {
               return (
                 <div
                   key={item.id}
-                  className="flex items-center gap-3 px-3 py-2.5"
+                  className="flex flex-col gap-2 px-2.5 py-2 sm:flex-row sm:items-center sm:gap-3"
                 >
-                  {/* Drag handle */}
-                  <GripVertical className="h-4 w-4 shrink-0 text-[var(--vendor-text-muted)] cursor-grab" />
+                  {/* Row 1 (mobile): handle + icon + label + action buttons */}
+                  <div className="flex items-center gap-2 sm:gap-2.5">
+                    {/* Drag handle */}
+                    <GripVertical className="h-3.5 w-3.5 shrink-0 text-[var(--vendor-text-muted)] cursor-grab" />
 
-                  {/* Coloured icon badge */}
-                  <span
-                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] text-white"
-                    style={{ backgroundColor: item.color }}
-                  >
-                    <Icon className="h-4 w-4" />
-                  </span>
+                    {/* Coloured icon badge */}
+                    <span
+                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[6px] text-white sm:h-8 sm:w-8 sm:rounded-[8px]"
+                      style={{ backgroundColor: item.color }}
+                    >
+                      <Icon className="h-3.5 w-3.5" />
+                    </span>
 
-                  {/* Platform name */}
-                  <span className="w-[88px] shrink-0 text-[11px] font-semibold text-[var(--vendor-text)]">
-                    {item.label}
-                  </span>
+                    {/* Platform name — fixed width so URL input aligns */}
+                    <span className="w-[76px] shrink-0 text-[10px] font-semibold text-[var(--vendor-text)] sm:w-[88px] sm:text-[11px]">
+                      {item.label}
+                    </span>
 
-                  {/* URL input */}
+                    {/* Edit / Delete — inline on mobile (right-aligned) */}
+                    <div className="ml-auto flex shrink-0 gap-1 sm:hidden">
+                      <Button type="button" variant="outline" size="icon-xs">
+                        <Edit2 className="h-3 w-3" />
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon-xs"
+                        className="text-rose-500 hover:text-rose-600"
+                        onClick={() => deleteSocialLink(item.id)}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Row 2 (mobile) / inline (sm+): URL input */}
                   <Input
                     value={item.url}
                     onChange={(e) =>
                       updateSocialLink(item.id, { url: e.target.value })
                     }
-                    className="h-7 flex-1 min-w-0 text-[10px] font-medium px-2 font-mono"
+                    // Full width on mobile so it's easy to type in
+                    className="h-7 w-full min-w-0 flex-1 px-2 font-mono text-[10px] font-medium"
                   />
 
-                  {/* Edit / Delete */}
-                  <div className="flex shrink-0 gap-1">
+                  {/* Edit / Delete — sm+ only, inline after the URL input */}
+                  <div className="hidden shrink-0 gap-1 sm:flex">
                     <Button type="button" variant="outline" size="icon-xs">
                       <Edit2 className="h-3.5 w-3.5" />
                     </Button>

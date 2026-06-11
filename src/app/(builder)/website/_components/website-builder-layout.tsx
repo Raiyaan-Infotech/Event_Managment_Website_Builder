@@ -40,7 +40,6 @@ export function WebsiteBuilderLayout({
   title,
   breadcrumbs = [],
   form,
-  preview,
   previewTitle = "Live Preview",
   previewSubtitle,
   saveLabel = "Save Changes",
@@ -63,15 +62,18 @@ export function WebsiteBuilderLayout({
   return (
     <div
       className={cn(
-        "flex flex-col overflow-hidden bg-[var(--vendor-page-bg)] px-3 py-1.5",
+        "flex flex-col overflow-hidden bg-[var(--vendor-page-bg)]",
+        // Responsive padding: tighter on mobile, comfortable on desktop
+        "px-2 py-1.5 sm:px-3",
         "h-full",
         className,
       )}
     >
       {!hideHeader && (
-        <header className="mb-1.5 flex shrink-0 flex-col gap-1.5 lg:flex-row lg:items-start lg:justify-between">
+        <header className="mb-1.5 flex shrink-0 flex-col gap-1.5">
+          {/* Title row */}
           <div className="min-w-0">
-            <h1 className="text-[15px] font-black leading-5 text-[var(--vendor-text)]">
+            <h1 className="text-[15px] font-black leading-5 text-[var(--vendor-text)] truncate">
               {title}
             </h1>
             {breadcrumbs.length > 0 ? (
@@ -81,7 +83,8 @@ export function WebsiteBuilderLayout({
             )}
           </div>
 
-          <div className="flex shrink-0 flex-wrap items-center gap-2">
+          {/* Action buttons row — scrollable on mobile so they never wrap to 2 rows */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
             {topActions}
             <OutlineButton
               type="button"
@@ -90,20 +93,21 @@ export function WebsiteBuilderLayout({
                 onPreview ||
                 (() => window.open("/website/preview-publish", "_blank"))
               }
-              className="h-8 px-3 text-[12px] gap-1.5"
+              // Shrink text/padding on very small screens
+              className="h-8 shrink-0 px-2.5 text-[11px] gap-1 sm:px-3 sm:text-[12px] sm:gap-1.5"
             >
-              <Eye className="h-3.5 w-3.5" />
-              Preview
+              <Eye className="h-3.5 w-3.5 shrink-0" />
+              <span>Preview</span>
             </OutlineButton>
             {onHowItWorks && (
               <OutlineButton
                 type="button"
                 size="sm"
                 onClick={onHowItWorks}
-                className="h-8 px-3 text-[12px]"
+                className="h-8 shrink-0 px-2.5 text-[11px] sm:px-3"
               >
-                <HelpCircle className="h-4 w-4" />
-                {howItWorksLabel}
+                <HelpCircle className="h-3.5 w-3.5 shrink-0" />
+                <span className="hidden sm:inline">{howItWorksLabel}</span>
               </OutlineButton>
             )}
             <PrimaryButton
@@ -111,33 +115,36 @@ export function WebsiteBuilderLayout({
               size="sm"
               onClick={onSave}
               disabled={disableSave || isSaving}
-              className="h-8 px-3 text-[12px] shadow-sm"
+              className="h-8 shrink-0 px-2.5 text-[11px] shadow-sm sm:px-3 sm:text-[12px]"
             >
-              <Save className="h-4 w-4" />
-              {isSaving ? "Saving..." : saveLabel}
+              <Save className="h-3.5 w-3.5 shrink-0" />
+              <span>{isSaving ? "Saving…" : saveLabel}</span>
             </PrimaryButton>
           </div>
         </header>
       )}
+
       <div
         className={cn(
           "grid min-h-0 flex-1 grid-cols-1 gap-2 overflow-hidden",
-          sidebar
-            ? "xl:grid-cols-[minmax(0,1fr)_minmax(240px,280px)]"
-            : "grid-cols-1",
+          sidebar &&
+            "xl:grid-cols-[minmax(0,1fr)_minmax(240px,280px)]",
           contentClassName,
         )}
       >
+        {/* Main form panel */}
         <aside
           className={cn(
             "flex h-full max-h-full flex-col overflow-hidden rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] shadow-sm website-builder-form-panel",
             leftClassName,
           )}
         >
-<div className="builder-form-scroll min-h-0 flex-1 overflow-y-auto p-3 h-full">
+          <div className="builder-form-scroll min-h-0 flex-1 overflow-y-auto p-2 sm:p-3 h-full">
             {form}
           </div>
         </aside>
+
+        {/* Optional sidebar */}
         {sidebar ? (
           <aside
             className={cn(
@@ -145,7 +152,9 @@ export function WebsiteBuilderLayout({
               sidebarClassName,
             )}
           >
-            <div className="min-h-0 flex-1 overflow-y-auto p-3">{sidebar}</div>
+            <div className="min-h-0 flex-1 overflow-y-auto p-2 sm:p-3">
+              {sidebar}
+            </div>
           </aside>
         ) : null}
       </div>

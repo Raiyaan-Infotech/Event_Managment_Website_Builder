@@ -12,7 +12,15 @@ interface SidebarProps {
   collapsed: boolean;
 }
 
-function SidebarItem({ item, pathname, collapsed }: { item: NavItem; pathname: string; collapsed: boolean }) {
+function SidebarItem({
+  item,
+  pathname,
+  collapsed,
+}: {
+  item: NavItem;
+  pathname: string;
+  collapsed: boolean;
+}) {
   const Icon = item.icon;
   const active = isActivePath(pathname, item.href);
 
@@ -44,10 +52,21 @@ function SidebarItem({ item, pathname, collapsed }: { item: NavItem; pathname: s
   );
 }
 
-function NavGroupItem({ item, pathname, collapsed }: { item: NavItem; pathname: string; collapsed: boolean }) {
-  const [open, setOpen] = React.useState(() => isActivePath(pathname, item.href));
+function NavGroupItem({
+  item,
+  pathname,
+  collapsed,
+}: {
+  item: NavItem;
+  pathname: string;
+  collapsed: boolean;
+}) {
+  const [open, setOpen] = React.useState(() =>
+    isActivePath(pathname, item.href),
+  );
   const Icon = item.icon;
-  const hasActiveChild = item.children?.some((child) => isActivePath(pathname, child.href)) ?? false;
+  const hasActiveChild =
+    item.children?.some((child) => isActivePath(pathname, child.href)) ?? false;
   const active = isActivePath(pathname, item.href) || hasActiveChild;
 
   React.useEffect(() => {
@@ -60,8 +79,10 @@ function NavGroupItem({ item, pathname, collapsed }: { item: NavItem; pathname: 
         href={item.href}
         title={item.label}
         className={cn(
-        "flex h-7 w-full items-center justify-center rounded-[var(--radius-sidebar-item)] text-[11px] font-medium transition-colors duration-100",
-          active ? "bg-[var(--color-primary)] text-white shadow-sm" : "text-[var(--color-text-secondary)] hover:bg-slate-100",
+          "flex h-7 w-full items-center justify-center rounded-[var(--radius-sidebar-item)] text-[11px] font-medium transition-colors duration-100",
+          active
+            ? "bg-[var(--color-primary)] text-white shadow-sm"
+            : "text-[var(--color-text-secondary)] hover:bg-slate-100",
         )}
       >
         <Icon className="h-3.5 w-3.5" strokeWidth={2} />
@@ -75,13 +96,18 @@ function NavGroupItem({ item, pathname, collapsed }: { item: NavItem; pathname: 
         onClick={() => setOpen(!open)}
         className={cn(
           "flex h-7 w-full items-center gap-1.5 rounded-[var(--radius-sidebar-item)] px-2 text-[11px] font-medium transition-colors duration-100",
-          active ? "bg-[var(--color-primary)] text-white shadow-sm" : "text-[var(--color-text-secondary)] hover:bg-slate-100 hover:text-[var(--color-text)]",
+          active
+            ? "bg-[var(--color-primary)] text-white shadow-sm"
+            : "text-[var(--color-text-secondary)] hover:bg-slate-100 hover:text-[var(--color-text)]",
         )}
       >
         <Icon className="h-[13px] w-[13px] shrink-0" strokeWidth={2} />
         <span className="flex-1 truncate text-left">{item.label}</span>
         <ChevronRight
-          className={cn("h-3 w-3 shrink-0 transition-transform duration-150", open && "rotate-90")}
+          className={cn(
+            "h-3 w-3 shrink-0 transition-transform duration-150",
+            open && "rotate-90",
+          )}
         />
       </button>
 
@@ -98,7 +124,10 @@ function NavGroupItem({ item, pathname, collapsed }: { item: NavItem; pathname: 
                   : "text-[var(--color-text-secondary)] hover:bg-slate-100 hover:text-[var(--color-text)]",
               )}
             >
-              <child.icon className="h-[11px] w-[11px] shrink-0" strokeWidth={2} />
+              <child.icon
+                className="h-[11px] w-[11px] shrink-0"
+                strokeWidth={2}
+              />
               <span className="truncate">{child.label}</span>
             </Link>
           ))}
@@ -112,12 +141,24 @@ export function Sidebar({ pathname, collapsed }: SidebarProps) {
   return (
     <aside
       style={{ width: collapsed ? 48 : 180 }}
-      className="fixed bottom-0 left-0 top-[var(--header-height)] z-20 flex flex-col overflow-hidden border-r border-[var(--color-border)] bg-white/95 shadow-sm transition-[width] duration-200 ease-in-out"
+      className={cn(
+        // KEY FIX: `relative` (not fixed) so the sidebar participates in the
+        // flex row. `<main>` then naturally fills the remaining space with no
+        // margin hacks needed.
+        "relative z-20 flex shrink-0 flex-col overflow-hidden",
+        "border-r border-[var(--color-border)] bg-white/95 shadow-sm",
+        // Width transition stays — the flex container width animates smoothly
+        "transition-[width] duration-200 ease-in-out",
+        // Fill the full body height (parent flex row is already h-full)
+        "h-full",
+      )}
     >
-      <div className={cn(
-        "flex-1 overflow-y-auto overflow-x-hidden py-2 space-y-2",
-        collapsed ? "px-1.5" : "px-2.5",
-      )}>
+      <div
+        className={cn(
+          "flex-1 overflow-y-auto overflow-x-hidden py-2 space-y-2",
+          collapsed ? "px-1.5" : "px-2.5",
+        )}
+      >
         {navSections.map((section, i) => (
           <div key={i} className="space-y-0.5">
             {section.title && !collapsed && (
@@ -130,9 +171,19 @@ export function Sidebar({ pathname, collapsed }: SidebarProps) {
             )}
             {section.items.map((item) =>
               item.children ? (
-                <NavGroupItem key={item.href} item={item} pathname={pathname} collapsed={collapsed} />
+                <NavGroupItem
+                  key={item.href}
+                  item={item}
+                  pathname={pathname}
+                  collapsed={collapsed}
+                />
               ) : (
-                <SidebarItem key={item.href} item={item} pathname={pathname} collapsed={collapsed} />
+                <SidebarItem
+                  key={item.href}
+                  item={item}
+                  pathname={pathname}
+                  collapsed={collapsed}
+                />
               ),
             )}
           </div>
