@@ -12,6 +12,7 @@ import {
 import { ImageUpload } from "../_components/image-upload";
 import { MultiSelectPages } from "../_components/multi-select-pages";
 import { ToggleField } from "../_components/toggle-field";
+import { FormActions } from "../_components/form-actions";
 import { OutlineButton } from "@/components/ui/button";
 
 const keywordOptions = [
@@ -99,8 +100,32 @@ export default function SEOPage() {
     setOgImage(nextUrl);
   };
 
+  const [isSaving, setIsSaving] = React.useState(false);
+
+  const handleSave = () => {
+    setIsSaving(true);
+    setTimeout(() => setIsSaving(false), 800);
+  };
+
+  const handleCancel = () => {
+    setMetaTitle("Eventify – Best Event Management & Planning Services");
+    setMetaDescription(
+      "Eventify offers top-notch event management and planning services for weddings, corporate events, birthdays, and more. Let us make your moments unforgettable.",
+    );
+    setKeywords(["event management", "event planning", "wedding events", "corporate events", "birthday parties"]);
+    setOgImage(defaultOgImage);
+    setRobotsMeta("index-follow");
+    setCanonicalUrl("https://www.eventify.com");
+    setAuthor("Eventify Team");
+    setLanguage("en");
+    setSiteName("Eventify");
+    setSitemapEnabled(true);
+    setStructuredData(false);
+  };
+
   const form = (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 items-start">
+    <div className="space-y-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 items-start">
 
       {/* ── LEFT: Metadata Information ─────────────────────────── */}
       <FormSection
@@ -139,11 +164,8 @@ export default function SEOPage() {
         <div className="space-y-1.5">
           <ImageUpload
             label="OG Image"
-            compact
-            title="Drag & drop your image here"
-            browseText="or click to browse"
-            hint="JPG, PNG (max. 5MB)"
-            size="wide"
+            recommendedSize="1200x630px"
+            maxFileSize="5MB"
             onFileSelect={handleOgImageSelect}
           />
           <div className="flex items-center justify-between gap-2 rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-white p-1.5">
@@ -253,18 +275,28 @@ export default function SEOPage() {
         </div>
       </FormSection>
     </div>
+
+    {/* ── Bottom Save / Cancel ── */}
+    {/* <div className="mt-2">
+      <FormActions
+        saveLabel="Save Changes"
+        onSave={handleSave}
+        onCancel={handleCancel}
+        isSaving={isSaving}
+        layout="end"
+      />
+    </div> */}
+  </div>
   );
 
   return (
     <WebsiteBuilderLayout
       title="SEO Settings"
-      breadcrumbs={[
-        { label: "Dashboard", href: "/dashboard" },
-        { label: "Settings", href: "/website" },
-        { label: "SEO Settings" },
-      ]}
       form={form}
       saveLabel="Save Changes"
+      onSave={handleSave}
+      onCancel={handleCancel}
+      isSaving={isSaving}
       leftClassName="border-0 bg-transparent p-0 shadow-none"
     />
   );

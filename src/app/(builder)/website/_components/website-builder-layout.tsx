@@ -1,7 +1,7 @@
 "use client";
 
 import type * as React from "react";
-import { Eye, HelpCircle, Save } from "lucide-react";
+import { Eye, HelpCircle, Save, X } from "lucide-react";
 import { OutlineButton, PrimaryButton } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { PageBreadcrumbs } from "./page-breadcrumbs";
@@ -19,8 +19,10 @@ interface WebsiteBuilderLayoutProps {
   previewTitle?: string;
   previewSubtitle?: string;
   saveLabel?: string;
+  cancelLabel?: string;
   howItWorksLabel?: string;
   onSave?: () => void;
+  onCancel?: () => void;
   onPreview?: () => void;
   onHowItWorks?: () => void;
   isSaving?: boolean;
@@ -43,8 +45,10 @@ export function WebsiteBuilderLayout({
   previewTitle = "Live Preview",
   previewSubtitle,
   saveLabel = "Save Changes",
+  cancelLabel = "Cancel",
   howItWorksLabel = "How It Works",
   onSave,
+  onCancel,
   onPreview,
   onHowItWorks,
   isSaving = false,
@@ -93,7 +97,6 @@ export function WebsiteBuilderLayout({
                 onPreview ||
                 (() => window.open("/website/preview-publish", "_blank"))
               }
-              // Shrink text/padding on very small screens
               className="h-8 shrink-0 px-2.5 text-[11px] gap-1 sm:px-3 sm:text-[12px] sm:gap-1.5"
             >
               <Eye className="h-3.5 w-3.5 shrink-0" />
@@ -108,6 +111,17 @@ export function WebsiteBuilderLayout({
               >
                 <HelpCircle className="h-3.5 w-3.5 shrink-0" />
                 <span className="hidden sm:inline">{howItWorksLabel}</span>
+              </OutlineButton>
+            )}
+            {onCancel && (
+              <OutlineButton
+                type="button"
+                size="sm"
+                onClick={onCancel}
+                className="h-8 shrink-0 px-2.5 text-[11px] gap-1 sm:px-3 sm:text-[12px] sm:gap-1.5"
+              >
+                <X className="h-3.5 w-3.5 shrink-0" />
+                <span>{cancelLabel}</span>
               </OutlineButton>
             )}
             <PrimaryButton

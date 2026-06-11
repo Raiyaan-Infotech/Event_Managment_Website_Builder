@@ -257,6 +257,18 @@ export default function TestimonialsPage() {
   const [editingId, setEditingId] = React.useState(initialTestimonials[0].id);
   const objectUrlsRef = React.useRef<string[]>([]);
 
+  const [isSaving, setIsSaving] = React.useState(false);
+
+  const handleSave = () => {
+    setIsSaving(true);
+    setTimeout(() => setIsSaving(false), 800);
+  };
+
+  const handleCancel = () => {
+    setTestimonials(initialTestimonials);
+    setEditingId(initialTestimonials[0].id);
+  };
+
   React.useEffect(() => {
     return () => {
       objectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
@@ -303,127 +315,125 @@ export default function TestimonialsPage() {
   // ── Form ──────────────────────────────────────────────────────────────────
 
   const form = (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-start">
+    <div className="space-y-3">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-start">
 
-      {/* ── Left: Editor (col-span-5) ── */}
-      <div className="lg:col-span-5">
-        <FormSection
-          title="Testimonial Details"
-          subtitle="Add customer testimonial and feedback."
-          className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-3 shadow-sm space-y-2.5"
-        >
-          {/* Name + Event side-by-side */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <BuilderCountedInput
-              label="Customer Name"
-              required
-              value={editing.customerName}
-              onChange={(v) => updateEditing({ customerName: v })}
-              maxLength={100}
-            />
-            <BuilderCountedInput
-              label="Event Name"
-              required
-              value={editing.eventName}
-              onChange={(v) => updateEditing({ eventName: v })}
-              maxLength={100}
-            />
-          </div>
-
-          {/* Photo: avatar preview + upload side-by-side */}
-          <div className="space-y-1">
-            <p className="text-[10px] font-semibold text-[var(--vendor-text)]">
-              Customer Photo
-            </p>
-            <div className="flex items-center gap-2">
-              <img
-                src={editing.photoUrl}
-                alt={editing.customerName}
-                className="h-14 w-14 shrink-0 rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] object-cover"
+        {/* ── Left: Editor (col-span-5) ── */}
+        <div className="lg:col-span-5">
+          <FormSection
+            title="Testimonial Details"
+            subtitle="Add customer testimonial and feedback."
+            className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-3 shadow-sm space-y-2.5"
+          >
+            {/* Name + Event side-by-side */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <BuilderCountedInput
+                label="Customer Name"
+                required
+                value={editing.customerName}
+                onChange={(v) => updateEditing({ customerName: v })}
+                maxLength={100}
               />
-              <ImageUpload
-                key={`${editing.id}-${editing.photoUrl}`}
-                value={null}
-                title="Upload Photo"
-                browseText=""
-                hint="JPG, PNG (max 2MB)"
-                recommendedSize=""
-                size="sm"
-                compact
-                onFileSelect={handlePhotoSelect}
-                className="space-y-0"
-                dropzoneClassName="h-14 w-24 p-1"
+              <BuilderCountedInput
+                label="Event Name"
+                required
+                value={editing.eventName}
+                onChange={(v) => updateEditing({ eventName: v })}
+                maxLength={100}
               />
             </div>
-          </div>
 
-          {/* Rich text feedback */}
-          <WebsiteRichTextEditor
-            label="Feedback"
-            value={editing.feedback}
-            onChange={(v) => updateEditing({ feedback: v })}
-            height="72px"
-            showWordCount={false}
-            showCharCount
-            maxChars={1000}
-          />
+            {/* Photo: avatar preview + upload side-by-side */}
+            <div className="space-y-1">
+              <p className="text-[10px] font-semibold text-[var(--vendor-text)]">
+                Customer Photo
+              </p>
+              <ImageUpload
+                key={`${editing.id}-${editing.photoUrl}`}
+                label="Customer Photo"
+                value={editing.photoUrl}
+                recommendedSize="200x200px"
+                maxFileSize="2MB"
+                onFileSelect={handlePhotoSelect}
+                onRemove={() => updateEditing({ photoUrl: "/placeholder-avatar.png" })}
+              />
+            </div>
 
-          {/* Show/Hide toggle */}
-          <ToggleField
-            label="Show/Hide Testimonial"
-            description="Show this testimonial on website"
-            checked={editing.status}
-            onCheckedChange={(status) => updateEditing({ status })}
-            className="border border-[var(--vendor-border)] bg-slate-50/60 p-2.5 rounded-[var(--vendor-radius-control)]"
-          />
-
-          {/* Actions */}
-          <div className="border-t border-[var(--vendor-border)] pt-2">
-            <FormActions
-              saveLabel="Update Testimonial"
-              onCancel={() => setEditingId(initialTestimonials[0].id)}
-              layout="default"
+            {/* Rich text feedback */}
+            <WebsiteRichTextEditor
+              label="Feedback"
+              value={editing.feedback}
+              onChange={(v) => updateEditing({ feedback: v })}
+              height="72px"
+              showWordCount={false}
+              showCharCount
+              maxChars={1000}
             />
-          </div>
-        </FormSection>
+
+            {/* Show/Hide toggle */}
+            <ToggleField
+              label="Show/Hide Testimonial"
+              description="Show this testimonial on website"
+              checked={editing.status}
+              onCheckedChange={(status) => updateEditing({ status })}
+              className="border border-[var(--vendor-border)] bg-slate-50/60 p-2.5 rounded-[var(--vendor-radius-control)]"
+            />
+
+            {/* Actions */}
+            {/* <div className="border-t border-[var(--vendor-border)] pt-2">
+              <FormActions
+                saveLabel="Update Testimonial"
+                onCancel={() => setEditingId(initialTestimonials[0].id)}
+                layout="default"
+              />
+            </div> */}
+          </FormSection>
+        </div>
+
+        {/* ── Right: Table + Stats (col-span-7) ── */}
+        <div className="lg:col-span-7">
+          <FormSection
+            title="Testimonials List"
+            subtitle="Manage all customer testimonials."
+            className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-3 shadow-sm space-y-2.5"
+          >
+            <TestimonialManagementTable
+              testimonials={testimonials}
+              activeId={editing.id}
+              onAdd={handleAdd}
+              onEdit={(t) => setEditingId(t.id)}
+              onDelete={handleDelete}
+              onStatusChange={(t, status) =>
+                setTestimonials((curr) =>
+                  curr.map((item) =>
+                    item.id === t.id ? { ...item, status } : item,
+                  ),
+                )
+              }
+            />
+          </FormSection>
+        </div>
       </div>
 
-      {/* ── Right: Table + Stats (col-span-7) ── */}
-      <div className="lg:col-span-7">
-        <FormSection
-          title="Testimonials List"
-          subtitle="Manage all customer testimonials."
-          className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-3 shadow-sm space-y-2.5"
-        >
-          <TestimonialManagementTable
-            testimonials={testimonials}
-            activeId={editing.id}
-            onAdd={handleAdd}
-            onEdit={(t) => setEditingId(t.id)}
-            onDelete={handleDelete}
-            onStatusChange={(t, status) =>
-              setTestimonials((curr) =>
-                curr.map((item) =>
-                  item.id === t.id ? { ...item, status } : item,
-                ),
-              )
-            }
-          />
-        </FormSection>
-      </div>
+      {/* Bottom Actions */}
+      {/* <FormActions
+        saveLabel="Save Testimonials"
+        onSave={handleSave}
+        onCancel={handleCancel}
+        isSaving={isSaving}
+        layout="end"
+      /> */}
     </div>
   );
 
   return (
     <WebsiteBuilderLayout
       title="Testimonials"
-      breadcrumbs={[
-        { label: "Dashboard", href: "/dashboard" },
-        { label: "Testimonials", href: "/website/testimonials" },
-        { label: "Add New Testimonial" },
-      ]}
       form={form}
-      saveLabel="Save Testimonial"
+      saveLabel="Save Testimonials"
+      onSave={handleSave}
+      onCancel={handleCancel}
+      isSaving={isSaving}
       leftClassName="border-0 bg-transparent p-0 shadow-none"
     />
   );

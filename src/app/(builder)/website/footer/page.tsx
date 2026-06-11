@@ -21,6 +21,7 @@ import {
   BuilderSegmentedControl,
 } from "../_components/builder-field";
 import { ToggleField } from "../_components/toggle-field";
+import { FormActions } from "../_components/form-actions";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
@@ -80,9 +81,31 @@ export default function FooterPage() {
 
   const copyright = "© 2026 EventCraft Pro. All rights reserved.";
   const poweredBy = "Powered by Raiyaan Infotech";
+  const [isSaving, setIsSaving] = React.useState(false);
+
+  const handleSave = () => {
+    setIsSaving(true);
+    setTimeout(() => setIsSaving(false), 800);
+  };
+
+  const handleCancel = () => {
+    setCompanyName("Eventify");
+    setShortDescription(
+      "Creating unforgettable experiences with creativity, precision, and passion. We turn your moments into lasting memories.",
+    );
+    setShowSocialLinks(true);
+    setTopListHeading("Quick Links");
+    setSelectedPages(["sample-page", "terms", "privacy"]);
+    setNewsletterEnabled(true);
+    setContactType("default");
+    setMobile("+1 234 567 8900");
+    setEmail("hello@eventify.com");
+    setAddress("123 Celebration Street, Event City, New York, NY 10001, USA");
+  };
 
   const form = (
-  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2.5 lg:h-full">
+  <div className="space-y-3">
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2.5 lg:h-full">
 
     {/* ── Column 1: Company Info ── */}
     <div className="flex flex-col gap-2 min-h-0 lg:overflow-y-auto pr-0.5">
@@ -108,20 +131,12 @@ export default function FooterPage() {
           textareaClassName="!min-h-[2.25rem] !max-h-[2.25rem] text-[10px]"
         />
 
-        {/* Logo upload — extra compact */}
-        <div className="space-y-1">
-          <p className="text-[9px] font-semibold text-slate-600">Company Logo</p>
-          <ImageUpload
-            compact
-            hint="JPG, PNG, SVG"
-            recommendedSize="Max 2MB"
-            browseText=""
-            title="Upload Logo"
-            size="sm"
-            dropzoneClassName="h-10 w-full"
-            className="space-y-0"
-          />
-        </div>
+        {/* Logo upload */}
+        <ImageUpload
+          label="Company Logo"
+          recommendedSize="200x200px"
+          maxFileSize="2MB"
+        />
       </FormSection>
 
       {/* Footer Bottom — kept in col 1 but super compact */}
@@ -129,17 +144,19 @@ export default function FooterPage() {
         title="Footer Bottom"
         className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-2.5 shadow-sm space-y-1.5"
       >
-        <div className="space-y-1">
-          <p className="text-[9px] font-black uppercase tracking-wide text-slate-500">
-            Copyright
-          </p>
-          <LockedInput value={copyright} />
-        </div>
-        <div className="space-y-1">
-          <p className="text-[9px] font-black uppercase tracking-wide text-slate-500">
-            Powered By
-          </p>
-          <LockedInput value={poweredBy} />
+        <div className="grid grid-cols-2 gap-2">
+          <div className="space-y-1">
+            <p className="text-[9px] font-black uppercase tracking-wide text-slate-500">
+              Copyright
+            </p>
+            <LockedInput value={copyright} />
+          </div>
+          <div className="space-y-1">
+            <p className="text-[9px] font-black uppercase tracking-wide text-slate-500">
+              Powered By
+            </p>
+            <LockedInput value={poweredBy} />
+          </div>
         </div>
       </FormSection>
     </div>
@@ -242,18 +259,28 @@ export default function FooterPage() {
       </FormSection>
     </div>
   </div>
+
+  {/* ── Bottom Save / Cancel ── */}
+  {/* <div className="mt-2">
+    <FormActions
+      saveLabel="Save Changes"
+      onSave={handleSave}
+      onCancel={handleCancel}
+      isSaving={isSaving}
+      layout="end"
+    />
+  </div> */}
+</div>
 );
 
   return (
     <WebsiteBuilderLayout
       title="Footer Settings"
-      breadcrumbs={[
-        { label: "Dashboard", href: "/dashboard" },
-        { label: "Settings", href: "/website" },
-        { label: "Footer Settings" },
-      ]}
       form={form}
       saveLabel="Save Changes"
+      onSave={handleSave}
+      onCancel={handleCancel}
+      isSaving={isSaving}
     />
   );
 }

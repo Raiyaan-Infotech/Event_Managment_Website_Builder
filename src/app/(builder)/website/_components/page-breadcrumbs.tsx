@@ -106,7 +106,7 @@ export function PageBreadcrumbs({ overrides, className }: PageBreadcrumbsProps) 
     return <BreadcrumbNav crumbs={overrides} className={className} />;
   }
 
-  const segments = pathname.split("/").filter(Boolean);
+  const segments = pathname ? pathname.split("/").filter(Boolean) : [];
   const crumbs: Array<{ label: string; href?: string }> = [
     { label: "Dashboard", href: "/" },
   ];

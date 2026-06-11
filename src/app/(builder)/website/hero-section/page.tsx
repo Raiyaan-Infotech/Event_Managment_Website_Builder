@@ -28,6 +28,7 @@ import {
   BuilderIconOptionGroup,
 } from "../_components/builder-field";
 import { RadioGroup } from "../_components/radio-group";
+import { FormActions } from "../_components/form-actions";
 
 type ButtonStyle = "Primary" | "Outline" | "Ghost";
 type ButtonLayout = "left" | "center" | "right" | "space-between" | "stack";
@@ -72,8 +73,28 @@ export default function HeroSectionPage() {
     setTimeout(() => setIsSaving(false), 800);
   };
 
+  const handleCancel = () => {
+    setBadgeText("Best Event Management");
+    setTitle("We Create Unforgettable Moments");
+    setDescription(
+      "From elegant weddings to corporate events, we handle every detail with creativity and perfection. Let us bring your dream event to life.",
+    );
+    setBtn1({ enabled: true, label: "Explore Events", link: "/events", style: "Primary", color: "#6C47FF" });
+    setBtn2({ enabled: true, label: "Contact Us", link: "/contact", style: "Outline", color: "#FFFFFF" });
+    setButtonLayout("left");
+    setContentAlign("left");
+    setHeroHeight("medium");
+    setOverlayEnabled(true);
+    setOverlayColor("#0B0D17");
+    setOverlayOpacity(60);
+    setHideBtn2Mobile(false);
+    setCenterMobile(true);
+    setMobileHeroHeight("medium-500");
+  };
+
   const form = (
-    <div className="grid gap-2 grid-cols-1 lg:grid-cols-3">
+    <div className="space-y-3">
+      <div className="grid gap-2 grid-cols-1 lg:grid-cols-3">
 
       {/* ── Column 1: Hero Content + Layouts ── */}
       <div className="dense-builder-form flex flex-col gap-2 min-h-0 min-w-0">
@@ -86,9 +107,8 @@ export default function HeroSectionPage() {
         >
           <ImageUpload
             label="Hero Image"
-            compact
-            hint="PNG, JPG, SVG (Max. 2MB)"
-            size="wide"
+            recommendedSize="1920x800px"
+            maxFileSize="2MB"
           />
           <BuilderCountedInput
             label="Badge Text (Optional)"
@@ -283,6 +303,7 @@ export default function HeroSectionPage() {
 
       </div>
     </div>
+  </div>
   );
 
   return (
@@ -291,6 +312,7 @@ export default function HeroSectionPage() {
       form={form}
       saveLabel="Save Changes"
       onSave={handleSave}
+      onCancel={handleCancel}
       isSaving={isSaving}
       leftClassName="border-0 bg-transparent p-0 shadow-none overflow-y-auto"
     />

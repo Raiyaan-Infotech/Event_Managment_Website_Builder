@@ -6,6 +6,7 @@ import { WebsiteBuilderLayout } from "../../_components/website-builder-layout";
 import { FormSection } from "../../_components/form-section";
 import { ImageUpload } from "../../_components/image-upload";
 import { BuilderCountedInput } from "../../_components/builder-field";
+import { FormActions } from "../../_components/form-actions";
 import { PrimaryButton } from "@/components/ui/button";
 
 interface Sponsor {
@@ -47,6 +48,18 @@ export default function PortfolioSponsorsPage() {
   const [sponsorName, setSponsorName] = React.useState("");
   const [draftLogo, setDraftLogo] = React.useState<string | null>(null);
   const objectUrlsRef = React.useRef<string[]>([]);
+  const [isSaving, setIsSaving] = React.useState(false);
+
+  const handleSave = () => {
+    setIsSaving(true);
+    setTimeout(() => setIsSaving(false), 800);
+  };
+
+  const handleCancel = () => {
+    setSponsors(initialSponsors);
+    setSponsorName("");
+    setDraftLogo(null);
+  };
 
   React.useEffect(() => {
     return () => {
@@ -81,20 +94,16 @@ export default function PortfolioSponsorsPage() {
   };
 
   const form = (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+    <div className="space-y-3">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
       <div className="lg:col-span-4 space-y-5">
         <FormSection title="Add New Sponsor">
           <ImageUpload
             key={draftLogo ?? "empty-sponsor-logo"}
             value={draftLogo}
-            label="Upload Logo"
-            title="Drag & drop sponsor logo here"
-            browseText="or click to browse"
-            hint="JPG, PNG, SVG or WebP · Max 2MB"
-            recommendedSize=""
-            size="wide"
-            dropzoneClassName="h-[130px]"
-            previewClassName="h-[130px]"
+            label="Sponsor Logo"
+            recommendedSize="300x200px"
+            maxFileSize="2MB"
             onFileSelect={handleLogoSelect}
             onRemove={() => setDraftLogo(null)}
           />
@@ -149,18 +158,26 @@ export default function PortfolioSponsorsPage() {
         </FormSection>
       </div>
     </div>
+
+    {/* ── Bottom Save / Cancel ── */}
+    {/* <FormActions
+      saveLabel="Save Changes"
+      onSave={handleSave}
+      onCancel={handleCancel}
+      isSaving={isSaving}
+      layout="end"
+    /> */}
+  </div>
   );
 
   return (
     <WebsiteBuilderLayout
       title="Portfolio - Sponsors"
-      breadcrumbs={[
-        { label: "Dashboard", href: "/dashboard" },
-        { label: "Portfolio", href: "/website/portfolio" },
-        { label: "Sponsors" },
-      ]}
       form={form}
       saveLabel="Save Changes"
+      onSave={handleSave}
+      onCancel={handleCancel}
+      isSaving={isSaving}
     />
   );
 }

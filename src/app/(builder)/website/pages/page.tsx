@@ -6,6 +6,7 @@ import { WebsiteBuilderLayout } from "../_components/website-builder-layout";
 import { FormSection } from "../_components/form-section";
 import { BuilderCountedInput } from "../_components/builder-field";
 import { WebsiteRichTextEditor } from "../_components/rich-text-editor";
+import { FormActions } from "../_components/form-actions";
 import { cn } from "@/lib/utils";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -31,6 +32,21 @@ export default function PagesPage() {
     { id: "privacy", label: "Privacy Policy",      title: "Privacy Policy",     content: DEFAULT_PRIVACY_CONTENT },
     { id: "about",   label: "About Us",            title: "About Us",           content: DEFAULT_ABOUT_CONTENT },
   ]);
+  const [isSaving, setIsSaving] = React.useState(false);
+
+  const handleSave = () => {
+    setIsSaving(true);
+    setTimeout(() => setIsSaving(false), 800);
+  };
+
+  const handleCancel = () => {
+    setPages([
+      { id: "terms",   label: "Terms & Conditions", title: "Terms & Conditions", content: DEFAULT_TERMS_CONTENT },
+      { id: "privacy", label: "Privacy Policy",      title: "Privacy Policy",     content: DEFAULT_PRIVACY_CONTENT },
+      { id: "about",   label: "About Us",            title: "About Us",           content: DEFAULT_ABOUT_CONTENT },
+    ]);
+    setActivePage("terms");
+  };
 
   const currentPage = pages.find((p) => p.id === activePage)!;
 
@@ -41,7 +57,8 @@ export default function PagesPage() {
   };
 
   const form = (
-  <div className="grid grid-cols-1 gap-3 lg:grid-cols-12 lg:h-full lg:min-h-0">
+  <div className="space-y-3">
+    <div className="grid grid-cols-1 gap-3 lg:grid-cols-12 lg:h-full lg:min-h-0">
 
     {/* ── LEFT column ───────────────────────────────────────── */}
     <div className="lg:col-span-4 flex flex-col gap-3">
@@ -132,19 +149,26 @@ export default function PagesPage() {
       </FormSection>
     </div>
 
+    </div>
+    {/* <FormActions
+      saveLabel="Save Changes"
+      onSave={handleSave}
+      onCancel={handleCancel}
+      isSaving={isSaving}
+      layout="end"
+      className="mt-2"
+    /> */}
   </div>
 );
 
   return (
     <WebsiteBuilderLayout
       title="Legal Pages"
-      breadcrumbs={[
-        { label: "Dashboard", href: "/dashboard" },
-        { label: "Settings", href: "/website" },
-        { label: "Legal Pages" },
-      ]}
       form={form}
       saveLabel="Save Changes"
+      onSave={handleSave}
+      onCancel={handleCancel}
+      isSaving={isSaving}
       leftClassName="border-0 bg-transparent p-0 shadow-none"
     />
   );

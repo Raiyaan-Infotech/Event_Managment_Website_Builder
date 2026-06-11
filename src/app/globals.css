@@ -341,7 +341,7 @@ button {
 }
 
 .dense-builder-form label:not(.cursor-pointer) {
-  font-size: 7.5px !important;
+  font-size: 9px !important;
   font-weight: 700 !important;
   color: var(--vendor-text-muted) !important;
 }
@@ -351,14 +351,14 @@ button {
 .dense-builder-form button[role="combobox"],
 .dense-builder-form .flex.items-center.gap-2.border {
   height: 1.5rem !important;
-  font-size: 8.5px !important;
+  font-size: 9px !important;
   padding-left: 0.25rem !important;
   padding-right: 0.25rem !important;
 }
 
 .dense-builder-form textarea {
   min-height: 2.25rem !important;
-  font-size: 8.5px !important;
+  font-size: 9px !important;
   padding: 0.25rem !important;
 }
 
@@ -388,9 +388,17 @@ button {
   margin: 0 !important;
 }
 
-.dense-builder-form .space-y-2.5 > :not([hidden]) ~ :not([hidden]),
+.dense-builder-form .space-y-2\.5 > :not([hidden]) ~ :not([hidden]),
 .dense-builder-form .space-y-2 > :not([hidden]) ~ :not([hidden]),
-.dense-builder-form .space-y-1.5 > :not([hidden]) ~ :not([hidden]),
+.dense-builder-form .space-y-1\.5 > :not([hidden]) ~ :not([hidden]),
 .dense-builder-form .space-y-1 > :not([hidden]) ~ :not([hidden]) {
   margin-top: 2px !important;
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }

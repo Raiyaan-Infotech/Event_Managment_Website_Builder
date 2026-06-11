@@ -64,8 +64,15 @@ export default function WebsiteMenuPage() {
     setTimeout(() => setIsSaving(false), 800);
   };
 
+  const handleCancel = () => {
+    setMenuHeading("Main Menu");
+    setSelectedPages(["home", "about-us", "services", "events", "gallery", "testimonials", "contact-us"]);
+    setMenuItems(initialMenuItems);
+  };
+
   const form = (
-  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:h-full">
+  <div className="space-y-3">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:h-full">
 
     {/* ── Column 1: Menu Settings ── */}
     <div className="flex flex-col gap-4 lg:overflow-y-auto">
@@ -135,6 +142,7 @@ export default function WebsiteMenuPage() {
     </div>
 
   </div>
+</div>
 );
 
   return (
@@ -143,6 +151,7 @@ export default function WebsiteMenuPage() {
       form={form}
       saveLabel="Save Changes"
       onSave={handleSave}
+      onCancel={handleCancel}
       isSaving={isSaving}
     />
   );

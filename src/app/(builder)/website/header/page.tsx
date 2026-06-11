@@ -3,6 +3,7 @@
 import * as React from "react";
 import {
   Camera,
+  Check,
   Edit2,
   Facebook,
   GripVertical,
@@ -83,11 +84,12 @@ export default function WebsiteHeaderPage() {
   );
   const [socialLinks, setSocialLinks] =
     React.useState<SocialLink[]>(initialSocialLinks);
+  const [editingLinkId, setEditingLinkId] = React.useState<string | null>(null);
   const [isSaving, setIsSaving] = React.useState(false);
 
   const updateSocialLink = (
     id: string,
-    patch: Partial<Pick<SocialLink, "url">>,
+    patch: Partial<SocialLink>,
   ) => {
     setSocialLinks((prev) =>
       prev.map((item) => (item.id === id ? { ...item, ...patch } : item)),
@@ -114,6 +116,16 @@ export default function WebsiteHeaderPage() {
   const handleSave = () => {
     setIsSaving(true);
     setTimeout(() => setIsSaving(false), 800);
+  };
+
+  const handleCancel = () => {
+    setCompanyName("Royal Moments Events");
+    setCity("New Delhi, India");
+    setContactType("default");
+    setMobile("+91 98765 43210");
+    setEmail("info@royalmoments.com");
+    setAddress("123, Wedding Avenue, Connaught Place, New Delhi - 110001");
+    setSocialLinks(initialSocialLinks);
   };
 
   // ── Form ──────────────────────────────────────────────────────────────────
@@ -144,12 +156,9 @@ export default function WebsiteHeaderPage() {
           className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-3 shadow-sm space-y-3 sm:p-4"
         >
           <ImageUpload
-            compact
             label="Company Logo"
-            title="Upload Logo"
-            browseText="PNG, JPG or SVG"
-            hint="Max. 2MB"
-            size="wide"
+            recommendedSize="200x200px"
+            maxFileSize="2MB"
           />
 
           <BuilderCountedInput
@@ -265,14 +274,41 @@ export default function WebsiteHeaderPage() {
                     </span>
 
                     {/* Platform name — fixed width so URL input aligns */}
-                    <span className="w-[76px] shrink-0 text-[10px] font-semibold text-[var(--vendor-text)] sm:w-[88px] sm:text-[11px]">
-                      {item.label}
-                    </span>
+                    {editingLinkId === item.id ? (
+                      <Input
+                        value={item.label}
+                        onChange={(e) =>
+                          updateSocialLink(item.id, { label: e.target.value })
+                        }
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") setEditingLinkId(null);
+                        }}
+                        className="h-7 w-[76px] px-1 text-[10px] sm:w-[88px] sm:text-[11px]"
+                        autoFocus
+                      />
+                    ) : (
+                      <span className="w-[76px] shrink-0 text-[10px] font-semibold text-[var(--vendor-text)] sm:w-[88px] sm:text-[11px]">
+                        {item.label}
+                      </span>
+                    )}
 
                     {/* Edit / Delete — inline on mobile (right-aligned) */}
                     <div className="ml-auto flex shrink-0 gap-1 sm:hidden">
-                      <Button type="button" variant="outline" size="icon-xs">
-                        <Edit2 className="h-3 w-3" />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon-xs"
+                        onClick={() =>
+                          setEditingLinkId(
+                            editingLinkId === item.id ? null : item.id,
+                          )
+                        }
+                      >
+                        {editingLinkId === item.id ? (
+                          <Check className="h-3 w-3" />
+                        ) : (
+                          <Edit2 className="h-3 w-3" />
+                        )}
                       </Button>
                       <Button
                         type="button"
@@ -298,8 +334,21 @@ export default function WebsiteHeaderPage() {
 
                   {/* Edit / Delete — sm+ only, inline after the URL input */}
                   <div className="hidden shrink-0 gap-1 sm:flex">
-                    <Button type="button" variant="outline" size="icon-xs">
-                      <Edit2 className="h-3.5 w-3.5" />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon-xs"
+                      onClick={() =>
+                        setEditingLinkId(
+                          editingLinkId === item.id ? null : item.id,
+                        )
+                      }
+                    >
+                      {editingLinkId === item.id ? (
+                        <Check className="h-3.5 w-3.5" />
+                      ) : (
+                        <Edit2 className="h-3.5 w-3.5" />
+                      )}
                     </Button>
                     <Button
                       type="button"
@@ -319,21 +368,24 @@ export default function WebsiteHeaderPage() {
       </FormSection>
 
       {/* ── Save / Cancel ── */}
-      <FormActions
+      {/* <FormActions
         saveLabel="Save Changes"
         onSave={handleSave}
+        onCancel={handleCancel}
         isSaving={isSaving}
         layout="end"
         className="pt-1"
-      />
+      /> */}
     </div>
   );
 
   return (
     <WebsiteBuilderLayout
       title="Header"
-      hideHeader={true}
       form={form}
+      onSave={handleSave}
+      onCancel={handleCancel}
+      isSaving={isSaving}
       leftClassName="border-0 bg-transparent p-0 shadow-none"
     />
   );

@@ -89,8 +89,15 @@ export default function SimpleSliderPage() {
     setTimeout(() => setIsSaving(false), 800);
   };
 
+  const handleCancel = () => {
+    setSlides(initialSlides);
+    setSliderTitle("Home Page Slider");
+    setEditingIndex(0);
+  };
+
   const form = (
-    <div className="grid gap-3 grid-cols-1 lg:grid-cols-2">
+    <div className="space-y-3">
+      <div className="grid gap-3 grid-cols-1 lg:grid-cols-2">
 
       {/* ── Column 1: Slide Editor ── */}
       <div className="dense-builder-form flex flex-col gap-2 min-h-0 min-w-0">
@@ -176,20 +183,17 @@ export default function SimpleSliderPage() {
           </div>
 
           {/* Slide Image */}
-          <div className="space-y-0.5">
-            <label className="block">Slide Image</label>
-            <ImageUpload
-              compact
-              size="wide"
-              value={editing.imageUrl}
-              onFileSelect={(file) => {
-                const url = URL.createObjectURL(file);
-                updateEditing({ imageUrl: url });
-              }}
-              onRemove={() => updateEditing({ imageUrl: "" })}
-              hint="Recommended: 1920x800px (Max: 2MB)"
-            />
-          </div>
+          <ImageUpload
+            label="Slide Image"
+            value={editing.imageUrl}
+            recommendedSize="1920x800px"
+            maxFileSize="2MB"
+            onFileSelect={(file) => {
+              const url = URL.createObjectURL(file);
+              updateEditing({ imageUrl: url });
+            }}
+            onRemove={() => updateEditing({ imageUrl: "" })}
+          />
 
           {/* Actions */}
           <div className="border-t border-[var(--vendor-border)] pt-1.5">
@@ -254,8 +258,8 @@ export default function SimpleSliderPage() {
           />
         </FormSection>
       </div>
-
     </div>
+  </div>
   );
 
   return (
@@ -264,6 +268,7 @@ export default function SimpleSliderPage() {
       form={form}
       saveLabel="Save Changes"
       onSave={handleSave}
+      onCancel={handleCancel}
       isSaving={isSaving}
       leftClassName="border-0 bg-transparent p-0 shadow-none"
     />
