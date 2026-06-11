@@ -24,6 +24,7 @@ export function WebsiteBuilderShell({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const showWebsiteActions = pathname.startsWith("/website");
   const [device, setDevice] = useState<"desktop" | "mobile">("desktop");
   const [collapsed, setCollapsed] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -132,19 +133,23 @@ export function WebsiteBuilderShell({
         </div>
 
         <div className="flex min-w-max items-center justify-end gap-1 overflow-visible sm:min-w-0 sm:gap-2 sm:overflow-x-auto">
-          <Button variant="outline" size="sm" className="hidden h-7 shrink-0 gap-1.5 px-2 text-[12px] font-medium sm:inline-flex sm:px-2.5">
-            <Save className="h-3 w-3" />
-            <span className="hidden lg:inline">Save Draft</span>
-          </Button>
-          <Button variant="outline" size="sm" className="hidden h-7 shrink-0 gap-1.5 border-[var(--color-primary)]/30 px-2 text-[12px] font-medium text-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 sm:inline-flex sm:px-2.5">
-            <Eye className="h-3 w-3" />
-            <span className="hidden lg:inline">Preview Website</span>
-          </Button>
-          <Button size="sm" className="hidden h-7 shrink-0 gap-1.5 bg-[var(--color-primary)] px-2 text-[12px] font-semibold hover:bg-[var(--color-primary)]/90 sm:inline-flex sm:px-3">
-            <Globe className="h-3 w-3" />
-            <span className="hidden lg:inline">Publish Website</span>
-          </Button>
-          <div className="hidden h-6 w-px shrink-0 bg-[var(--color-border)] sm:block" />
+          {showWebsiteActions ? (
+            <>
+              <Button variant="outline" size="sm" className="hidden h-7 shrink-0 gap-1.5 px-2 text-[12px] font-medium sm:inline-flex sm:px-2.5">
+                <Save className="h-3 w-3" />
+                <span className="hidden lg:inline">Save Draft</span>
+              </Button>
+              <Button variant="outline" size="sm" className="hidden h-7 shrink-0 gap-1.5 border-[var(--color-primary)]/30 px-2 text-[12px] font-medium text-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 sm:inline-flex sm:px-2.5">
+                <Eye className="h-3 w-3" />
+                <span className="hidden lg:inline">Preview Website</span>
+              </Button>
+              <Button size="sm" className="hidden h-7 shrink-0 gap-1.5 bg-[var(--color-primary)] px-2 text-[12px] font-semibold hover:bg-[var(--color-primary)]/90 sm:inline-flex sm:px-3">
+                <Globe className="h-3 w-3" />
+                <span className="hidden lg:inline">Publish Website</span>
+              </Button>
+              <div className="hidden h-6 w-px shrink-0 bg-[var(--color-border)] sm:block" />
+            </>
+          ) : null}
           <div ref={menuRef} className="relative shrink-0">
             <button
             type="button"
@@ -173,20 +178,22 @@ export function WebsiteBuilderShell({
         </div>
       </header>
 
-      <div className="grid shrink-0 gap-2 border-b border-[var(--color-border)] bg-white/95 p-2 shadow-sm sm:hidden">
-        <Button variant="outline" size="sm" className="h-9 w-full justify-start gap-2 px-3 text-[12px] font-medium">
-          <Save className="h-3.5 w-3.5" />
-          Save Draft
-        </Button>
-        <Button variant="outline" size="sm" className="h-9 w-full justify-start gap-2 border-[var(--color-primary)]/30 px-3 text-[12px] font-medium text-[var(--color-primary)] hover:bg-[var(--color-primary)]/5">
-          <Eye className="h-3.5 w-3.5" />
-          Preview Website
-        </Button>
-        <Button size="sm" className="h-9 w-full justify-start gap-2 bg-[var(--color-primary)] px-3 text-[12px] font-semibold hover:bg-[var(--color-primary)]/90">
-          <Globe className="h-3.5 w-3.5" />
-          Publish Website
-        </Button>
-      </div>
+      {showWebsiteActions ? (
+        <div className="grid shrink-0 gap-2 border-b border-[var(--color-border)] bg-white/95 p-2 shadow-sm sm:hidden">
+          <Button variant="outline" size="sm" className="h-9 w-full justify-start gap-2 px-3 text-[12px] font-medium">
+            <Save className="h-3.5 w-3.5" />
+            Save Draft
+          </Button>
+          <Button variant="outline" size="sm" className="h-9 w-full justify-start gap-2 border-[var(--color-primary)]/30 px-3 text-[12px] font-medium text-[var(--color-primary)] hover:bg-[var(--color-primary)]/5">
+            <Eye className="h-3.5 w-3.5" />
+            Preview Website
+          </Button>
+          <Button size="sm" className="h-9 w-full justify-start gap-2 bg-[var(--color-primary)] px-3 text-[12px] font-semibold hover:bg-[var(--color-primary)]/90">
+            <Globe className="h-3.5 w-3.5" />
+            Publish Website
+          </Button>
+        </div>
+      ) : null}
 
       {/* ── Body row ───────────────────────────────────────────────────── */}
       {/*
@@ -202,7 +209,10 @@ export function WebsiteBuilderShell({
           aria-label="Close navigation"
           onClick={() => setMobileSidebarOpen(false)}
           className={cn(
-            "fixed inset-x-0 bottom-0 top-[var(--header-height)] z-20 bg-transparent sm:hidden",
+            "fixed inset-x-0 bottom-0 z-20 bg-transparent sm:hidden",
+            showWebsiteActions
+              ? "top-[calc(var(--header-height)+132px)]"
+              : "top-[var(--header-height)]",
             mobileSidebarOpen ? "block" : "hidden",
           )}
         />
@@ -210,6 +220,7 @@ export function WebsiteBuilderShell({
           pathname={pathname}
           collapsed={collapsed}
           mobileOpen={mobileSidebarOpen}
+          mobileActionsVisible={showWebsiteActions}
           onNavigate={() => setMobileSidebarOpen(false)}
         />
 

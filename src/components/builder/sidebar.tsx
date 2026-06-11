@@ -11,31 +11,20 @@ interface SidebarProps {
   pathname: string;
   collapsed: boolean;
   mobileOpen?: boolean;
+  mobileActionsVisible?: boolean;
   onNavigate?: () => void;
 }
-
-const mobilePrimaryHrefs = new Set([
-  "/",
-  "/bookings",
-  "/leads",
-  "/payments",
-  "/website/hero-section",
-  "/website/preview-publish",
-  "/settings",
-]);
 
 function SidebarItem({
   item,
   pathname,
   collapsed,
   onNavigate,
-  mobileHidden = false,
 }: {
   item: NavItem;
   pathname: string;
   collapsed: boolean;
   onNavigate?: () => void;
-  mobileHidden?: boolean;
 }) {
   const Icon = item.icon;
   const active = isActivePath(pathname, item.href);
@@ -49,7 +38,6 @@ function SidebarItem({
         "flex h-7 w-full items-center rounded-[var(--radius-sidebar-item)] text-[11px] font-medium transition-colors duration-100",
         collapsed ? "justify-center px-0 gap-0" : "gap-1.5 px-2",
         "max-sm:justify-center max-sm:gap-0 max-sm:px-0",
-        mobileHidden && "max-sm:hidden",
         active
           ? "bg-[var(--color-primary)] text-white shadow-sm"
           : "text-[var(--color-text-secondary)] hover:bg-slate-100 hover:text-[var(--color-text)]",
@@ -76,13 +64,11 @@ function NavGroupItem({
   pathname,
   collapsed,
   onNavigate,
-  mobileHidden = false,
 }: {
   item: NavItem;
   pathname: string;
   collapsed: boolean;
   onNavigate?: () => void;
-  mobileHidden?: boolean;
 }) {
   const [open, setOpen] = React.useState(() =>
     isActivePath(pathname, item.href),
@@ -104,7 +90,6 @@ function NavGroupItem({
         onClick={onNavigate}
         className={cn(
           "flex h-7 w-full items-center justify-center rounded-[var(--radius-sidebar-item)] text-[11px] font-medium transition-colors duration-100",
-          mobileHidden && "max-sm:hidden",
           active
             ? "bg-[var(--color-primary)] text-white shadow-sm"
             : "text-[var(--color-text-secondary)] hover:bg-slate-100",
@@ -118,11 +103,11 @@ function NavGroupItem({
   return (
     <div>
       <button
+        title={item.label}
         onClick={() => setOpen(!open)}
         className={cn(
           "flex h-7 w-full items-center gap-1.5 rounded-[var(--radius-sidebar-item)] px-2 text-[11px] font-medium transition-colors duration-100",
           "max-sm:justify-center max-sm:gap-0 max-sm:px-0",
-          mobileHidden && "max-sm:hidden",
           active
             ? "bg-[var(--color-primary)] text-white shadow-sm"
             : "text-[var(--color-text-secondary)] hover:bg-slate-100 hover:text-[var(--color-text)]",
@@ -139,11 +124,12 @@ function NavGroupItem({
       </button>
 
       {open && item.children ? (
-        <div className="ml-1.5 mt-0.5 space-y-0.5 border-l border-[var(--color-border)] pl-2 max-sm:hidden">
+        <div className="ml-1.5 mt-0.5 space-y-0.5 border-l border-[var(--color-border)] pl-2 max-sm:ml-0 max-sm:border-l-0 max-sm:pl-0">
           {item.children.map((child) => (
             <Link
               key={child.href}
               href={child.href}
+              title={child.label}
               onClick={onNavigate}
               className={cn(
                 "flex h-6 items-center gap-1.5 rounded-[var(--radius-sidebar-item)] px-2 text-[10.5px] font-medium transition-colors duration-100",
@@ -170,6 +156,7 @@ export function Sidebar({
   pathname,
   collapsed,
   mobileOpen = false,
+  mobileActionsVisible = false,
   onNavigate,
 }: SidebarProps) {
   return (
@@ -185,7 +172,10 @@ export function Sidebar({
         "transition-[width,transform] duration-200 ease-in-out",
         // Fill the full body height (parent flex row is already h-full)
         "h-full",
-        "max-sm:fixed max-sm:bottom-0 max-sm:left-0 max-sm:top-[calc(var(--header-height)+132px)] max-sm:z-30 max-sm:h-auto max-sm:!w-[56px] max-sm:shadow-xl",
+        "max-sm:fixed max-sm:bottom-0 max-sm:left-0 max-sm:z-30 max-sm:h-auto max-sm:!w-[56px] max-sm:shadow-xl",
+        mobileActionsVisible
+          ? "max-sm:top-[calc(var(--header-height)+132px)]"
+          : "max-sm:top-[var(--header-height)]",
         mobileOpen ? "max-sm:translate-x-0" : "max-sm:-translate-x-full",
       )}
     >
@@ -207,22 +197,13 @@ export function Sidebar({
               <div className="my-1 mx-auto h-px w-4 bg-gray-200" />
             )}
             {section.items.map((item) =>
-              {
-                const hasActiveChild =
-                  item.children?.some((child) => isActivePath(pathname, child.href)) ?? false;
-                const mobileHidden =
-                  !mobilePrimaryHrefs.has(item.href) &&
-                  !isActivePath(pathname, item.href) &&
-                  !hasActiveChild;
-
-                return item.children ? (
+              item.children ? (
                 <NavGroupItem
                   key={item.href}
                   item={item}
                   pathname={pathname}
                   collapsed={collapsed}
                   onNavigate={onNavigate}
-                  mobileHidden={mobileHidden}
                 />
               ) : (
                 <SidebarItem
@@ -231,10 +212,8 @@ export function Sidebar({
                   pathname={pathname}
                   collapsed={collapsed}
                   onNavigate={onNavigate}
-                  mobileHidden={mobileHidden}
                 />
-              );
-              }
+              ),
             )}
           </div>
         ))}
