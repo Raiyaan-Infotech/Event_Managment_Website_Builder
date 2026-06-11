@@ -84,7 +84,10 @@
 
 html, body {
   height: 100%;
-  overflow: hidden;
+  /* Do NOT set overflow: hidden here.
+     The shell component manages its own overflow via 100dvh + flex layout.
+     Locking overflow on html/body prevents scrolling on mobile browsers
+     and breaks any page that uses normal document flow. */
 }
 
 html {

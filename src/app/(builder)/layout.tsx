@@ -8,15 +8,17 @@ export default function BuilderLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
-  const isBuilderPage = pathname?.includes("/website");
-
   return (
     <WebsiteBuilderShell>
-      {/* This div is the scroll container.
-          For website builder pages, we lock overflow to hidden so only internal columns scroll.
-          For other dashboard pages, we keep overflow-y-auto to allow standard scrolling. */}
-      <div className={isBuilderPage ? "h-full overflow-hidden" : "h-full overflow-y-auto"}>
+      {/*
+        Do NOT add overflow-hidden here — the scroll container is <main>
+        inside WebsiteBuilderShell. Wrapping children in overflow-hidden
+        re-blocks scrolling and is why mobile couldn't scroll to the end.
+
+        h-full ensures the children fill the available height so internal
+        flex/grid layouts that depend on height work correctly.
+      */}
+      <div className="h-full">
         {children}
       </div>
     </WebsiteBuilderShell>
