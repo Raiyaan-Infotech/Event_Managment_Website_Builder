@@ -100,7 +100,7 @@ export default function PortfolioSponsorsPage() {
         <FormSection title="Add New Sponsor">
           <ImageUpload
             key={draftLogo ?? "empty-sponsor-logo"}
-            value={draftLogo}
+            value={draftLogo ?? undefined}
             label="Sponsor Logo"
             recommendedSize="300x200px"
             maxFileSize="2MB"
