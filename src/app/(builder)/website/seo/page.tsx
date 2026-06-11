@@ -146,36 +146,36 @@ export default function SEOPage() {
             size="wide"
             onFileSelect={handleOgImageSelect}
           />
-          <div className="flex items-center justify-between rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-white p-1.5">
-            <div className="flex min-w-0 items-center gap-2">
-              <img
-                src={ogImage}
-                alt="OG thumbnail"
-                className="h-7 w-11 rounded object-cover shrink-0"
-              />
-              <div className="min-w-0">
-                <p className="truncate text-[10px] font-bold text-[var(--vendor-text)]">
-                  og-image.jpg
-                </p>
-                <p className="text-[9px] font-medium text-[var(--vendor-text-muted)]">
-                  1200 × 630px (245 KB)
-                </p>
-              </div>
-            </div>
-            <OutlineButton
-              type="button"
-              size="icon-xs"
-              onClick={() => {
-                if (objectUrlRef.current)
-                  URL.revokeObjectURL(objectUrlRef.current);
-                objectUrlRef.current = null;
-                setOgImage(defaultOgImage);
-              }}
-              className="text-rose-500 hover:text-rose-600 shrink-0"
-            >
-              <Trash2 className="h-3 w-3" />
-            </OutlineButton>
-          </div>
+          <div className="flex items-center justify-between gap-2 rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-white p-1.5">
+  <div className="flex min-w-0 flex-1 items-center gap-2">
+    <img
+      src={ogImage}
+      alt="OG thumbnail"
+      className="h-7 w-11 rounded object-cover shrink-0"
+    />
+    <div className="min-w-0">
+      <p className="truncate text-[10px] font-bold text-[var(--vendor-text)]">
+        og-image.jpg
+      </p>
+      <p className="text-[9px] font-medium text-[var(--vendor-text-muted)]">
+        1200 × 630px (245 KB)
+      </p>
+    </div>
+  </div>
+  <OutlineButton
+    type="button"
+    size="icon-xs"
+    onClick={() => {
+      if (objectUrlRef.current)
+        URL.revokeObjectURL(objectUrlRef.current);
+      objectUrlRef.current = null;
+      setOgImage(defaultOgImage);
+    }}
+    className="text-rose-500 hover:text-rose-600 shrink-0"
+  >
+    <Trash2 className="h-3 w-3" />
+  </OutlineButton>
+</div>
         </div>
       </FormSection>
 

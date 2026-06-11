@@ -86,7 +86,7 @@ export function RichTextEditor({
         value={plainValue}
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
-        style={{ minHeight: height }}
+        style={{ height }}
         className={cn(
           "w-full resize-none border-0 bg-transparent px-3 py-3 text-[var(--vendor-form-input-text)] font-medium leading-6 text-[var(--vendor-text)] outline-none placeholder:text-[var(--vendor-text-muted)]",
         )}

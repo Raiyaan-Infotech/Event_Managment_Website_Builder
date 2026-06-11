@@ -51,7 +51,7 @@ export function WebsiteRichTextEditor({
         <label className="text-[12px] font-black text-[var(--vendor-text)]">{label}</label>
       ) : null}
 
-      <div className="overflow-hidden rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] shadow-xs">
+      <div className="overflow-hidden rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] shadow-xs [&_.ProseMirror]:min-h-[800px]">
         <BaseRichTextEditor
           value={value}
           onChange={onChange}

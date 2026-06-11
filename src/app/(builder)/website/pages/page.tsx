@@ -41,99 +41,99 @@ export default function PagesPage() {
   };
 
   const form = (
-    <div className="grid grid-cols-1 gap-3 lg:grid-cols-12 h-full min-h-0">
+  <div className="grid grid-cols-1 gap-3 lg:grid-cols-12 lg:h-full lg:min-h-0">
 
-      {/* ── LEFT column ───────────────────────────────────────── */}
-      <div className="lg:col-span-4 flex flex-col gap-3">
+    {/* ── LEFT column ───────────────────────────────────────── */}
+    <div className="lg:col-span-4 flex flex-col gap-3">
 
-        {/* Page Selection card */}
-        <FormSection
-          title="Page Selection"
-          subtitle="Choose a legal page to edit"
-          icon={<FileText className="h-4 w-4" />}
-          className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-3 shadow-sm"
-        >
-          <div className="flex flex-col gap-1.5 pt-1">
-            {pages.map((page) => {
-              const isActive = activePage === page.id;
-              return (
-                <button
-                  key={page.id}
-                  type="button"
-                  onClick={() => setActivePage(page.id)}
+      {/* Page Selection card */}
+      <FormSection
+        title="Page Selection"
+        subtitle="Choose a legal page to edit"
+        icon={<FileText className="h-4 w-4" />}
+        className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-3 shadow-sm"
+      >
+        <div className="flex flex-col gap-1.5 pt-1">
+          {pages.map((page) => {
+            const isActive = activePage === page.id;
+            return (
+              <button
+                key={page.id}
+                type="button"
+                onClick={() => setActivePage(page.id)}
+                className={cn(
+                  "flex w-full items-center gap-3 rounded-[var(--vendor-radius-control)] border px-3 py-2.5 text-left transition-all",
+                  isActive
+                    ? "border-[var(--vendor-primary-btn)]/25 bg-[var(--vendor-primary-btn)]/8 text-[var(--vendor-primary-btn)]"
+                    : "border-[var(--vendor-border)] bg-transparent text-[var(--vendor-text-muted)] hover:bg-slate-50 hover:text-[var(--vendor-text)]",
+                )}
+              >
+                {/* file icon box */}
+                <span
                   className={cn(
-                    "flex w-full items-center gap-3 rounded-[var(--vendor-radius-control)] border px-3 py-2.5 text-left transition-all",
+                    "flex h-7 w-7 shrink-0 items-center justify-center rounded-[6px]",
                     isActive
-                      ? "border-[var(--vendor-primary-btn)]/25 bg-[var(--vendor-primary-btn)]/8 text-[var(--vendor-primary-btn)]"
-                      : "border-[var(--vendor-border)] bg-transparent text-[var(--vendor-text-muted)] hover:bg-slate-50 hover:text-[var(--vendor-text)]",
+                      ? "bg-[var(--vendor-primary-btn)]/15 text-[var(--vendor-primary-btn)]"
+                      : "bg-slate-100 text-slate-400",
                   )}
                 >
-                  {/* file icon box */}
-                  <span
-                    className={cn(
-                      "flex h-7 w-7 shrink-0 items-center justify-center rounded-[6px]",
-                      isActive
-                        ? "bg-[var(--vendor-primary-btn)]/15 text-[var(--vendor-primary-btn)]"
-                        : "bg-slate-100 text-slate-400",
-                    )}
-                  >
-                    <FileText className="h-3.5 w-3.5" />
-                  </span>
+                  <FileText className="h-3.5 w-3.5" />
+                </span>
 
-                  <span className="flex-1 text-[12px] font-bold leading-tight">
-                    {page.label}
-                  </span>
+                <span className="flex-1 text-[12px] font-bold leading-tight">
+                  {page.label}
+                </span>
 
-                  <ChevronRight
-                    className={cn(
-                      "h-4 w-4 shrink-0",
-                      isActive
-                        ? "text-[var(--vendor-primary-btn)]"
-                        : "text-slate-300",
-                    )}
-                  />
-                </button>
-              );
-            })}
-          </div>
-        </FormSection>
+                <ChevronRight
+                  className={cn(
+                    "h-4 w-4 shrink-0",
+                    isActive
+                      ? "text-[var(--vendor-primary-btn)]"
+                      : "text-slate-300",
+                  )}
+                />
+              </button>
+            );
+          })}
+        </div>
+      </FormSection>
 
-        {/* Page Title card */}
-        <FormSection
-          title="Page Title"
-          icon={<Type className="h-4 w-4" />}
-          className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-3 shadow-sm"
-        >
-          <BuilderCountedInput
-            label="Page Title"
-            value={currentPage.title}
-            onChange={(v) => updatePage({ title: v })}
-            maxLength={100}
-          />
-        </FormSection>
-      </div>
-
-      {/* ── RIGHT column ──────────────────────────────────────── */}
-<div className="lg:col-span-8 flex flex-col min-h-0 h-full">
-        <FormSection
-          title="Page Content"
-          subtitle="Edit the content for the selected page"
-          icon={<Pencil className="h-4 w-4" />}
-    className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-3 shadow-sm flex flex-col flex-1 h-full"
-        >
-          <WebsiteRichTextEditor
-            label=""
-            value={currentPage.content}
-            onChange={(v) => updatePage({ content: v })}
-            height="calc(100vh - 220px)"
-            showWordCount
-            showCharCount
-          />
-        </FormSection>
-      </div>
-
+      {/* Page Title card */}
+      <FormSection
+        title="Page Title"
+        icon={<Type className="h-4 w-4" />}
+        className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-3 shadow-sm"
+      >
+        <BuilderCountedInput
+          label="Page Title"
+          value={currentPage.title}
+          onChange={(v) => updatePage({ title: v })}
+          maxLength={100}
+        />
+      </FormSection>
     </div>
-  );
+
+    {/* ── RIGHT column ──────────────────────────────────────── */}
+    <div className="lg:col-span-8 flex flex-col min-h-0 lg:h-full">
+      <FormSection
+        title="Page Content"
+        subtitle="Edit the content for the selected page"
+        icon={<Pencil className="h-4 w-4" />}
+        className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-3 shadow-sm flex flex-col flex-1 lg:h-full"
+      >
+        <WebsiteRichTextEditor
+          label=""
+          value={currentPage.content}
+          onChange={(v) => updatePage({ content: v })}
+          height="200px"
+          showWordCount
+          showCharCount
+        />
+      </FormSection>
+    </div>
+
+  </div>
+);
 
   return (
     <WebsiteBuilderLayout

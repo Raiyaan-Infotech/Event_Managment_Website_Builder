@@ -90,7 +90,7 @@ export default function SimpleSliderPage() {
   };
 
   const form = (
-    <div className="grid h-full min-h-0 gap-3" style={{ gridTemplateColumns: "1fr 1fr" }}>
+    <div className="grid gap-3 grid-cols-1 lg:grid-cols-2">
 
       {/* ── Column 1: Slide Editor ── */}
       <div className="dense-builder-form flex flex-col gap-2 min-h-0 min-w-0">
@@ -124,7 +124,7 @@ export default function SimpleSliderPage() {
           />
 
           {/* Button Label + Page */}
-          <div className="grid items-end gap-2" style={{ gridTemplateColumns: "1fr 1fr" }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 items-end gap-2">
             <BuilderCountedInput
               label="Button Label"
               value={editing.buttonLabel}
@@ -154,7 +154,7 @@ export default function SimpleSliderPage() {
           </div>
 
           {/* Button Color + Status */}
-          <div className="grid items-start gap-2" style={{ gridTemplateColumns: "1fr 1fr" }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 items-start gap-2">
             <div className="space-y-0.5">
               <label className="block">Button Color</label>
               <ColorPickerInput

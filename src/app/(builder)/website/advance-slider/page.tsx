@@ -88,11 +88,11 @@ export default function AdvancedSliderPage() {
   };
 
   const form = (
-    <div className="grid h-full min-h-0 gap-3" style={{ gridTemplateColumns: "1fr" }}>
+    <div className="grid gap-3 grid-cols-1">
       <div className="dense-builder-form flex flex-col gap-3 min-h-0">
 
         {/* ── Row 1: 3 columns ── */}
-        <div className="grid gap-3" style={{ gridTemplateColumns: "1fr 1fr 1fr" }}>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
 
           {/* Card 1: Slide Text Settings */}
           <FormSection
@@ -158,7 +158,7 @@ export default function AdvancedSliderPage() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="grid gap-2" style={{ gridTemplateColumns: "1fr 1fr" }}>
+            <div className="grid grid-cols-2 gap-2">
               <ColorPickerInput
                 label="Button Background"
                 value={editing.buttonColor}
@@ -184,7 +184,7 @@ export default function AdvancedSliderPage() {
             <RangeSliderInput label="Overlay Opacity" value={overlayOpacity} onChange={setOverlayOpacity} />
             <RangeSliderInput label="Brightness" value={brightness} onChange={setBrightness} />
             <RangeSliderInput label="Blur" value={blur} onChange={setBlur} suffix="px" />
-            <div className="grid gap-2 pt-1 border-t border-[var(--vendor-border)]" style={{ gridTemplateColumns: "1fr 1fr" }}>
+            <div className="grid grid-cols-2 gap-2 pt-1 border-t border-[var(--vendor-border)]">
               <ColorPickerInput label="Title Color" value={titleColor} onChange={setTitleColor} compact />
               <ColorPickerInput label="Description Color" value={descriptionColor} onChange={setDescriptionColor} compact />
             </div>
@@ -192,16 +192,16 @@ export default function AdvancedSliderPage() {
         </div>
 
         {/* ── Row 2: Image+Status (2/3) + Tip (1/3) ── */}
-        <div className="grid gap-3" style={{ gridTemplateColumns: "2fr 1fr" }}>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
 
           {/* Card 4: Slide Image & Status */}
           <FormSection
             title="4. Slide Image & Status"
             icon={<Layers className="h-4 w-4" />}
             subtitle="Upload slide image and manage its status."
-            className={`${card} space-y-2`}
+            className={`${card} space-y-2 lg:col-span-2`}
           >
-            <div className="grid gap-3" style={{ gridTemplateColumns: "1fr 1fr" }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <ImageUpload
                 compact
                 size="wide"
@@ -233,7 +233,7 @@ export default function AdvancedSliderPage() {
           </FormSection>
 
           {/* Card 5: Tip */}
-          <div className={`${card} flex flex-col gap-2`}>
+          <div className={`${card} flex flex-col gap-2 lg:col-span-1`}>
             <div className="flex items-start gap-2.5">
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] bg-[hsl(228_64%_96%)] text-[#2457d6]">
                 <Info className="h-4 w-4" />

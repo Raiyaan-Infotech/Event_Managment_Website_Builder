@@ -41,7 +41,7 @@ export default function GalleryPage() {
   };
 
   const form = (
-    <div className="grid h-full min-h-0 gap-3" style={{ gridTemplateColumns: "380px 1fr" }}>
+    <div className="grid min-h-0 gap-3 grid-cols-1 lg:h-full lg:grid-cols-[380px_1fr]">
 
       {/* ── Left: Gallery Info (fixed, no scroll) ── */}
       <div className="dense-builder-form flex flex-col gap-3 min-h-0 min-w-0">
@@ -104,13 +104,13 @@ export default function GalleryPage() {
       </div>
 
       {/* ── Right: Gallery Images (scrollable when many images) ── */}
-      <div className="dense-builder-form flex flex-col min-h-0 min-w-0 overflow-y-auto">
+      <div className="dense-builder-form flex flex-col min-w-0 lg:min-h-0 lg:overflow-y-auto">
 
         <FormSection
           title="Gallery Images"
           icon={<Sparkles className="h-4 w-4" />}
           subtitle="Upload and manage images for this gallery."
-          className={`${card} space-y-2 h-full`}
+          className={`${card} space-y-2 lg:h-full`}
         >
           <MultiImageUpload
             label="Gallery Images"

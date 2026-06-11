@@ -73,7 +73,7 @@ export default function HeroSectionPage() {
   };
 
   const form = (
-    <div className="grid h-full min-h-0 gap-2" style={{ gridTemplateColumns: "1fr 1fr 1fr" }}>
+    <div className="grid gap-2 grid-cols-1 lg:grid-cols-3">
 
       {/* ── Column 1: Hero Content + Layouts ── */}
       <div className="dense-builder-form flex flex-col gap-2 min-h-0 min-w-0">
@@ -169,7 +169,7 @@ export default function HeroSectionPage() {
         >
           <BuilderCountedInput label="Label" value={btn1.label} onChange={(label) => setBtn1((p) => ({ ...p, label }))} maxLength={30} className="space-y-0.5" />
           <BuilderCountedInput label="Link" value={btn1.link} onChange={(link) => setBtn1((p) => ({ ...p, link }))} maxLength={100} className="space-y-0.5" />
-          <div className="grid gap-1.5" style={{ gridTemplateColumns: "1fr 34px" }}>
+          <div className="grid grid-cols-[1fr_34px] gap-1.5">
             <div className="min-w-0 space-y-0.5">
               <p className="text-[9px] font-semibold text-[var(--vendor-text)]">Style</p>
               <Select value={btn1.style} onValueChange={(style) => setBtn1((p) => ({ ...p, style: style as ButtonStyle }))}>
@@ -200,7 +200,7 @@ export default function HeroSectionPage() {
         >
           <BuilderCountedInput label="Label" value={btn2.label} onChange={(label) => setBtn2((p) => ({ ...p, label }))} maxLength={30} className="space-y-0.5" />
           <BuilderCountedInput label="Link" value={btn2.link} onChange={(link) => setBtn2((p) => ({ ...p, link }))} maxLength={100} className="space-y-0.5" />
-          <div className="grid gap-1.5" style={{ gridTemplateColumns: "1fr 34px" }}>
+          <div className="grid grid-cols-[1fr_34px] gap-1.5">
             <div className="min-w-0 space-y-0.5">
               <p className="text-[9px] font-semibold text-[var(--vendor-text)]">Style</p>
               <Select value={btn2.style} onValueChange={(style) => setBtn2((p) => ({ ...p, style: style as ButtonStyle }))}>

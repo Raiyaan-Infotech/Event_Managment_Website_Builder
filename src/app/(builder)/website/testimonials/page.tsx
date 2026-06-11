@@ -2,8 +2,6 @@
 
 import * as React from "react";
 import {
-  ChevronLeft,
-  ChevronRight,
   Edit2,
   GripVertical,
   Plus,
@@ -30,6 +28,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { TestimonialStatCard } from "@/components/builder/testimonial-stat-card";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -68,10 +67,6 @@ function avatarDataUrl(name: string, background: string) {
   `)}`;
 }
 
-function stripHtml(value: string) {
-  return value.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-}
-
 // ─── Seed data ────────────────────────────────────────────────────────────────
 
 const initialTestimonials: Testimonial[] = [
@@ -105,39 +100,6 @@ const initialTestimonials: Testimonial[] = [
 ];
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
-
-function StatCard({
-  icon,
-  iconBg,
-  iconColor,
-  value,
-  label,
-}: {
-  icon: React.ReactNode;
-  iconBg: string;
-  iconColor: string;
-  value: string | number;
-  label: string;
-}) {
-  return (
-    <div className="flex items-center gap-2.5 rounded-[var(--vendor-radius-control)] border border-[var(--vendor-border)] bg-slate-50/80 px-3 py-2">
-      <span
-        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
-        style={{ background: iconBg, color: iconColor }}
-      >
-        {icon}
-      </span>
-      <div className="min-w-0">
-        <p className="text-[14px] font-black leading-none text-[var(--vendor-text)]">
-          {value}
-        </p>
-        <p className="mt-0.5 text-[9px] font-semibold leading-none text-[var(--vendor-text-muted)]">
-          {label}
-        </p>
-      </div>
-    </div>
-  );
-}
 
 function TestimonialManagementTable({
   testimonials,
@@ -181,8 +143,8 @@ function TestimonialManagementTable({
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)]">
-        <Table>
+      <div className="overflow-x-auto rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)]">
+        <Table className="min-w-[560px]">
           <TableHeader>
             <TableRow className="bg-slate-50 hover:bg-slate-50">
               <TableHead className="h-7 w-6 px-2 py-1.5" />
@@ -261,22 +223,22 @@ function TestimonialManagementTable({
 
       {/* ── Stats Row ── */}
       <div className="grid grid-cols-3 gap-2">
-        <StatCard
-          icon={<Users className="h-3.5 w-3.5" />}
+        <TestimonialStatCard
+          icon={Users}
           iconBg="#dbeafe"
           iconColor="#3b82f6"
           value={total}
           label="Total Testimonials"
         />
-        <StatCard
-          icon={<CheckCircle2 className="h-3.5 w-3.5" />}
+        <TestimonialStatCard
+          icon={CheckCircle2}
           iconBg="#d1fae5"
           iconColor="#10b981"
           value={active}
           label="Active Testimonials"
         />
-        <StatCard
-          icon={<Star className="h-3.5 w-3.5 fill-current" />}
+        <TestimonialStatCard
+          icon={Star}
           iconBg="#fef3c7"
           iconColor="#f59e0b"
           value="4.9"
@@ -351,7 +313,7 @@ export default function TestimonialsPage() {
           className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-3 shadow-sm space-y-2.5"
         >
           {/* Name + Event side-by-side */}
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <BuilderCountedInput
               label="Customer Name"
               required
