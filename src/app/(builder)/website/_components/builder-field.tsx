@@ -118,7 +118,7 @@ export function BuilderCountedTextarea({
           onChange={(event) => onChange(event.target.value)}
           className={cn(
             // Slightly taller on mobile for comfortable typing
-            "min-h-[4rem] sm:min-h-16 w-full pb-5 text-[11px] font-medium leading-4",
+  "min-h-[6rem] sm:min-h-[8rem] w-full pb-5 resize-y text-[11px] font-medium leading-4",
             textareaClassName,
           )}
         />

@@ -128,8 +128,8 @@ export default function FooterPage() {
           value={shortDescription}
           onChange={setShortDescription}
           maxLength={200}
-          textareaClassName="!min-h-[2.25rem] !max-h-[2.25rem] text-[10px]"
-        />
+// Short Description textarea
+textareaClassName="!min-h-[5rem] text-[10px] resize-y"        />
 
         {/* Logo upload */}
         <ImageUpload

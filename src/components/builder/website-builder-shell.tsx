@@ -137,6 +137,7 @@ export function WebsiteBuilderShell({
           <div className="hidden h-6 w-px shrink-0 bg-[var(--color-border)] sm:block" />
           <div ref={menuRef} className="relative shrink-0">
             <button
+            type="button"
               onClick={() => setMenuOpen(!menuOpen)}
               className="flex items-center gap-1.5 rounded-[var(--radius-button)] px-1 py-1 transition-colors hover:bg-gray-50 sm:px-1.5"
             >
@@ -146,8 +147,9 @@ export function WebsiteBuilderShell({
               <ChevronDown className="hidden h-3 w-3 text-[var(--color-text-secondary)] sm:block" />
             </button>
             {menuOpen && (
-              <div className="absolute right-0 top-full z-50 mt-1 w-48 rounded-[var(--radius-input)] border border-[var(--color-border)] bg-white py-1 shadow-lg">
-                <Link href="/settings" onClick={() => setMenuOpen(false)} className="flex items-center gap-2.5 px-3 py-2 text-[13px] font-medium text-[var(--color-text)] transition-colors hover:bg-gray-50">
+<div className="fixed right-3 z-50 mt-1 w-48 rounded-[var(--radius-input)] border border-[var(--color-border)] bg-white py-1 shadow-lg"
+    style={{ top: "var(--header-height)" }}
+  >                <Link href="/settings" onClick={() => setMenuOpen(false)} className="flex items-center gap-2.5 px-3 py-2 text-[13px] font-medium text-[var(--color-text)] transition-colors hover:bg-gray-50">
                   <User className="h-4 w-4 text-[var(--color-text-secondary)]" />
                   Profile
                 </Link>

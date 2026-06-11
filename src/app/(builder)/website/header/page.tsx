@@ -24,7 +24,6 @@ import {
   BuilderCountedTextarea,
   BuilderSegmentedControl,
 } from "../_components/builder-field";
-import { FormActions } from "../_components/form-actions";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -87,10 +86,7 @@ export default function WebsiteHeaderPage() {
   const [editingLinkId, setEditingLinkId] = React.useState<string | null>(null);
   const [isSaving, setIsSaving] = React.useState(false);
 
-  const updateSocialLink = (
-    id: string,
-    patch: Partial<SocialLink>,
-  ) => {
+  const updateSocialLink = (id: string, patch: Partial<SocialLink>) => {
     setSocialLinks((prev) =>
       prev.map((item) => (item.id === id ? { ...item, ...patch } : item)),
     );
@@ -143,9 +139,7 @@ export default function WebsiteHeaderPage() {
         </p>
       </div>
 
-      {/* ── Top row: Company Info + Contact Info ──
-          Single column on mobile/tablet, 2-col on lg+
-          Using minmax(0,1fr) so neither column can overflow its track. */}
+      {/* ── Top row: Company Info + Contact Info ── */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:items-start">
 
         {/* ── 1. Company Information ── */}
@@ -197,7 +191,6 @@ export default function WebsiteHeaderPage() {
             ]}
           />
 
-          {/* Mobile + Email: stack on xs, side-by-side on sm+ */}
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <BuilderCountedInput
               label="Mobile"
@@ -223,7 +216,7 @@ export default function WebsiteHeaderPage() {
             value={address}
             onChange={setAddress}
             maxLength={200}
-            textareaClassName="min-h-[64px] resize-none"
+            textareaClassName="min-h-[64px] resize-y"
             className="space-y-0.5"
           />
         </FormSection>
@@ -246,34 +239,33 @@ export default function WebsiteHeaderPage() {
         }
         className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-3 shadow-sm space-y-3 sm:p-4"
       >
-        {/* Social link rows */}
-        <div className="rounded-[var(--vendor-radius-control)] border border-[var(--vendor-border)] divide-y divide-[var(--vendor-border)]">
-          {socialLinks.length === 0 ? (
-            <p className="py-6 text-center text-[10px] text-[var(--vendor-text-muted)]">
-              No social links yet. Click "+ Add Link" to add one.
-            </p>
-          ) : (
-            socialLinks.map((item) => {
-              const Icon = item.icon;
-              return (
-                <div
-                  key={item.id}
-                  className="flex flex-col gap-2 px-2.5 py-2 sm:flex-row sm:items-center sm:gap-3"
-                >
-                  {/* Row 1 (mobile): handle + icon + label + action buttons */}
-                  <div className="flex items-center gap-2 sm:gap-2.5">
+        {/* Horizontal scroll wrapper */}
+        <div className="overflow-x-auto rounded-[var(--vendor-radius-control)]">
+          <div className="min-w-[480px] rounded-[var(--vendor-radius-control)] border border-[var(--vendor-border)] divide-y divide-[var(--vendor-border)]">
+            {socialLinks.length === 0 ? (
+              <p className="py-6 text-center text-[10px] text-[var(--vendor-text-muted)]">
+                No social links yet. Click &quot;+ Add Link&quot; to add one.
+              </p>
+            ) : (
+              socialLinks.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <div
+                    key={item.id}
+                    className="flex items-center gap-2.5 px-2.5 py-2"
+                  >
                     {/* Drag handle */}
                     <GripVertical className="h-3.5 w-3.5 shrink-0 text-[var(--vendor-text-muted)] cursor-grab" />
 
                     {/* Coloured icon badge */}
                     <span
-                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[6px] text-white sm:h-8 sm:w-8 sm:rounded-[8px]"
+                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[6px] text-white"
                       style={{ backgroundColor: item.color }}
                     >
                       <Icon className="h-3.5 w-3.5" />
                     </span>
 
-                    {/* Platform name — fixed width so URL input aligns */}
+                    {/* Platform name / editable label */}
                     {editingLinkId === item.id ? (
                       <Input
                         value={item.label}
@@ -283,17 +275,26 @@ export default function WebsiteHeaderPage() {
                         onKeyDown={(e) => {
                           if (e.key === "Enter") setEditingLinkId(null);
                         }}
-                        className="h-7 w-[76px] px-1 text-[10px] sm:w-[88px] sm:text-[11px]"
+                        className="h-7 w-[88px] shrink-0 px-1 text-[10px]"
                         autoFocus
                       />
                     ) : (
-                      <span className="w-[76px] shrink-0 text-[10px] font-semibold text-[var(--vendor-text)] sm:w-[88px] sm:text-[11px]">
+                      <span className="w-[88px] shrink-0 text-[10px] font-semibold text-[var(--vendor-text)]">
                         {item.label}
                       </span>
                     )}
 
-                    {/* Edit / Delete — inline on mobile (right-aligned) */}
-                    <div className="ml-auto flex shrink-0 gap-1 sm:hidden">
+                    {/* URL input — flex-1 fills remaining space */}
+                    <Input
+                      value={item.url}
+                      onChange={(e) =>
+                        updateSocialLink(item.id, { url: e.target.value })
+                      }
+                      className="h-7 min-w-0 flex-1 px-2 font-mono text-[10px] font-medium"
+                    />
+
+                    {/* Action buttons */}
+                    <div className="flex shrink-0 gap-1">
                       <Button
                         type="button"
                         variant="outline"
@@ -305,9 +306,9 @@ export default function WebsiteHeaderPage() {
                         }
                       >
                         {editingLinkId === item.id ? (
-                          <Check className="h-3 w-3" />
+                          <Check className="h-3.5 w-3.5" />
                         ) : (
-                          <Edit2 className="h-3 w-3" />
+                          <Edit2 className="h-3.5 w-3.5" />
                         )}
                       </Button>
                       <Button
@@ -317,65 +318,16 @@ export default function WebsiteHeaderPage() {
                         className="text-rose-500 hover:text-rose-600"
                         onClick={() => deleteSocialLink(item.id)}
                       >
-                        <Trash2 className="h-3 w-3" />
+                        <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>
                   </div>
-
-                  {/* Row 2 (mobile) / inline (sm+): URL input */}
-                  <Input
-                    value={item.url}
-                    onChange={(e) =>
-                      updateSocialLink(item.id, { url: e.target.value })
-                    }
-                    // Full width on mobile so it's easy to type in
-                    className="h-7 w-full min-w-0 flex-1 px-2 font-mono text-[10px] font-medium"
-                  />
-
-                  {/* Edit / Delete — sm+ only, inline after the URL input */}
-                  <div className="hidden shrink-0 gap-1 sm:flex">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon-xs"
-                      onClick={() =>
-                        setEditingLinkId(
-                          editingLinkId === item.id ? null : item.id,
-                        )
-                      }
-                    >
-                      {editingLinkId === item.id ? (
-                        <Check className="h-3.5 w-3.5" />
-                      ) : (
-                        <Edit2 className="h-3.5 w-3.5" />
-                      )}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon-xs"
-                      className="text-rose-500 hover:text-rose-600"
-                      onClick={() => deleteSocialLink(item.id)}
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                </div>
-              );
-            })
-          )}
+                );
+              })
+            )}
+          </div>
         </div>
       </FormSection>
-
-      {/* ── Save / Cancel ── */}
-      {/* <FormActions
-        saveLabel="Save Changes"
-        onSave={handleSave}
-        onCancel={handleCancel}
-        isSaving={isSaving}
-        layout="end"
-        className="pt-1"
-      /> */}
     </div>
   );
 
