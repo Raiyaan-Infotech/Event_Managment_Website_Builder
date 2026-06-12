@@ -120,7 +120,7 @@ export function SelectItem({
         setOpen(false);
       }}
     >
-      <span className="line-clamp-1 text-[14px]">{children}</span>
+      <span className="line-clamp-1 text-[12px]">{children}</span>
       <Check className="h-3.5 w-3.5 opacity-0" />
     </button>
   );

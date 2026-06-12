@@ -17,10 +17,10 @@
   --color-text: #0f172a;
   --color-text-secondary: #64748b;
   --color-text-muted: #94a3b8;
-  --radius-card: 8px;
+  --radius-card: 6px;
   --radius-input: 4px;
-  --radius-button: 7px;
-  --radius-sidebar-item: 7px;
+  --radius-button: 6px;
+  --radius-sidebar-item: 6px;
   --radius-badge: 999px;
   --button-height: 36px;
   --button-radius: var(--radius-button);
@@ -76,6 +76,8 @@
   --vendor-table-head-bg: hsl(210 40% 98%);
   --vendor-table-row-alt: hsl(210 40% 98% / 0.7);
   --vendor-table-row-hover: hsl(228 64% 51% / 0.06);
+  --vendor-primary: var(--color-primary);
+  --vendor-radius-control: 4px;
 }
 
 * {

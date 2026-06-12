@@ -8,7 +8,7 @@ const segmentLabels: Record<string, string> = {
   "": "Dashboard",
   website: "Website Builder",
   header: "Header",
-  menu: "Menu Management",
+  menu: "Nav Menu",
   "hero-section": "Hero Section",
   "simple-slider": "Simple Slider",
   "advance-slider": "Advance Slider",
@@ -21,13 +21,6 @@ const segmentLabels: Record<string, string> = {
   "preview-publish": "Preview & Publish",
   portfolio: "Portfolio",
   setup: "Website Setup",
-  bookings: "Bookings",
-  leads: "Leads",
-  customers: "Customers",
-  payments: "Payments",
-  reviews: "Reviews",
-  analytics: "Analytics",
-  settings: "Settings",
 };
 
 const baseHrefs: Record<string, string> = {

@@ -3,6 +3,13 @@
 import * as React from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
 // ─── BuilderLabel ────────────────────────────────────────────────────────────
@@ -43,6 +50,10 @@ interface CountedInputProps {
   className?: string;
   inputClassName?: string;
   labelClassName?: string;
+  inputPrefix?: React.ReactNode;
+  showCount?: boolean;
+  onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
+  autoFocus?: boolean;
 }
 
 export function BuilderCountedInput({
@@ -55,6 +66,10 @@ export function BuilderCountedInput({
   className,
   inputClassName,
   labelClassName,
+  inputPrefix,
+  showCount = true,
+  onKeyDown,
+  autoFocus = false,
 }: CountedInputProps) {
   return (
     <div className={cn("w-full space-y-1", className)}>
@@ -63,22 +78,36 @@ export function BuilderCountedInput({
           {label}
         </BuilderLabel>
       ) : null}
-      <div className="relative w-full">
+      <div
+        className={cn(
+          "relative w-full",
+          inputPrefix &&
+            "flex h-8 overflow-hidden rounded-[var(--vendor-radius-control)] border border-[var(--vendor-border)] bg-white sm:h-9",
+        )}
+      >
+        {inputPrefix ? inputPrefix : null}
         <Input
           value={value}
           maxLength={maxLength}
           placeholder={placeholder}
           onChange={(event) => onChange(event.target.value)}
+          onKeyDown={onKeyDown}
+          autoFocus={autoFocus}
           className={cn(
             // h-8 on mobile (32px), h-9 on sm+ — fits the compact panel
-            "h-8 sm:h-9 w-full pr-12 text-[11px] font-medium",
+            "h-8 sm:h-9 w-full text-[11px] font-medium",
+            showCount ? "pr-12" : "pr-2",
+            inputPrefix &&
+              "h-full rounded-none border-0 shadow-none focus:border-transparent focus:ring-0",
             inputClassName,
           )}
         />
         {/* Character counter — stays inside the input on the right */}
-        <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[8px] font-bold text-slate-400 tabular-nums">
-          {value.length}/{maxLength}
-        </span>
+        {showCount ? (
+          <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[8px] font-bold text-slate-400 tabular-nums">
+            {value.length}/{maxLength}
+          </span>
+        ) : null}
       </div>
     </div>
   );
@@ -132,6 +161,54 @@ export function BuilderCountedTextarea({
 }
 
 // ─── BuilderSegmentedControl ─────────────────────────────────────────────────
+
+interface BuilderSelectOption<T extends string> {
+  label: string;
+  value: T;
+}
+
+interface BuilderSelectFieldProps<T extends string> {
+  value: T;
+  options: Array<BuilderSelectOption<T>>;
+  onChange: (value: T) => void;
+  label?: string;
+  placeholder?: string;
+  className?: string;
+  triggerClassName?: string;
+}
+
+export function BuilderSelectField<T extends string>({
+  value,
+  options,
+  onChange,
+  label,
+  placeholder,
+  className,
+  triggerClassName,
+}: BuilderSelectFieldProps<T>) {
+  return (
+    <div className={cn("w-full space-y-1", className)}>
+      {label ? <BuilderLabel>{label}</BuilderLabel> : null}
+      <Select value={value} onValueChange={(nextValue) => onChange(nextValue as T)}>
+        <SelectTrigger
+          className={cn(
+            "h-8 sm:h-9 w-full px-2 text-[10px] font-semibold",
+            triggerClassName,
+          )}
+        >
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((option) => (
+            <SelectItem key={option.value} value={option.value} className="!text-[11px]">
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
 
 interface SegmentedOption<T extends string> {
   label: string;

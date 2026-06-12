@@ -5,7 +5,10 @@ import { FormSection } from "../_components/form-section";
 import { ImageUpload } from "../_components/image-upload";
 import { ColorPickerInput } from "../_components/color-picker-input";
 import { ToggleField } from "../_components/toggle-field";
-import { SliderManagementTable } from "../_components/slider-management-table";
+import {
+  SliderManagementTable,
+  type SliderManagementRow,
+} from "../_components/slider-management-table";
 import {
   BuilderCountedInput,
   BuilderCountedTextarea,
@@ -84,6 +87,18 @@ export default function SimpleSliderPage() {
     );
   };
 
+  const handleSlideReorder = (rows: SliderManagementRow[]) => {
+    const activeSlideId = slides[editingIndex]?.id;
+    const nextSlides = rows
+      .map((row) => slides.find((slide) => slide.id === row.id))
+      .filter((slide): slide is Slide => Boolean(slide));
+
+    setSlides(nextSlides);
+
+    const nextEditingIndex = nextSlides.findIndex((slide) => slide.id === activeSlideId);
+    setEditingIndex(nextEditingIndex >= 0 ? nextEditingIndex : 0);
+  };
+
   const handleSave = () => {
     setIsSaving(true);
     setTimeout(() => setIsSaving(false), 800);
@@ -100,12 +115,12 @@ export default function SimpleSliderPage() {
       <div className="grid gap-3 grid-cols-1 lg:grid-cols-2">
 
       {/* ── Column 1: Slide Editor ── */}
-      <div className="dense-builder-form flex flex-col gap-2 min-h-0 min-w-0">
+      <div className="flex flex-col gap-2 min-h-0 min-w-0">
         <FormSection
           title="Slide Editor"
           icon={<SlidersHorizontal className="h-4 w-4" />}
           subtitle="Edit the content and appearance of the slider."
-          className={`${card} space-y-1.5`}
+          className={`${card} space-y-3`}
         >
           <BuilderCountedInput
             label="Slider Title"
@@ -130,55 +145,50 @@ export default function SimpleSliderPage() {
             className="space-y-0.5"
           />
 
-          {/* Button Label + Page */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 items-end gap-2">
-            <BuilderCountedInput
-              label="Button Label"
-              value={editing.buttonLabel}
-              onChange={(v) => updateEditing({ buttonLabel: v })}
-              maxLength={30}
-              className="space-y-0.5"
-            />
-            <div className="space-y-0.5">
-              <label className="block">Button Page</label>
-              <Select
-                value={editing.buttonPage}
-                onValueChange={(v) => updateEditing({ buttonPage: v })}
-              >
-                <SelectTrigger className="h-6 w-full text-[9px] px-2 font-semibold">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="home">Home</SelectItem>
-                  <SelectItem value="about">About Us</SelectItem>
-                  <SelectItem value="services">Services</SelectItem>
-                  <SelectItem value="events">Events</SelectItem>
-                  <SelectItem value="gallery">Gallery</SelectItem>
-                  <SelectItem value="contact">Contact Us</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <BuilderCountedInput
+            label="Button Label"
+            value={editing.buttonLabel}
+            onChange={(v) => updateEditing({ buttonLabel: v })}
+            maxLength={30}
+            className="space-y-0.5"
+          />
+
+          <div className="space-y-0.5">
+            <label className="block">Button Page</label>
+            <Select
+              value={editing.buttonPage}
+              onValueChange={(v) => updateEditing({ buttonPage: v })}
+            >
+              <SelectTrigger className="h-9 w-full text-[11px] px-2 font-semibold">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="home">Home</SelectItem>
+                <SelectItem value="about">About Us</SelectItem>
+                <SelectItem value="services">Services</SelectItem>
+                <SelectItem value="events">Events</SelectItem>
+                <SelectItem value="gallery">Gallery</SelectItem>
+                <SelectItem value="contact">Contact Us</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
-          {/* Button Color + Status */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 items-start gap-2">
-            <div className="space-y-0.5">
-              <label className="block">Button Color</label>
-              <ColorPickerInput
-                value={editing.buttonColor}
-                onChange={(color) => updateEditing({ buttonColor: color })}
-                compact
+          <div className="space-y-0.5">
+            <label className="block">Button Color</label>
+            <ColorPickerInput
+              value={editing.buttonColor}
+              onChange={(color) => updateEditing({ buttonColor: color })}
+            />
+          </div>
+
+          <div className="space-y-0.5">
+            <label className="block">Status</label>
+            <div className="flex items-center justify-between rounded-[var(--vendor-radius-control)] border border-[var(--vendor-border)] px-3 py-2">
+              <span className="text-[11px] text-[var(--vendor-text-muted)]">Enable slide</span>
+              <Switch
+                checked={editing.status}
+                onCheckedChange={(v) => updateEditing({ status: v })}
               />
-            </div>
-            <div className="space-y-0.5">
-              <label className="block">Status</label>
-              <div className="flex items-center justify-between rounded-[var(--vendor-radius-control)] border border-[var(--vendor-border)] px-2 py-1">
-                <span className="text-[9px] text-[var(--vendor-text-muted)]">Enable slide</span>
-                <Switch
-                  checked={editing.status}
-                  onCheckedChange={(v) => updateEditing({ status: v })}
-                />
-              </div>
             </div>
           </div>
 
@@ -202,14 +212,14 @@ export default function SimpleSliderPage() {
               onCancel={() => setEditingIndex(0)}
               onSave={handleSave}
               isSaving={isSaving}
-              layout="between"
+              layout="default"
             />
           </div>
         </FormSection>
       </div>
 
       {/* ── Column 2: Slider Management Table ── */}
-      <div className="dense-builder-form flex flex-col gap-2 min-h-0 min-w-0">
+      <div className="flex flex-col gap-2 min-h-0 min-w-0">
         <FormSection
           title="Slider Management"
           icon={<List className="h-4 w-4" />}
@@ -250,6 +260,7 @@ export default function SimpleSliderPage() {
               setSlides((prev) => prev.filter((s) => s.id !== row.id));
               setEditingIndex(0);
             }}
+            onReorder={handleSlideReorder}
             onStatusChange={(row, enabled) => {
               setSlides((prev) =>
                 prev.map((s) => (s.id === row.id ? { ...s, status: enabled } : s)),
@@ -271,6 +282,14 @@ export default function SimpleSliderPage() {
       onCancel={handleCancel}
       isSaving={isSaving}
       leftClassName="border-0 bg-transparent p-0 shadow-none"
+      primaryButton={{
+        label: "Save Changes",
+        onClick: handleSave,
+        isLoading: isSaving,
+      }}
+      onHowItWorks={() =>
+        alert("This is where you'd explain how to use the page editor.")
+      }
     />
   );
 }

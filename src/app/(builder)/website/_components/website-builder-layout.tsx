@@ -1,7 +1,7 @@
 "use client";
 
 import type * as React from "react";
-import { HelpCircle, Save } from "lucide-react";
+import { HelpCircle } from "lucide-react";
 import { OutlineButton, PrimaryButton } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { PageBreadcrumbs } from "./page-breadcrumbs";
@@ -11,14 +11,11 @@ export interface WebsiteBuilderBreadcrumbItem {
   href?: string;
 }
 
-export interface WebsiteBuilderActionButton {
+export interface WebsiteBuilderPrimaryButtonProps {
   label: string;
   onClick?: () => void;
   disabled?: boolean;
   isLoading?: boolean;
-  loadingLabel?: string;
-  icon?: React.ReactNode;
-  className?: string;
 }
 
 interface WebsiteBuilderLayoutProps {
@@ -37,7 +34,6 @@ interface WebsiteBuilderLayoutProps {
   onHowItWorks?: () => void;
   isSaving?: boolean;
   disableSave?: boolean;
-  primaryButton?: WebsiteBuilderActionButton;
   topActions?: React.ReactNode;
   previewActions?: React.ReactNode;
   leftClassName?: string;
@@ -47,6 +43,8 @@ interface WebsiteBuilderLayoutProps {
   sidebar?: React.ReactNode;
   sidebarClassName?: string;
   hideHeader?: boolean;
+  /** Optional primary action button rendered in the header actions row */
+  primaryButton?: WebsiteBuilderPrimaryButtonProps;
 }
 
 export function WebsiteBuilderLayout({
@@ -64,7 +62,6 @@ export function WebsiteBuilderLayout({
   onHowItWorks,
   isSaving = false,
   disableSave = false,
-  primaryButton,
   topActions,
   previewActions,
   leftClassName,
@@ -74,6 +71,7 @@ export function WebsiteBuilderLayout({
   sidebar,
   sidebarClassName,
   hideHeader = false,
+  primaryButton,
 }: WebsiteBuilderLayoutProps) {
   return (
     <div
@@ -86,8 +84,8 @@ export function WebsiteBuilderLayout({
       )}
     >
       {!hideHeader && (
-        <header className="mb-1.5 flex shrink-0 flex-col gap-1.5">
-          {/* Title row */}
+        <header className="mb-1.5 flex shrink-0 items-center justify-between gap-3">
+          {/* Left — title + breadcrumbs */}
           <div className="min-w-0">
             <h1 className="text-[15px] font-black leading-5 text-[var(--vendor-text)] truncate">
               {title}
@@ -99,30 +97,9 @@ export function WebsiteBuilderLayout({
             )}
           </div>
 
-          {/* Action buttons row — scrollable on mobile so they never wrap to 2 rows */}
-          <div className="flex items-end gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
+          {/* Right — action buttons */}
+          <div className="flex shrink-0 items-center gap-1.5">
             {topActions}
-            {primaryButton ? (
-              <PrimaryButton
-                type="button"
-                size="sm"
-                onClick={primaryButton.onClick}
-                disabled={primaryButton.disabled || primaryButton.isLoading}
-                className={cn(
-                  "h-8 shrink-0 px-2.5 text-[11px] shadow-sm sm:px-3",
-                  primaryButton.className,
-                )}
-              >
-                {primaryButton.icon ?? (
-                  <Save className="h-3.5 w-3.5 shrink-0" />
-                )}
-                <span>
-                  {primaryButton.isLoading
-                    ? primaryButton.loadingLabel ?? "Saving..."
-                    : primaryButton.label}
-                </span>
-              </PrimaryButton>
-            ) : null}
             {onHowItWorks && (
               <OutlineButton
                 type="button"
@@ -133,6 +110,17 @@ export function WebsiteBuilderLayout({
                 <HelpCircle className="h-3.5 w-3.5 shrink-0" />
                 <span className="hidden sm:inline">{howItWorksLabel}</span>
               </OutlineButton>
+            )}
+            {primaryButton && (
+              <PrimaryButton
+                type="button"
+                size="sm"
+                onClick={primaryButton.onClick}
+                disabled={primaryButton.disabled || primaryButton.isLoading}
+                className="h-8 shrink-0 px-3 text-[11px]"
+              >
+                {primaryButton.isLoading ? "Loading…" : primaryButton.label}
+              </PrimaryButton>
             )}
           </div>
         </header>

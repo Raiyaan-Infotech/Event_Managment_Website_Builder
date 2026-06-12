@@ -5,7 +5,10 @@ import { FormSection } from "../_components/form-section";
 import { ImageUpload } from "../_components/image-upload";
 import { ColorPickerInput } from "../_components/color-picker-input";
 import { ToggleField } from "../_components/toggle-field";
-import { SliderManagementTable } from "../_components/slider-management-table";
+import {
+  SliderManagementTable,
+  type SliderManagementRow,
+} from "../_components/slider-management-table";
 import { BuilderCountedInput, BuilderCountedTextarea } from "../_components/builder-field";
 import { RangeSliderInput } from "../_components/range-slider-input";
 import { FormActions } from "../_components/form-actions";
@@ -81,6 +84,18 @@ export default function AdvancedSliderPage() {
 
   const updateEditing = (patch: Partial<Slide>) =>
     setSlides((prev) => prev.map((s, i) => (i === editingIndex ? { ...s, ...patch } : s)));
+
+  const handleSlideReorder = (rows: SliderManagementRow[]) => {
+    const activeSlideId = slides[editingIndex]?.id;
+    const nextSlides = rows
+      .map((row) => slides.find((slide) => slide.id === row.id))
+      .filter((slide): slide is Slide => Boolean(slide));
+
+    setSlides(nextSlides);
+
+    const nextEditingIndex = nextSlides.findIndex((slide) => slide.id === activeSlideId);
+    setEditingIndex(nextEditingIndex >= 0 ? nextEditingIndex : 0);
+  };
 
   const handleSave = () => {
     setIsSaving(true);
@@ -292,6 +307,7 @@ export default function AdvancedSliderPage() {
                 setSlides((prev) => prev.filter((s) => s.id !== row.id));
                 setEditingIndex(0);
               }}
+              onReorder={handleSlideReorder}
               onStatusChange={(row, enabled) =>
                 setSlides((prev) => prev.map((s) => (s.id === row.id ? { ...s, status: enabled } : s)))
               }

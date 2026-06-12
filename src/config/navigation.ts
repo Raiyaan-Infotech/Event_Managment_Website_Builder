@@ -36,44 +36,55 @@ export const navSections: NavSection[] = [
   {
     items: [
       { label: "Dashboard", icon: LayoutDashboard, href: "/" },
-      { label: "Bookings", icon: Calendar, href: "/bookings" },
-      { label: "Leads", icon: Users, href: "/leads" },
-      { label: "Customers", icon: Users, href: "/customers" },
-      { label: "Payments", icon: CreditCard, href: "/payments" },
     ],
   },
   {
-    title: "WEBSITE BUILDER",
+    title: "Website Setup",
     items: [
-      { label: "Website Setup", icon: Monitor, href: "/website" },
-      { label: "Header", icon: Home, href: "/website/header" },
-      { label: "Menu", icon: Menu, href: "/website/menu" },
-      { label: "HeroSection", icon: Home, href: "/website/hero-section" },
-      { label: "Simple Slider", icon: Folder, href: "/website/simple-slider" },
-      { label: "Advance Slider", icon: Calendar, href: "/website/advance-slider" },
+      { label: "Basic Information", icon: FileText, href: "/website/basic-information" },
+      { label: "Contact Information", icon: Phone, href: "/website/contact-information" },
+      { label: "Social Links", icon: Users, href: "/website/social-links" },
+    ],
+  },
+  {
+    title: "Content",
+    items: [
+      { label: "Pages", icon: FileText, href: "/website/pages" },
+      { label: "Nav Menu", icon: Menu, href: "/website/menu" },
+      { label: "Hero Section", icon: Monitor, href: "/website/hero-section" },
       {
-        label: "Portfolio",
-        icon: ImageIcon,
-        href: "/website/portfolio",
+        label : "Slider",
+        icon: Folder,
+        href: "/website/slider",
         children: [
-          { label: "Clients", icon: Users, href: "/website/portfolio/clients" },
-          { label: "Sponsors", icon: Award, href: "/website/portfolio/sponsors" },
+          { label: "Simple Slider", icon: Folder, href: "/website/simple-slider" },
+          { label: "Advance Slider", icon: Calendar, href: "/website/advance-slider" },
         ],
       },
       { label: "Gallery", icon: GalleryHorizontal, href: "/website/gallery" },
       { label: "Testimonials", icon: Star, href: "/website/testimonials" },
-      { label: "Contact Information", icon: Phone, href: "/website/contact-information" },
-      { label: "Footer", icon: CreditCard, href: "/website/footer" },
-      { label: "SEO", icon: Search, href: "/website/seo" },
-      { label: "Pages", icon: FileText, href: "/website/pages" },
-      { label: "Preview & Publish", icon: Send, href: "/website/preview-publish" },
     ],
   },
   {
+    title: "Portfolio",
     items: [
-      { label: "Reviews", icon: Star, href: "/reviews" },
-      { label: "Analytics", icon: BarChart3, href: "/analytics" },
-      { label: "Settings", icon: Settings, href: "/settings" },
+      { label: "Clients", icon: Users, href: "/website/portfolio/clients" },
+      { label: "Sponsors", icon: Award, href: "/website/portfolio/sponsors" },
+      { label: "Events", icon: Calendar, href: "/website/portfolio/events" },
+    ],
+  },
+  {
+    title: "Footer",
+    items: [
+      { label: "Footer Settings", icon: Settings, href: "/website/footer" },
+      { label: "Legal Pages", icon: FileText, href: "/website/legal-pages" },
+    ],
+  },
+  {
+    title: "Settings",
+    items: [
+      { label: "SEO Settings", icon: Search, href: "/website/seo" },
+      { label: "Preview & Publish", icon: Send, href: "/website/preview-publish" },
     ],
   },
 ];
