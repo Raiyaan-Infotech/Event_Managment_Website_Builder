@@ -1,7 +1,7 @@
 "use client";
 
 import type * as React from "react";
-import { Eye, HelpCircle, Save, X } from "lucide-react";
+import { HelpCircle, Save } from "lucide-react";
 import { OutlineButton, PrimaryButton } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { PageBreadcrumbs } from "./page-breadcrumbs";
@@ -9,6 +9,16 @@ import { PageBreadcrumbs } from "./page-breadcrumbs";
 export interface WebsiteBuilderBreadcrumbItem {
   label: string;
   href?: string;
+}
+
+export interface WebsiteBuilderActionButton {
+  label: string;
+  onClick?: () => void;
+  disabled?: boolean;
+  isLoading?: boolean;
+  loadingLabel?: string;
+  icon?: React.ReactNode;
+  className?: string;
 }
 
 interface WebsiteBuilderLayoutProps {
@@ -27,6 +37,7 @@ interface WebsiteBuilderLayoutProps {
   onHowItWorks?: () => void;
   isSaving?: boolean;
   disableSave?: boolean;
+  primaryButton?: WebsiteBuilderActionButton;
   topActions?: React.ReactNode;
   previewActions?: React.ReactNode;
   leftClassName?: string;
@@ -53,6 +64,7 @@ export function WebsiteBuilderLayout({
   onHowItWorks,
   isSaving = false,
   disableSave = false,
+  primaryButton,
   topActions,
   previewActions,
   leftClassName,
@@ -88,20 +100,29 @@ export function WebsiteBuilderLayout({
           </div>
 
           {/* Action buttons row — scrollable on mobile so they never wrap to 2 rows */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
+          <div className="flex items-end gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
             {topActions}
-            <OutlineButton
-              type="button"
-              size="sm"
-              onClick={
-                onPreview ||
-                (() => window.open("/website/preview-publish", "_blank"))
-              }
-              className="h-8 shrink-0 px-2.5 text-[11px] gap-1 sm:px-3 sm:text-[12px] sm:gap-1.5"
-            >
-              <Eye className="h-3.5 w-3.5 shrink-0" />
-              <span>Preview</span>
-            </OutlineButton>
+            {primaryButton ? (
+              <PrimaryButton
+                type="button"
+                size="sm"
+                onClick={primaryButton.onClick}
+                disabled={primaryButton.disabled || primaryButton.isLoading}
+                className={cn(
+                  "h-8 shrink-0 px-2.5 text-[11px] shadow-sm sm:px-3",
+                  primaryButton.className,
+                )}
+              >
+                {primaryButton.icon ?? (
+                  <Save className="h-3.5 w-3.5 shrink-0" />
+                )}
+                <span>
+                  {primaryButton.isLoading
+                    ? primaryButton.loadingLabel ?? "Saving..."
+                    : primaryButton.label}
+                </span>
+              </PrimaryButton>
+            ) : null}
             {onHowItWorks && (
               <OutlineButton
                 type="button"
@@ -113,27 +134,6 @@ export function WebsiteBuilderLayout({
                 <span className="hidden sm:inline">{howItWorksLabel}</span>
               </OutlineButton>
             )}
-            {onCancel && (
-              <OutlineButton
-                type="button"
-                size="sm"
-                onClick={onCancel}
-                className="h-8 shrink-0 px-2.5 text-[11px] gap-1 sm:px-3 sm:text-[12px] sm:gap-1.5"
-              >
-                <X className="h-3.5 w-3.5 shrink-0" />
-                <span>{cancelLabel}</span>
-              </OutlineButton>
-            )}
-            <PrimaryButton
-              type="button"
-              size="sm"
-              onClick={onSave}
-              disabled={disableSave || isSaving}
-              className="h-8 shrink-0 px-2.5 text-[11px] shadow-sm sm:px-3 sm:text-[12px]"
-            >
-              <Save className="h-3.5 w-3.5 shrink-0" />
-              <span>{isSaving ? "Saving…" : saveLabel}</span>
-            </PrimaryButton>
           </div>
         </header>
       )}
