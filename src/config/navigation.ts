@@ -49,7 +49,17 @@ export const navSections: NavSection[] = [
   {
     title: "Content",
     items: [
-      { label: "Pages", icon: FileText, href: "/website/pages" },
+      {
+        label: "Pages",
+        icon: FileText,
+        href: "/website/pages",
+        children: [
+          { label: "About Us", icon: FileText, href: "/website/pages/about-us/edit" },
+          { label: "Services", icon: FileText, href: "/website/pages/services/edit" },
+          { label: "Events", icon: FileText, href: "/website/pages/events/edit" },
+          { label: "Create Page", icon: FileText, href: "/website/pages/create" },
+        ],
+      },
       { label: "Nav Menu", icon: Menu, href: "/website/menu" },
       { label: "Hero Section", icon: Monitor, href: "/website/hero-section" },
       {

@@ -44,7 +44,7 @@ export const INITIAL_PAGES: WebsitePage[] = [
   },
 ];
 
-const STORAGE_KEY = "eventify.website.pages";
+export const STORAGE_KEY = "eventify.website.pages";
 
 export function createSlug(title: string) {
   const slug = title

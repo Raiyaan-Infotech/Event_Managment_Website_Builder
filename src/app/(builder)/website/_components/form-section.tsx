@@ -4,7 +4,7 @@ import type * as React from "react";
 import { cn } from "@/lib/utils";
 
 interface FormSectionProps {
-  title: string;
+  title?: string;
   subtitle?: string;
   icon?: React.ReactNode;
   actions?: React.ReactNode;
