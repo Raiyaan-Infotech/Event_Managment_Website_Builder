@@ -39,6 +39,7 @@ interface DraggableItemListProps {
   onDeleteChild?: (parentId: string | number, childId: string) => void;
   emptyText?: string;
   className?: string;
+  showAddChild?: boolean;          // ← add this
 }
 
 interface ChildPagePickerProps {
@@ -171,6 +172,7 @@ export function DraggableItemList({
   onDeleteChild,
   emptyText = "No items added.",
   className,
+  showAddChild = true,
 }: DraggableItemListProps) {
   const dragItemIndex = React.useRef<number | null>(null);
   const dragOverItemIndex = React.useRef<number | null>(null);
@@ -280,6 +282,7 @@ export function DraggableItemList({
                   {children.length} child
                 </span>
               ) : null}
+{showAddChild ? (
 
               <Button
                 type="button"
@@ -292,7 +295,7 @@ export function DraggableItemList({
                 aria-label={`Add child menu under ${item.label}`}
               >
                 <Plus className="h-4 w-4" />
-              </Button>
+              </Button> ) : null}
 
               {onDelete ? (
                 <Button
@@ -308,7 +311,7 @@ export function DraggableItemList({
               ) : null}
             </div>
 
-            {isChildPickerOpen ? (
+            {showAddChild  && isChildPickerOpen ? (
               <ChildPagePicker
                 parentId={item.id}
                 children={children}

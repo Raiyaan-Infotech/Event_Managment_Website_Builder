@@ -1,16 +1,8 @@
 "use client";
 
 import * as React from "react";
-import {
-  Facebook,
-  Instagram,
-  Phone,
-  Share2,
-  Trash2,
-  Youtube,
-  Twitter,
-  Linkedin,
-} from "lucide-react";
+import { Icon } from "@iconify/react";
+import { Trash2 } from "lucide-react";
 import { Button, OutlineButton, PrimaryButton } from "@/components/ui/button";
 import { WebsiteBuilderLayout } from "../_components/website-builder-layout";
 import { FormSection } from "../_components/form-section";
@@ -21,6 +13,7 @@ import {
   BuilderSegmentedControl,
 } from "../_components/builder-field";
 import { ColorPickerInput } from "../_components/color-picker-input";
+import { IconPickerDialog } from "../_components/icon-picker-dialog";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -31,7 +24,7 @@ interface SocialLink {
   label: string;
   url: string;
   color: string;
-  icon: React.ComponentType<{ className?: string }>;
+  iconName: string;
 }
 
 // ── Initial Data ──────────────────────────────────────────────────────────────
@@ -42,28 +35,28 @@ const initialSocialLinks: SocialLink[] = [
     label: "WhatsApp",
     url: "https://wa.me/919876543210",
     color: "#25D366",
-    icon: Phone,
+    iconName: "simple-icons:whatsapp",
   },
   {
     id: "instagram",
     label: "Instagram",
     url: "https://instagram.com/royalmoments",
     color: "#E4405F",
-    icon: Instagram,
+    iconName: "simple-icons:instagram",
   },
   {
     id: "facebook",
     label: "Facebook",
     url: "https://facebook.com/royalmoments",
     color: "#1877F2",
-    icon: Facebook,
+    iconName: "simple-icons:facebook",
   },
   {
     id: "youtube",
     label: "YouTube",
     url: "https://youtube.com/@royalmoments",
     color: "#FF0000",
-    icon: Youtube,
+    iconName: "simple-icons:youtube",
   },
 ];
 
@@ -91,6 +84,15 @@ const SocialTableHead = () => (
   </thead>
 );
 
+// ── Active status badge ──────────────────────────────────────────────────────
+
+const ActiveStatusBadge = () => (
+  <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-[var(--vendor-radius-control)] border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 sm:right-4 sm:top-4">
+    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+    Active
+  </span>
+);
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function WebsiteBasicInformationPage() {
@@ -104,6 +106,7 @@ export default function WebsiteBasicInformationPage() {
   );
   const [socialLinks, setSocialLinks] =
     React.useState<SocialLink[]>(initialSocialLinks);
+  const [iconPickerLinkId, setIconPickerLinkId] = React.useState<string | null>(null);
   const [isSaving, setIsSaving] = React.useState(false);
 
   const MAX_LINKS = 10;
@@ -131,7 +134,7 @@ export default function WebsiteBasicInformationPage() {
         label: "New Link",
         url: "https://",
         color: "#6C47FF",
-        icon: Share2,
+        iconName: "simple-icons:linktree",
       },
     ]);
   };
@@ -151,21 +154,30 @@ export default function WebsiteBasicInformationPage() {
     setSocialLinks(initialSocialLinks);
   };
 
+  const handleIconSelect = (iconName: string) => {
+    if (!iconPickerLinkId) return;
+    updateSocialLink(iconPickerLinkId, {
+      iconName,
+    });
+  };
+
   // ── Render rows helper (inline, no custom component) ─────────────────────
 
   const renderRows = (rows: SocialLink[]) =>
     rows.map((item) => {
-      const Icon = item.icon;
       return (
         <tr key={item.id} className="group">
           {/* Icon badge */}
           <td className="py-2 pl-1 pr-2">
-            <span
-              className="flex h-7 w-7 items-center justify-center rounded-[6px] text-white"
+            <button
+              type="button"
+              onClick={() => setIconPickerLinkId(item.id)}
+              title="Choose icon"
+              className="flex h-7 w-7 items-center justify-center rounded-[6px] text-white transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[var(--vendor-primary-btn)]/30"
               style={{ backgroundColor: item.color }}
             >
-              <Icon className="h-3.5 w-3.5" />
-            </span>
+              <Icon icon={item.iconName} className="h-3.5 w-3.5" />
+            </button>
           </td>
 
           {/* Icon Color */}
@@ -174,7 +186,7 @@ export default function WebsiteBasicInformationPage() {
               value={item.color}
               onChange={(val) => updateSocialLink(item.id, { color: val })}
               compact
-              className="w-[150px]"
+              className="w-full"
             />
           </td>
 
@@ -196,6 +208,7 @@ export default function WebsiteBasicInformationPage() {
               onChange={(val) => updateSocialLink(item.id, { url: val })}
               maxLength={300}
               className="space-y-0"
+              inputClassName="h-7 min-w-0 rounded-[var(--vendor-radius-control)] border border-[var(--vendor-border)] bg-white pl-2 pr-14 shadow-xs"
             />
           </td>
 
@@ -221,16 +234,6 @@ export default function WebsiteBasicInformationPage() {
 
   const form = (
     <div className="space-y-4">
-      {/* Page heading */}
-      <div className="px-1">
-        <h2 className="text-[14px] font-black text-[var(--vendor-text)]">
-          Basic Information
-        </h2>
-        <p className="text-[10px] font-medium text-[var(--vendor-text-muted)]">
-          Manage your website basic information and Basic Information settings.
-        </p>
-      </div>
-
       {/* ── 1 & 2. Header Information + Contact Information — combined row ── */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {/* Header Information */}
@@ -238,7 +241,7 @@ export default function WebsiteBasicInformationPage() {
           title="Header Information"
           className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-3 shadow-sm sm:p-4"
         >
-          <div className="grid grid-cols-[140px_1fr] gap-4 items-start">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-[140px_1fr] sm:items-start">
             <div className="flex flex-col items-center">
               <ImageUpload
                 label="Company Logo"
@@ -271,8 +274,10 @@ export default function WebsiteBasicInformationPage() {
         {/* Contact Information */}
         <FormSection
           title="Contact Information"
-          className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-3 shadow-sm space-y-3 sm:p-4"
+          className="relative rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-3 shadow-sm space-y-3 sm:p-4"
         >
+          <ActiveStatusBadge />
+
           <BuilderSegmentedControl
             label="Type"
             value={contactType}
@@ -283,7 +288,7 @@ export default function WebsiteBasicInformationPage() {
             ]}
           />
 
-          <div className="grid grid-cols-2 gap-3 items-start">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:items-start">
             <BuilderCountedInput
               label="Mobile"
               required
@@ -333,22 +338,22 @@ export default function WebsiteBasicInformationPage() {
           </div>
         ) : (
           <div
-            className={`grid gap-0 ${
+            className={`grid gap-3 ${
               hasRightPanel
-                ? "grid-cols-2 divide-x divide-[var(--vendor-border)]"
+                ? "grid-cols-1 lg:grid-cols-2 lg:gap-0 lg:divide-x lg:divide-[var(--vendor-border)]"
                 : "grid-cols-1"
             }`}
           >
             {/* Left panel — rows 1–5 */}
-            <div className={hasRightPanel ? "pr-3" : ""}>
+            <div className={hasRightPanel ? "lg:pr-3" : ""}>
               <div className="overflow-x-auto rounded-[var(--vendor-radius-control)]">
-                <table className="w-full table-fixed text-[11px]">
+                <table className="w-full min-w-[700px] table-fixed text-[11px]">
                   <colgroup>
-                    <col className="w-[44px]" />
-                    <col className="w-[170px]" />
-                    <col className="w-[120px]" />
+                    <col className="w-[40px]" />
+                    <col className="w-[140px]" />
+                    <col className="w-[160px]" />
                     <col />
-                    <col className="w-[44px]" />
+                    <col className="w-[40px]" />
                   </colgroup>
                   <SocialTableHead />
                   <tbody className="divide-y divide-[var(--vendor-border)]">
@@ -360,15 +365,15 @@ export default function WebsiteBasicInformationPage() {
 
             {/* Right panel — rows 6–10 */}
             {hasRightPanel && (
-              <div className="pl-3">
+              <div className="lg:pl-3">
                 <div className="overflow-x-auto rounded-[var(--vendor-radius-control)]">
-                  <table className="w-full table-fixed text-[11px]">
+                  <table className="w-full min-w-[700px] table-fixed text-[11px]">
                     <colgroup>
-                      <col className="w-[44px]" />
-                      <col className="w-[170px]" />
-                      <col className="w-[120px]" />
+                      <col className="w-[40px]" />
+                      <col className="w-[140px]" />
+                      <col className="w-[160px]" />
                       <col />
-                      <col className="w-[44px]" />
+                      <col className="w-[40px]" />
                     </colgroup>
                     <SocialTableHead />
                     <tbody className="divide-y divide-[var(--vendor-border)]">
@@ -412,13 +417,22 @@ export default function WebsiteBasicInformationPage() {
   );
 
   return (
-    <WebsiteBuilderLayout
-      title="Basic Information"
-      form={form}
-      onSave={handleSave}
-      onCancel={handleCancel}
-      isSaving={isSaving}
-      leftClassName="border-0 bg-transparent p-0 shadow-none"
-    />
+    <>
+      <WebsiteBuilderLayout
+        title="Basic Information"
+        form={form}
+        onSave={handleSave}
+        onCancel={handleCancel}
+        isSaving={isSaving}
+        leftClassName="border-0 bg-transparent p-0 shadow-none"
+      />
+      <IconPickerDialog
+        open={Boolean(iconPickerLinkId)}
+        onOpenChange={(open) => {
+          if (!open) setIconPickerLinkId(null);
+        }}
+        onSelect={handleIconSelect}
+      />
+    </>
   );
 }

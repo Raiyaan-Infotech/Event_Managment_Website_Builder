@@ -18,7 +18,6 @@ export function PageEditorForm({ draft, onChange }: PageEditorFormProps) {
     <div className="space-y-3">
       <FormSection title="Page Title" className={card}>
         <BuilderCountedInput
-          label="Page Title"
           value={draft.title}
           onChange={(title) => onChange({ ...draft, title })}
           maxLength={100}

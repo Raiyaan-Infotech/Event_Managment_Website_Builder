@@ -22,8 +22,24 @@ export interface WebsiteBuilderPrimaryButtonProps {
   isLoading?: boolean;
 }
 
+const pageSubtitles: Record<string, string> = {
+  "Advanced Slider": "Manage your website advanced slider and Advanced Slider settings.",
+  "Basic Information": "Manage your website basic information and Basic Information settings.",
+  "Footer Settings": "Manage your website footer settings and Footer Settings settings.",
+  Gallery: "Manage your website gallery and Gallery settings.",
+  "Hero Section": "Manage your website hero section and Hero Section settings.",
+  "Legal Pages": "Manage your website legal pages and Legal Pages settings.",
+  "Nav Menu": "Manage your website navigation menu and Nav Menu settings.",
+  Pages: "Manage your website pages and Pages settings.",
+  "SEO Settings": "Manage your website SEO settings and SEO Settings settings.",
+  "Simple Slider": "Manage your website simple slider and Simple Slider settings.",
+  Testimonials: "Manage your website testimonials and Testimonials settings.",
+  "Web UI Block": "Manage your website UI blocks and UI Block settings.",
+};
+
 interface WebsiteBuilderLayoutProps {
-  title: string;
+  title?: string;
+  subtitle?: string;
   breadcrumbs?: WebsiteBuilderBreadcrumbItem[];
   form: React.ReactNode;
   preview?: React.ReactNode;
@@ -56,6 +72,7 @@ interface WebsiteBuilderLayoutProps {
 
 export function WebsiteBuilderLayout({
   title,
+  subtitle,
   breadcrumbs = [],
   form,
   preview,
@@ -87,6 +104,7 @@ export function WebsiteBuilderLayout({
 }: WebsiteBuilderLayoutProps) {
   const [internalDevice, setInternalDevice] = React.useState<PreviewDevice>("desktop");
   const activeDevice = previewDeviceProp ?? internalDevice;
+  const resolvedSubtitle = subtitle ?? (title ? pageSubtitles[title] : undefined);
   const handleDeviceChange = (d: PreviewDevice) => {
     setInternalDevice(d);
     onPreviewDeviceChange?.(d);
@@ -102,11 +120,16 @@ export function WebsiteBuilderLayout({
       )}
     >
       {!hideHeader && (
-        <header className="mb-1.5 flex shrink-0 items-center justify-between gap-3">
+        <header className="mb-1.5 flex shrink-0 items-center justify-between gap-3 pl-9">
           <div className="min-w-0">
             <h1 className="text-[15px] font-black leading-5 text-[var(--vendor-text)] truncate">
               {title}
             </h1>
+            {resolvedSubtitle ? (
+              <p className="mt-0.5 truncate text-[11px] font-medium leading-4 text-[var(--vendor-text-muted)]">
+                {resolvedSubtitle}
+              </p>
+            ) : null}
             {breadcrumbs.length > 0 ? (
               <PageBreadcrumbs overrides={breadcrumbs} className="mt-0.5" />
             ) : (

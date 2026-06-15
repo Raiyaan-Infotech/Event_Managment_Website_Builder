@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { PlayCircle } from "lucide-react";
+import { Menu, PlayCircle, X } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import {
   Select,
@@ -60,6 +60,67 @@ const buttonLinkOptions: Array<{ label: string; value: string }> = [
   { label: "/book-now", value: "/book-now" },
 ];
 
+// ─── Button Layout options (rendered with custom buttons below) ───────────────
+
+const buttonLayoutOptions: Array<{ value: ButtonLayout; label: string; icon: React.ReactNode }> = [
+  {
+    value: "left",
+    label: "Left",
+    icon: (
+      <svg width="18" height="12" viewBox="0 0 20 14" fill="currentColor">
+        <rect x="0"  y="0"   width="12" height="3" rx="1.5"/>
+        <rect x="0"  y="5.5" width="20" height="3" rx="1.5"/>
+        <rect x="0"  y="11"  width="8"  height="3" rx="1.5"/>
+      </svg>
+    ),
+  },
+  {
+    value: "center",
+    label: "Center",
+    icon: (
+      <svg width="18" height="12" viewBox="0 0 20 14" fill="currentColor">
+        <rect x="4"  y="0"   width="12" height="3" rx="1.5"/>
+        <rect x="0"  y="5.5" width="20" height="3" rx="1.5"/>
+        <rect x="6"  y="11"  width="8"  height="3" rx="1.5"/>
+      </svg>
+    ),
+  },
+  {
+    value: "right",
+    label: "Right",
+    icon: (
+      <svg width="18" height="12" viewBox="0 0 20 14" fill="currentColor">
+        <rect x="8"  y="0"   width="12" height="3" rx="1.5"/>
+        <rect x="0"  y="5.5" width="20" height="3" rx="1.5"/>
+        <rect x="12" y="11"  width="8"  height="3" rx="1.5"/>
+      </svg>
+    ),
+  },
+  {
+    value: "space-between",
+    label: "Space Between",
+    icon: (
+      <svg width="18" height="12" viewBox="0 0 20 14" fill="currentColor">
+        <rect x="0"  y="0"   width="8"  height="3" rx="1.5"/>
+        <rect x="12" y="0"   width="8"  height="3" rx="1.5"/>
+        <rect x="0"  y="5.5" width="20" height="3" rx="1.5"/>
+        <rect x="0"  y="11"  width="20" height="3" rx="1.5"/>
+      </svg>
+    ),
+  },
+  {
+    value: "stack",
+    label: "Stack Vertical",
+    icon: (
+      <svg width="18" height="12" viewBox="0 0 20 14" fill="currentColor">
+        <rect x="2" y="0"   width="16" height="3" rx="1.5"/>
+        <rect x="2" y="5.5" width="16" height="3" rx="1.5"/>
+        <rect x="2" y="11"  width="16" height="3" rx="1.5"/>
+      </svg>
+    ),
+  },
+];
+
 interface ButtonColorFieldProps {
   value: string;
   onChange: (value: string) => void;
@@ -100,7 +161,13 @@ export default function HeroSectionPage() {
   const [centerMobile, setCenterMobile]         = React.useState(true);
   const [mobileHeroHeight, setMobileHeroHeight] = React.useState("medium-500");
   const [previewDevice, setPreviewDevice]       = React.useState<PreviewDevice>("desktop");
+  const [mobileNavOpen, setMobileNavOpen]       = React.useState(false);
   const [isSaving, setIsSaving]                 = React.useState(false);
+
+  // Close the mobile nav dropdown whenever the preview device changes
+  React.useEffect(() => {
+    setMobileNavOpen(false);
+  }, [previewDevice]);
 
   const handleSave = () => {
     setIsSaving(true);
@@ -176,7 +243,7 @@ export default function HeroSectionPage() {
           }
           className={`${card} space-y-2`}
         >
-          <div className="grid grid-cols-4 items-start gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 items-start gap-2">
             <BuilderCountedInput
               label="Label"
               value={btn1.label}
@@ -214,7 +281,7 @@ export default function HeroSectionPage() {
           }
           className={`${card} space-y-2`}
         >
-          <div className="grid grid-cols-4 items-start gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 items-start gap-2">
             <BuilderCountedInput
               label="Label"
               value={btn2.label}
@@ -247,69 +314,24 @@ export default function HeroSectionPage() {
           subtitle="How buttons are arranged."
           className={`${card} space-y-2`}
         >
-          <BuilderIconOptionGroup
-            value={buttonLayout}
-            onChange={setButtonLayout}
-            columns="5"
-            options={[
-              {
-                value: "left",
-                label: "Left",
-                icon: (
-                  <svg width="18" height="12" viewBox="0 0 20 14" fill="currentColor">
-                    <rect x="0"  y="0"   width="12" height="3" rx="1.5"/>
-                    <rect x="0"  y="5.5" width="20" height="3" rx="1.5"/>
-                    <rect x="0"  y="11"  width="8"  height="3" rx="1.5"/>
-                  </svg>
-                ),
-              },
-              {
-                value: "center",
-                label: "Center",
-                icon: (
-                  <svg width="18" height="12" viewBox="0 0 20 14" fill="currentColor">
-                    <rect x="4"  y="0"   width="12" height="3" rx="1.5"/>
-                    <rect x="0"  y="5.5" width="20" height="3" rx="1.5"/>
-                    <rect x="6"  y="11"  width="8"  height="3" rx="1.5"/>
-                  </svg>
-                ),
-              },
-              {
-                value: "right",
-                label: "Right",
-                icon: (
-                  <svg width="18" height="12" viewBox="0 0 20 14" fill="currentColor">
-                    <rect x="8"  y="0"   width="12" height="3" rx="1.5"/>
-                    <rect x="0"  y="5.5" width="20" height="3" rx="1.5"/>
-                    <rect x="12" y="11"  width="8"  height="3" rx="1.5"/>
-                  </svg>
-                ),
-              },
-              {
-                value: "space-between",
-                label: "Space Between",
-                icon: (
-                  <svg width="18" height="12" viewBox="0 0 20 14" fill="currentColor">
-                    <rect x="0"  y="0"   width="8"  height="3" rx="1.5"/>
-                    <rect x="12" y="0"   width="8"  height="3" rx="1.5"/>
-                    <rect x="0"  y="5.5" width="20" height="3" rx="1.5"/>
-                    <rect x="0"  y="11"  width="20" height="3" rx="1.5"/>
-                  </svg>
-                ),
-              },
-              {
-                value: "stack",
-                label: "Stack Vertical",
-                icon: (
-                  <svg width="18" height="12" viewBox="0 0 20 14" fill="currentColor">
-                    <rect x="2" y="0"   width="16" height="3" rx="1.5"/>
-                    <rect x="2" y="5.5" width="16" height="3" rx="1.5"/>
-                    <rect x="2" y="11"  width="16" height="3" rx="1.5"/>
-                  </svg>
-                ),
-              },
-            ]}
-          />
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+            {buttonLayoutOptions.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => setButtonLayout(opt.value)}
+                aria-pressed={buttonLayout === opt.value}
+                className={`flex flex-col items-center justify-center gap-1.5 rounded-[var(--vendor-radius-control)] border p-2.5 text-[10px] font-semibold transition-colors ${
+                  buttonLayout === opt.value
+                    ? "border-[var(--vendor-primary-btn)] bg-[var(--vendor-primary-btn)]/10 text-[var(--vendor-primary-btn)]"
+                    : "border-[var(--vendor-border)] text-[var(--vendor-text-muted)] hover:border-[var(--vendor-primary-btn)]/40 hover:text-[var(--vendor-text)]"
+                }`}
+              >
+                {opt.icon}
+                {opt.label}
+              </button>
+            ))}
+          </div>
         </FormSection>
 
         {/* Content Alignment */}
@@ -469,16 +491,43 @@ export default function HeroSectionPage() {
   // Live preview — a simple mock of what the hero looks like on the website.
   // Replace the inner markup with your real preview iframe / component later.
   // ---------------------------------------------------------------------------
+  const effectiveContentAlign: ContentAlign =
+    previewDevice === "mobile" && centerMobile ? "center" : contentAlign;
+
+  const effectiveButtonLayout: ButtonLayout =
+    previewDevice === "mobile" && centerMobile ? "center" : buttonLayout;
+
+  const effectiveHeroMinHeight =
+    previewDevice === "mobile"
+      ? mobileHeroHeight === "small-300"
+        ? 300
+        : mobileHeroHeight === "large-700"
+        ? 700
+        : mobileHeroHeight === "fullscreen"
+        ? 560
+        : 500
+      : heroHeight === "small"
+      ? 240
+      : heroHeight === "large"
+      ? 480
+      : heroHeight === "fullscreen"
+      ? 560
+      : 360;
+
   const previewContent = (
     <div className="h-full w-full overflow-hidden rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)]">
       {/* Simulated top bar */}
-      <div className="flex items-center justify-between bg-[#0B0D17] px-4 py-2 text-[10px] text-white/70">
-        <div className="flex items-center gap-3">
-          <span>📞 +91 98765 43210</span>
-          <span>|</span>
-          <span>✉ hello@eventify.com</span>
+      <div className="flex items-center justify-between gap-2 bg-[#0B0D17] px-4 py-2 text-[10px] text-white/70">
+        <div className="flex items-center gap-3 overflow-hidden">
+          <span className="whitespace-nowrap">📞 +91 98765 43210</span>
+          {previewDevice === "desktop" && (
+            <>
+              <span>|</span>
+              <span className="whitespace-nowrap">✉ hello@eventify.com</span>
+            </>
+          )}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <span>f</span><span>in</span><span>▶</span>
         </div>
       </div>
@@ -486,24 +535,49 @@ export default function HeroSectionPage() {
       {/* Simulated nav */}
       <div className="flex items-center justify-between bg-white px-4 py-2 shadow-sm">
         <span className="text-[12px] font-black text-[#6C47FF]">⬛ Eventify</span>
-        <div className="hidden items-center gap-3 sm:flex text-[10px] text-gray-700 font-medium">
-          <span>Home</span><span>About Us</span><span>Services ▾</span>
-          <span>Events</span><span>Gallery</span><span>Contact Us</span>
-        </div>
-        <div className="rounded-md bg-[#6C47FF] px-3 py-1 text-[10px] font-bold text-white">
-          Book Now
-        </div>
+        {previewDevice === "desktop" ? (
+          <>
+            <div className="flex items-center gap-3 text-[10px] text-gray-700 font-medium">
+              <span>Home</span><span>About Us</span><span>Services ▾</span>
+              <span>Events</span><span>Gallery</span><span>Contact Us</span>
+            </div>
+            <div className="rounded-md bg-[#6C47FF] px-3 py-1 text-[10px] font-bold text-white">
+              Book Now
+            </div>
+          </>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setMobileNavOpen((open) => !open)}
+            aria-label="Toggle navigation menu"
+            aria-expanded={mobileNavOpen}
+            className="flex h-7 w-7 items-center justify-center rounded-md text-gray-700 hover:bg-gray-100"
+          >
+            {mobileNavOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          </button>
+        )}
       </div>
+
+      {/* Mobile nav dropdown */}
+      {previewDevice === "mobile" && mobileNavOpen && (
+        <div className="flex flex-col gap-2 border-t border-[var(--vendor-border)] bg-white px-4 py-3 text-[11px] font-medium text-gray-700">
+          <span>Home</span>
+          <span>About Us</span>
+          <span>Services ▾</span>
+          <span>Events</span>
+          <span>Gallery</span>
+          <span>Contact Us</span>
+          <div className="mt-1 rounded-md bg-[#6C47FF] px-3 py-1.5 text-center text-[11px] font-bold text-white">
+            Book Now
+          </div>
+        </div>
+      )}
 
       {/* Hero */}
       <div
         className="relative flex flex-col justify-end overflow-hidden"
         style={{
-          minHeight:
-            heroHeight === "small" ? 240
-            : heroHeight === "large" ? 480
-            : heroHeight === "fullscreen" ? 560
-            : 360,
+          minHeight: effectiveHeroMinHeight,
           background: "linear-gradient(135deg,#1a1033 0%,#2d1b4e 50%,#3d1a2e 100%)",
         }}
       >
@@ -521,7 +595,15 @@ export default function HeroSectionPage() {
         {/* Content */}
         <div
           className="relative z-10 flex flex-col gap-3 p-6"
-          style={{ alignItems: contentAlign === "center" ? "center" : contentAlign === "right" ? "flex-end" : "flex-start", textAlign: contentAlign }}
+          style={{
+            alignItems:
+              effectiveContentAlign === "center"
+                ? "center"
+                : effectiveContentAlign === "right"
+                ? "flex-end"
+                : "flex-start",
+            textAlign: effectiveContentAlign,
+          }}
         >
           {badgeText && (
             <span className="inline-block rounded-full bg-[#6C47FF]/80 px-3 py-0.5 text-[10px] font-semibold text-white">
@@ -540,15 +622,22 @@ export default function HeroSectionPage() {
 
           {/* Buttons */}
           <div
-            className="flex flex-wrap gap-2 mt-1"
+            className="mt-1 flex w-full flex-wrap gap-2"
             style={{
               justifyContent:
-                buttonLayout === "center" ? "center"
-                : buttonLayout === "right" ? "flex-end"
-                : buttonLayout === "space-between" ? "space-between"
+                effectiveButtonLayout === "center" ? "center"
+                : effectiveButtonLayout === "right" ? "flex-end"
+                : effectiveButtonLayout === "space-between" ? "space-between"
                 : "flex-start",
-              flexDirection: buttonLayout === "stack" ? "column" : "row",
-              alignItems: buttonLayout === "stack" ? (contentAlign === "center" ? "center" : contentAlign === "right" ? "flex-end" : "flex-start") : undefined,
+              flexDirection: effectiveButtonLayout === "stack" ? "column" : "row",
+              alignItems:
+                effectiveButtonLayout === "stack"
+                  ? effectiveContentAlign === "center"
+                    ? "center"
+                    : effectiveContentAlign === "right"
+                    ? "flex-end"
+                    : "flex-start"
+                  : undefined,
             }}
           >
             {btn1.enabled && (

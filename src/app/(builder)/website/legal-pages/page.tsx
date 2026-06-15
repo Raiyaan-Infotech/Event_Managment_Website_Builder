@@ -5,28 +5,27 @@ import { WebsiteBuilderLayout } from "../_components/website-builder-layout";
 import { FormSection } from "../_components/form-section";
 import { BuilderCountedInput } from "../_components/builder-field";
 import { WebsiteRichTextEditor } from "../_components/rich-text-editor";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
-type LegalPageId = "terms" | "privacy" | "about";
+type LegalPageId = "terms" | "privacy";
 
 interface LegalPage {
   id: LegalPageId;
   label: string;
   title: string;
   content: string;
+  enabled: boolean; // ← added
 }
 
 const DEFAULT_TERMS_CONTENT = `<h2>1. Introduction</h2><p>Welcome to Eventify. By accessing or using our website and services, you agree to be bound by these Terms &amp; Conditions. Please read them carefully.</p><h2>2. Use of Our Services</h2><p>You agree to use our services only for lawful purposes and in accordance with these Terms. You must not use our services in any way that may harm, disable, or impair our platform.</p><h2>3. User Responsibilities</h2><p>You are responsible for maintaining the confidentiality of your account and for all activities under your account. You agree to provide accurate and complete information.</p><h2>4. Changes to Terms</h2><p>We may update these Terms &amp; Conditions from time to time. We will notify you of any changes by posting the new Terms on this page.</p><h2>5. Limitation of Liability</h2><p>Eventify is not liable for any indirect, incidental, or consequential damages arising from the use of our services.</p>`;
 
 const DEFAULT_PRIVACY_CONTENT = `<h2>1. Information We Collect</h2><p>We collect personal information you provide when booking our services, including name, contact details, and payment information.</p><h2>2. How We Use Your Information</h2><p>Your information is used to process bookings, communicate with you, and improve our services. We do not sell your data to third parties.</p><h2>3. Data Security</h2><p>We implement appropriate security measures to protect your personal information from unauthorized access or disclosure.</p>`;
 
-const DEFAULT_ABOUT_CONTENT = `<h2>Who We Are</h2><p>Eventify is a premier event management company dedicated to creating unforgettable experiences. With over a decade of expertise, we specialize in weddings, corporate events, and private celebrations.</p><h2>Our Mission</h2><p>To deliver flawless, personalized events that exceed expectations and create lasting memories for our clients.</p>`;
-
 const INITIAL_PAGES: LegalPage[] = [
-  { id: "terms",   label: "Terms & Conditions", title: "Terms & Conditions", content: DEFAULT_TERMS_CONTENT },
-  { id: "privacy", label: "Privacy Policy",      title: "Privacy Policy",     content: DEFAULT_PRIVACY_CONTENT },
-  { id: "about",   label: "About Us",            title: "About Us",           content: DEFAULT_ABOUT_CONTENT },
+  { id: "terms",   label: "Terms & Conditions", title: "Terms & Conditions", content: DEFAULT_TERMS_CONTENT,   enabled: true },
+  { id: "privacy", label: "Privacy Policy",      title: "Privacy Policy",     content: DEFAULT_PRIVACY_CONTENT, enabled: true },
 ];
 
 export default function PagesPage() {
@@ -34,22 +33,13 @@ export default function PagesPage() {
   const [pages, setPages] = React.useState<LegalPage[]>(INITIAL_PAGES);
   const [isSaving, setIsSaving] = React.useState(false);
 
-  const handleSave = () => {
-    setIsSaving(true);
-    setTimeout(() => setIsSaving(false), 800);
-  };
-
-  const handleCancel = () => {
-    setPages(INITIAL_PAGES);
-    setActivePage("terms");
-  };
+  const handleSave = () => { setIsSaving(true); setTimeout(() => setIsSaving(false), 800); };
+  const handleCancel = () => { setPages(INITIAL_PAGES); setActivePage("terms"); };
 
   const currentPage = pages.find((p) => p.id === activePage)!;
 
-  const updatePage = (patch: Partial<Pick<LegalPage, "title" | "content">>) => {
-    setPages((prev) =>
-      prev.map((p) => (p.id === activePage ? { ...p, ...patch } : p)),
-    );
+  const updatePage = (patch: Partial<Pick<LegalPage, "title" | "content" | "enabled">>) => {
+    setPages((prev) => prev.map((p) => (p.id === activePage ? { ...p, ...patch } : p)));
   };
 
   const form = (
@@ -87,6 +77,13 @@ export default function PagesPage() {
       <FormSection
         title="Page Title"
         className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-3 shadow-sm"
+        actions={
+          // ← same pattern as hero page Button 1 / Button 2
+          <Switch
+            checked={currentPage.enabled}
+            onCheckedChange={(enabled) => updatePage({ enabled })}
+          />
+        }
       >
         <BuilderCountedInput
           label="Page Title"

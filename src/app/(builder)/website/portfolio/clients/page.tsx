@@ -1,11 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { X } from "lucide-react";
 import { WebsiteBuilderLayout } from "../../_components/website-builder-layout";
-import { FormSection } from "../../_components/form-section";
-import { MultiImageUpload, type MultiImageUploadItem } from "../../_components/multi-image-upload";
-import { Image as ImageIcon } from "lucide-react";
+import { MultiImageUpload } from "../../_components/multi-image-upload";
+import { DraggableItemList, type DraggableItemListItem } from "../../_components/draggable-item-list";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface ClientLogo {
@@ -15,8 +13,12 @@ interface ClientLogo {
 }
 
 function logoDataUrl(name: string, color: string, accent: string) {
-  const initials = name.split(/\s+/).filter(Boolean).slice(0, 2)
-    .map((part) => part[0]?.toUpperCase()).join("");
+  const initials = name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("");
   return `data:image/svg+xml;utf8,${encodeURIComponent(`
     <svg xmlns="http://www.w3.org/2000/svg" width="360" height="240" viewBox="0 0 360 240">
       <rect width="360" height="240" rx="24" fill="#ffffff"/>
@@ -44,7 +46,6 @@ const card = "rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-b
 function ClientLogosPreview({ clients }: { clients: ClientLogo[] }) {
   return (
     <div className={`${card} space-y-3`}>
-      {/* Header */}
       <div className="flex items-center gap-2">
         <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
         <span className="text-[12px] font-semibold text-[var(--vendor-text)]">Live Preview</span>
@@ -53,7 +54,6 @@ function ClientLogosPreview({ clients }: { clients: ClientLogo[] }) {
         </span>
       </div>
 
-      {/* 3-col logo grid */}
       {clients.length > 0 ? (
         <div className="grid grid-cols-3 gap-3">
           {clients.map((client) => (
@@ -85,6 +85,7 @@ export default function PortfolioClientsPage() {
   const [isSaving, setIsSaving] = React.useState(false);
 
   const handleSave = () => { setIsSaving(true); setTimeout(() => setIsSaving(false), 800); };
+
   const handleCancel = () => {
     objectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
     objectUrlsRef.current = [];
@@ -99,20 +100,36 @@ export default function PortfolioClientsPage() {
     files.forEach((file) => {
       const url = URL.createObjectURL(file);
       objectUrlsRef.current.push(url);
-      setClients((prev) => [...prev, {
-        id: `${Date.now()}-${Math.random()}`,
-        name: file.name.replace(/\.[^.]+$/, ""),
-        logoUrl: url,
-      }]);
+      setClients((prev) => [
+        ...prev,
+        {
+          id: `${Date.now()}-${Math.random()}`,
+          name: file.name.replace(/\.[^.]+$/, ""),
+          logoUrl: url,
+        },
+      ]);
     });
   };
 
-  const removeClient = (id: string) => setClients((prev) => prev.filter((c) => c.id !== id));
+  const removeClient = (id: string) =>
+    setClients((prev) => prev.filter((c) => c.id !== id));
+
+  const handleReorder = (reordered: DraggableItemListItem[]) => {
+    setClients(
+      reordered.map((item) => clients.find((c) => c.id === item.id) as ClientLogo)
+    );
+  };
+
+  // Map clients → DraggableItemList items with logo thumbnail as rightContent
+  const draggableItems: DraggableItemListItem[] = clients.map((client) => ({
+    id: client.id,
+    label: client.name,
+  }));
 
   const form = (
     <div className="grid gap-3 grid-cols-1 lg:grid-cols-[340px_1fr] items-start">
 
-      {/* ── Left: Upload + Thumbnail grid ── */}
+      {/* ── Left: Upload + Draggable list ── */}
       <div className={`${card} space-y-3`}>
         <div>
           <p className="text-[13px] font-black text-[var(--vendor-text)]">Client Logos</p>
@@ -121,7 +138,7 @@ export default function PortfolioClientsPage() {
           </p>
         </div>
 
-        {/* Drag & drop upload zone */}
+        {/* Upload zone */}
         <MultiImageUpload
           items={clients.map((c) => ({ id: c.id, imageUrl: c.logoUrl, alt: c.name }))}
           onAdd={handleAdd}
@@ -132,7 +149,30 @@ export default function PortfolioClientsPage() {
           variant="fullwidth"
           uploadHeight={160}
           hint="JPG, PNG, SVG or WebP (Max. 2MB each)"
+            hideTiles={true}   // ← add this
         />
+
+        {/* Divider + draggable list */}
+        {clients.length > 0 && (
+          <div className="border-t border-[var(--vendor-border)] pt-2 space-y-2">
+            <p className="text-[12px] font-black text-[var(--vendor-text)]">
+              Added Clients ({clients.length})
+            </p>
+
+            <DraggableItemList
+              items={draggableItems}
+              variant="flat"
+              showAddChild={false}
+              onReorder={handleReorder}
+              onDelete={(item) => removeClient(item.id as string)}
+              emptyText="No clients added yet."
+            />
+
+            <p className="text-[10px] text-[var(--vendor-text-muted)]">
+              You can upload up to 30 client logos.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* ── Right: Live Preview ── */}

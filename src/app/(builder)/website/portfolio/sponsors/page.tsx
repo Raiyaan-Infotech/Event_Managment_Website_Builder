@@ -130,11 +130,6 @@ export default function PortfolioSponsorsPage() {
   const sponsorItems: DraggableItemListItem[] = sponsors.map((sponsor) => ({
     id: sponsor.id,
     label: sponsor.name,
-    rightContent: (
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-[var(--vendor-radius-control)] border border-[var(--vendor-border)] bg-white p-0.5">
-        <img src={sponsor.logoUrl} alt={sponsor.name} className="max-h-full max-w-full object-contain" />
-      </div>
-    ),
   }));
 
   const form = (
@@ -146,7 +141,14 @@ export default function PortfolioSponsorsPage() {
         <div>
           <p className="text-[13px] font-black text-[var(--vendor-text)]">Add New Sponsor</p>
         </div>
-
+        <BuilderCountedInput
+          label="Sponsor Name"
+          value={sponsorName}
+          onChange={setSponsorName}
+          maxLength={100}
+          placeholder="Enter sponsor name"
+          className="space-y-0.5"
+        />
         <div className="space-y-0.5">
           <p className="text-[11px] font-medium text-[var(--vendor-text)]">Upload Logo</p>
           <ImageUpload
@@ -159,16 +161,6 @@ export default function PortfolioSponsorsPage() {
             onRemove={() => setDraftLogo(null)}
           />
         </div>
-
-        <BuilderCountedInput
-          label="Sponsor Name"
-          value={sponsorName}
-          onChange={setSponsorName}
-          maxLength={100}
-          placeholder="Enter sponsor name"
-          className="space-y-0.5"
-        />
-
         <Button
           type="button"
           onClick={addSponsor}
@@ -185,6 +177,7 @@ export default function PortfolioSponsorsPage() {
           </p>
 
           <DraggableItemList
+            showAddChild={false}
             items={sponsorItems}
             variant="flat"
             onReorder={handleReorder}

@@ -4,8 +4,10 @@ import * as React from "react";
 import {
   Calendar,
   ChevronDown,
+  FileText,
   Home,
   Image as ImageIcon,
+  Link2,
   Mail,
   MessageSquareQuote,
   Plus,
@@ -25,48 +27,48 @@ import {
 // ─── Static data ──────────────────────────────────────────────────────────────
 
 const pageOptions: MultiSelectOption[] = [
-  { label: "Home",         value: "home" },
-  { label: "About Us",     value: "about-us" },
-  { label: "Services",     value: "services" },
-  { label: "Events",       value: "events" },
-  { label: "Gallery",      value: "gallery" },
-  { label: "Testimonials", value: "testimonials" },
-  { label: "Contact Us",   value: "contact-us" },
+  { label: "Home", value: "home" },
+  { label: "About Us", value: "about-us" },
+  { label: "Pages", value: "pages" },
+  { label: "Service", value: "service" },
+  { label: "Events", value: "events" },
+  { label: "Gallery", value: "gallery" },
+  { label: "Contact Us", value: "contact-us" },
 ];
 
 // Pages available to choose from inside the "Add Child Menu" modal
 const childPageOptions: PageOption[] = [
-  { label: "Home",         value: "home",         icon: Home },
-  { label: "About Us",     value: "about-us",     icon: Users },
-  { label: "Services",     value: "services",     icon: Calendar },
-  { label: "Events",       value: "events",       icon: Calendar },
-  { label: "Gallery",      value: "gallery",      icon: ImageIcon },
-  { label: "Testimonials", value: "testimonials", icon: MessageSquareQuote },
-  { label: "Contact Us",   value: "contact-us",   icon: Mail },
+  { label: "Home", value: "home", icon: Home },
+  { label: "About Us", value: "about-us", icon: Users },
+  { label: "Pages", value: "pages", icon: FileText },
+  { label: "Service", value: "service", icon: MessageSquareQuote },
+  { label: "Events", value: "events", icon: Calendar },
+  { label: "Gallery", value: "gallery", icon: ImageIcon },
+  { label: "Contact Us", value: "contact-us", icon: Mail },
 ];
 
 const initialMenuItems: DraggableItemListItem[] = [
-  { id: "home",         label: "Home",         icon: Home,               children: [] },
-  { id: "about-us",     label: "About Us",     icon: Users,              children: [] },
+  { id: "home", label: "Home", icon: Home, children: [] },
+  { id: "about-us", label: "About Us", icon: Users, children: [] },
+  { id: "pages", label: "Pages", icon: FileText, children: [] },
   {
-    id: "services",
-    label: "Services",
-    icon: Calendar,
+    id: "service",
+    label: "Service",
+    icon: MessageSquareQuote,
     rightContent: <ChevronDown className="h-4 w-4 text-slate-400" />,
     children: [],
   },
-  { id: "events",       label: "Events",       icon: Calendar,           children: [] },
-  { id: "gallery",      label: "Gallery",      icon: ImageIcon,          children: [] },
-  { id: "testimonials", label: "Testimonials", icon: MessageSquareQuote, children: [] },
-  { id: "contact-us",   label: "Contact Us",   icon: Mail,               children: [] },
+  { id: "events", label: "Events", icon: Calendar, children: [] },
+  { id: "gallery", label: "Gallery", icon: ImageIcon, children: [] },
+  { id: "contact-us", label: "Contact Us", icon: Mail, children: [] },
 ];
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function WebsiteMenuPage() {
-  const [menuHeading, setMenuHeading]     = React.useState("Main Menu");
+  const [menuHeading, setMenuHeading]     = React.useState("Nav Menu");
   const [selectedPages, setSelectedPages] = React.useState([
-    "home", "about-us", "services", "events", "gallery", "testimonials", "contact-us",
+    "home", "about-us", "pages", "service", "events", "gallery", "contact-us",
   ]);
   const [menuItems, setMenuItems] = React.useState<DraggableItemListItem[]>(initialMenuItems);
   const [isSaving, setIsSaving]   = React.useState(false);
@@ -81,7 +83,7 @@ export default function WebsiteMenuPage() {
 
   const handleCancel = () => {
     setMenuHeading("Main Menu");
-    setSelectedPages(["home", "about-us", "services", "events", "gallery", "testimonials", "contact-us"]);
+    setSelectedPages(["home", "about-us", "pages", "service", "events", "gallery", "contact-us"]);
     setMenuItems(initialMenuItems);
   };
 
@@ -108,14 +110,15 @@ export default function WebsiteMenuPage() {
 
   // ── "Add Custom Link" bottom button → adds a new TOP-LEVEL item ──
   const handleAddCustomLink = (name: string, link: string) => {
-    const newItem: DraggableItemListItem = {
-      id: `custom-${Date.now()}`,
-      label: name,
-      children: [],
-      description: link || undefined,
-    };
-    setMenuItems((prev) => [...prev, newItem]);
+  const newItem: DraggableItemListItem = {
+    id: `custom-${Date.now()}`,
+    label: name,
+    icon: Link2,
+    children: [],
+    description: link || undefined,
   };
+  setMenuItems((prev) => [...prev, newItem]);
+};
 
   const form = (
     <div className="space-y-3">
@@ -130,6 +133,7 @@ export default function WebsiteMenuPage() {
           value={menuHeading}
           onChange={setMenuHeading}
           maxLength={60}
+          lockInput={true}
         />
 
         <p className="text-[10px] font-medium text-[var(--vendor-text-muted)]">

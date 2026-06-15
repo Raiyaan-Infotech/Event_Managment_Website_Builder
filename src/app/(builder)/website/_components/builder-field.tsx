@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { Lock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -54,6 +55,7 @@ interface CountedInputProps {
   showCount?: boolean;
   onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
   autoFocus?: boolean;
+  lockInput?: boolean;
 }
 
 export function BuilderCountedInput({
@@ -70,6 +72,7 @@ export function BuilderCountedInput({
   showCount = true,
   onKeyDown,
   autoFocus = false,
+  lockInput = false,
 }: CountedInputProps) {
   return (
     <div className={cn("w-full space-y-1", className)}>
@@ -96,15 +99,25 @@ export function BuilderCountedInput({
           className={cn(
             // h-8 on mobile (32px), h-9 on sm+ — fits the compact panel
             "h-8 sm:h-9 w-full text-[11px] font-medium",
-            showCount ? "pr-12" : "pr-2",
+            lockInput ? (showCount ? "!pr-16" : "!pr-8") : showCount ? "pr-12" : "pr-2",
+            lockInput && "cursor-not-allowed bg-slate-50 text-slate-500",
             inputPrefix &&
               "h-full rounded-none border-0 shadow-none focus:border-transparent focus:ring-0",
             inputClassName,
           )}
+          disabled={lockInput}
         />
+        {lockInput ? (
+          <Lock className="pointer-events-none absolute right-2.5 top-1/2 h-3 w-3 -translate-y-1/2 text-slate-400" />
+        ) : null}
         {/* Character counter — stays inside the input on the right */}
         {showCount ? (
-          <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[8px] font-bold text-slate-400 tabular-nums">
+          <span
+            className={cn(
+              "pointer-events-none absolute top-1/2 -translate-y-1/2 text-[8px] font-bold text-slate-400 tabular-nums",
+              lockInput ? "right-7" : "right-2",
+            )}
+          >
             {value.length}/{maxLength}
           </span>
         ) : null}

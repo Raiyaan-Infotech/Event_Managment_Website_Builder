@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ChevronRight, FileText, ChevronRight as ArrowRight } from "lucide-react";
+import { ChevronRight, FileText } from "lucide-react";
 import type { NavItem } from "@/config/navigation";
 import { navSections, isActivePath } from "@/config/navigation";
 import {
@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 interface SidebarProps {
   pathname: string;
   collapsed: boolean;
+  mobilePreview?: boolean;
   mobileOpen?: boolean;
   mobileActionsVisible?: boolean;
   onNavigate?: () => void;
@@ -73,8 +74,7 @@ function SidebarItem({
     >
       <Icon
         className={cn(
-          "shrink-0",
-          collapsed ? "h-4 w-4" : "h-4 w-4",
+          "shrink-0 h-4 w-4",
           active ? "text-[var(--color-primary)]" : "text-gray-400",
         )}
         strokeWidth={1.8}
@@ -175,6 +175,7 @@ function NavGroupItem({
 export function Sidebar({
   pathname,
   collapsed,
+  mobilePreview = false,
   mobileOpen = false,
   mobileActionsVisible = false,
   onNavigate,
@@ -194,16 +195,16 @@ export function Sidebar({
           return {
             ...item,
             children: [
-              ...websitePages.map((page) => ({
-                label: page.title,
-                icon: FileText,
-                href: `/website/pages/${encodeURIComponent(page.id)}/edit`,
-              })),
               {
                 label: "Create Page",
                 icon: FileText,
                 href: "/website/pages/create",
               },
+              ...websitePages.map((page) => ({
+                label: page.title,
+                icon: FileText,
+                href: `/website/pages/${encodeURIComponent(page.id)}/edit`,
+              })),
             ],
           };
         }),
@@ -224,19 +225,18 @@ export function Sidebar({
 
       {/* ── Sidebar panel ─────────────────────────────────────────────── */}
       <aside
-        style={{ width: collapsed ? 48 : 200 }}
+        style={{ width: collapsed || mobilePreview ? 48 : 220 }}
         className={cn(
           "relative z-30 flex shrink-0 flex-col overflow-hidden",
           "border-r border-[var(--color-border)] bg-white shadow-sm",
           "transition-[width,transform] duration-200 ease-in-out",
           "h-full",
-          // Mobile: full overlay drawer, always wide (220px), slides in/out
           "max-sm:fixed max-sm:bottom-0 max-sm:left-0 max-sm:z-30 max-sm:!w-[220px] max-sm:shadow-2xl",
           "max-sm:top-[var(--header-height)]",
           mobileOpen ? "max-sm:translate-x-0" : "max-sm:-translate-x-full",
         )}
       >
-        {/* Nav items */}
+        {/* ── Nav items ─────────────────────────────────────────────── */}
         <div
           className={cn(
             "flex-1 overflow-y-auto overflow-x-hidden py-3 space-y-3",
@@ -277,40 +277,6 @@ export function Sidebar({
         </div>
 
         {/* ── User profile footer ───────────────────────────────────────── */}
-        {!collapsed && (
-          <div className="shrink-0 border-t border-[var(--color-border)] p-3">
-            <Link
-              href="/settings"
-              onClick={onNavigate}
-              className="flex items-center gap-2.5 rounded-[var(--radius-sidebar-item)] px-2 py-2 transition-colors hover:bg-slate-100"
-            >
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary)] text-[10px] font-bold text-white">
-                RK
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-[12px] font-semibold text-[var(--color-text)]">
-                  Royal Kraft
-                </p>
-                <p className="truncate text-[10px] text-[var(--color-text-secondary)]">
-                  View Profile
-                </p>
-              </div>
-              <ArrowRight className="h-3.5 w-3.5 shrink-0 text-gray-400" />
-            </Link>
-          </div>
-        )}
-
-        {collapsed && (
-          <div className="shrink-0 border-t border-[var(--color-border)] p-1.5 flex justify-center">
-            <Link
-              href="/settings"
-              onClick={onNavigate}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-primary)] text-[10px] font-bold text-white hover:opacity-90 transition-opacity"
-            >
-              RK
-            </Link>
-          </div>
-        )}
       </aside>
     </>
   );

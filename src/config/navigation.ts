@@ -1,20 +1,13 @@
 import type { LucideIcon } from "lucide-react";
 import {
   Award,
-  BarChart3,
   Calendar,
-  CreditCard,
   FileText,
   Folder,
   GalleryHorizontal,
-  Home,
-  ImageIcon,
-  LayoutDashboard,
   Menu,
   Monitor,
-  Phone,
   Search,
-  Send,
   Settings,
   Star,
   Users,
@@ -34,16 +27,9 @@ export interface NavSection {
 
 export const navSections: NavSection[] = [
   {
-    items: [
-      { label: "Dashboard", icon: LayoutDashboard, href: "/" },
-    ],
-  },
-  {
     title: "Website Setup",
     items: [
       { label: "Basic Information", icon: FileText, href: "/website/basic-information" },
-      { label: "Contact Information", icon: Phone, href: "/website/contact-information" },
-      { label: "Social Links", icon: Users, href: "/website/social-links" },
     ],
   },
   {
@@ -54,13 +40,13 @@ export const navSections: NavSection[] = [
         icon: FileText,
         href: "/website/pages",
         children: [
+          { label: "Create Page", icon: FileText, href: "/website/pages/create" },
           { label: "About Us", icon: FileText, href: "/website/pages/about-us/edit" },
           { label: "Services", icon: FileText, href: "/website/pages/services/edit" },
-          { label: "Events", icon: FileText, href: "/website/pages/events/edit" },
-          { label: "Create Page", icon: FileText, href: "/website/pages/create" },
         ],
       },
       { label: "Nav Menu", icon: Menu, href: "/website/menu" },
+      { label: "Web UI Block", icon: Monitor, href: "/website/ui-block" },
       { label: "Hero Section", icon: Monitor, href: "/website/hero-section" },
       {
         label : "Slider",
@@ -80,7 +66,6 @@ export const navSections: NavSection[] = [
     items: [
       { label: "Clients", icon: Users, href: "/website/portfolio/clients" },
       { label: "Sponsors", icon: Award, href: "/website/portfolio/sponsors" },
-      { label: "Events", icon: Calendar, href: "/website/portfolio/events" },
     ],
   },
   {
@@ -94,7 +79,6 @@ export const navSections: NavSection[] = [
     title: "Settings",
     items: [
       { label: "SEO Settings", icon: Search, href: "/website/seo" },
-      { label: "Preview & Publish", icon: Send, href: "/website/preview-publish" },
     ],
   },
 ];

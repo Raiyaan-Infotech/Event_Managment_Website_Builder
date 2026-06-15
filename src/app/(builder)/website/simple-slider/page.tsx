@@ -11,17 +11,12 @@ import {
 import {
   BuilderCountedInput,
   BuilderCountedTextarea,
+  BuilderSelectField,
 } from "../_components/builder-field";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { List, SlidersHorizontal, ChevronLeft, ChevronRight, Circle, Wifi } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { FormActions } from "../_components/form-actions";
+import { RadioGroup } from "../_components/radio-group";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface Slide {
@@ -34,6 +29,9 @@ interface Slide {
   imageUrl: string;
   status: boolean;
 }
+
+type SliderHeight = "small" | "medium" | "large" | "fullscreen";
+type EditorMode = "edit" | "new";
 
 const initialSlides: Slide[] = [
   {
@@ -71,10 +69,42 @@ const initialSlides: Slide[] = [
 
 const card = "rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-2.5 shadow-sm";
 
+const buttonPageOptions: Array<{ label: string; value: string }> = [
+  { label: "Home", value: "home" },
+  { label: "About Us", value: "about" },
+  { label: "Services", value: "services" },
+  { label: "Events", value: "events" },
+  { label: "Gallery", value: "gallery" },
+  { label: "Contact Us", value: "contact" },
+];
+
+const sliderHeightOptions = [
+  { label: "Small (400px)", value: "small" },
+  { label: "Medium (600px)", value: "medium" },
+  { label: "Large (800px)", value: "large" },
+  { label: "Full Screen", value: "fullscreen" },
+];
+
 // ── Live Preview Slider ────────────────────────────────────────────────────────
-function LivePreviewSlider({ slides, activeIndex }: { slides: Slide[]; activeIndex: number }) {
+function LivePreviewSlider({
+  slides,
+  activeIndex,
+  sliderHeight,
+}: {
+  slides: Slide[];
+  activeIndex: number;
+  sliderHeight: SliderHeight;
+}) {
   const [current, setCurrent] = React.useState(activeIndex);
   const activeSlides = slides.filter((s) => s.status);
+  const heightClass =
+    sliderHeight === "small"
+      ? "h-[220px]"
+      : sliderHeight === "large"
+        ? "h-[420px]"
+        : sliderHeight === "fullscreen"
+          ? "h-[520px]"
+          : "h-[320px]";
 
   React.useEffect(() => {
     const idx = activeSlides.findIndex((s) => s.id === slides[activeIndex]?.id);
@@ -97,7 +127,7 @@ function LivePreviewSlider({ slides, activeIndex }: { slides: Slide[]; activeInd
       </div>
 
       {/* Slider */}
-      <div className="relative overflow-hidden rounded-[var(--vendor-radius-panel)] bg-[linear-gradient(135deg,#1a0a2e,#6b2fa0_40%,#1a1035)] aspect-[16/7] w-full">
+      <div className={`relative w-full overflow-hidden rounded-[var(--vendor-radius-panel)] bg-[linear-gradient(135deg,#1a0a2e,#6b2fa0_40%,#1a1035)] ${heightClass}`}>
         {/* Background image */}
         {slide.imageUrl ? (
           <img
@@ -170,7 +200,9 @@ function LivePreviewSlider({ slides, activeIndex }: { slides: Slide[]; activeInd
 export default function SimpleSliderPage() {
   const [slides, setSlides] = React.useState<Slide[]>(initialSlides);
   const [sliderTitle, setSliderTitle] = React.useState("Home Page Slider");
+  const [sliderHeight, setSliderHeight] = React.useState<SliderHeight>("medium");
   const [editingIndex, setEditingIndex] = React.useState(0);
+  const [editorMode, setEditorMode] = React.useState<EditorMode>("edit");
   const [isSaving, setIsSaving] = React.useState(false);
 
   const editing = slides[editingIndex] ?? slides[0];
@@ -196,10 +228,35 @@ export default function SimpleSliderPage() {
     setTimeout(() => setIsSaving(false), 800);
   };
 
+  const handleSlideSave = () => {
+    setIsSaving(true);
+    setTimeout(() => {
+      setIsSaving(false);
+      setEditorMode("edit");
+    }, 800);
+  };
+
+  const handleSlideCancel = () => {
+    if (editorMode === "new") {
+      const currentId = slides[editingIndex]?.id;
+      setSlides((prev) => {
+        const nextSlides = prev.filter((slide) => slide.id !== currentId);
+        return nextSlides.length ? nextSlides : initialSlides;
+      });
+      setEditingIndex(0);
+      setEditorMode("edit");
+      return;
+    }
+
+    setEditingIndex(0);
+  };
+
   const handleCancel = () => {
     setSlides(initialSlides);
     setSliderTitle("Home Page Slider");
+    setSliderHeight("medium");
     setEditingIndex(0);
+    setEditorMode("edit");
   };
 
   const form = (
@@ -218,6 +275,21 @@ export default function SimpleSliderPage() {
         maxLength={100}
         className="space-y-0.5"
       />
+      <div className="space-y-1.5 rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] p-2.5">
+        <div>
+          <h3 className="text-[13px] font-black text-[var(--vendor-text)]">
+            Slider Height
+          </h3>
+          <p className="mt-0.5 text-[11px] font-medium text-[var(--vendor-text-muted)]">
+            Set the height of the slider section.
+          </p>
+        </div>
+        <RadioGroup
+          value={sliderHeight}
+          onChange={(value) => setSliderHeight(value as SliderHeight)}
+          options={sliderHeightOptions}
+        />
+      </div>
       <BuilderCountedInput
         label="Slide Title"
         value={editing.title}
@@ -240,25 +312,13 @@ export default function SimpleSliderPage() {
         maxLength={30}
         className="space-y-0.5"
       />
-      <div className="space-y-0.5">
-        <label className="block text-[11px] font-medium">Button Page</label>
-        <Select
-          value={editing.buttonPage}
-          onValueChange={(v) => updateEditing({ buttonPage: v })}
-        >
-          <SelectTrigger className="h-9 w-full text-[11px] px-2 font-semibold">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="home">Home</SelectItem>
-            <SelectItem value="about">About Us</SelectItem>
-            <SelectItem value="services">Services</SelectItem>
-            <SelectItem value="events">Events</SelectItem>
-            <SelectItem value="gallery">Gallery</SelectItem>
-            <SelectItem value="contact">Contact Us</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      <BuilderSelectField
+        label="Button Page"
+        value={editing.buttonPage}
+        onChange={(v) => updateEditing({ buttonPage: v })}
+        options={buttonPageOptions}
+        className="space-y-0.5"
+      />
       <div className="space-y-0.5">
         <label className="block text-[11px] font-medium">Button Color</label>
         <ColorPickerInput
@@ -287,22 +347,26 @@ export default function SimpleSliderPage() {
           />
         </div>
       </div>
-      {/* <div className="border-t border-[var(--vendor-border)] pt-1.5">
+      <div className="border-t border-[var(--vendor-border)] pt-2">
         <FormActions
-          saveLabel="Update Slide"
-          onCancel={() => setEditingIndex(0)}
-          onSave={handleSave}
+          saveLabel={editorMode === "new" ? "Save Slide" : "Update Slide"}
+          onCancel={handleSlideCancel}
+          onSave={handleSlideSave}
           isSaving={isSaving}
           layout="default"
         />
-      </div> */}
+      </div>
     </FormSection>
 
     {/* ── Right: Live Preview + Slider Management ── */}
     <div className="flex flex-col gap-3 min-w-0">
 
       {/* Live Preview */}
-      <LivePreviewSlider slides={slides} activeIndex={editingIndex} />
+      <LivePreviewSlider
+        slides={slides}
+        activeIndex={editingIndex}
+        sliderHeight={sliderHeight}
+      />
 
       {/* Slider Management Table */}
       <FormSection
@@ -334,15 +398,20 @@ export default function SimpleSliderPage() {
             };
             setSlides((prev) => [...prev, newSlide]);
             setEditingIndex(slides.length);
+            setEditorMode("new");
           }}
           onEdit={(row) => {
             const nextIndex = slides.findIndex((slide) => slide.id === row.id);
-            if (nextIndex >= 0) setEditingIndex(nextIndex);
+            if (nextIndex >= 0) {
+              setEditingIndex(nextIndex);
+              setEditorMode("edit");
+            }
           }}
           onDelete={(row) => {
             if (slides.length <= 1) return;
             setSlides((prev) => prev.filter((s) => s.id !== row.id));
             setEditingIndex(0);
+            setEditorMode("edit");
           }}
           onReorder={handleSlideReorder}
           onStatusChange={(row, enabled) => {
