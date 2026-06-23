@@ -1,13 +1,38 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import * as React from "react";
 import { WebsiteBuilderShell } from "@/components/builder/website-builder-shell";
+import { StatusLoader } from "@/components/status-pages/status-loader";
+import { apiRequest } from "@/lib/api-client";
+import { getVendorPortalLoginUrl } from "@/lib/utils";
 
 export default function BuilderLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const [isCheckingSession, setIsCheckingSession] = React.useState(true);
+
+  React.useEffect(() => {
+    let cancelled = false;
+
+    apiRequest("/vendors/auth/me")
+      .then(() => {
+        if (!cancelled) setIsCheckingSession(false);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          window.location.replace(
+            getVendorPortalLoginUrl(window.location.href),
+          );
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <WebsiteBuilderShell>
       {/*
@@ -19,7 +44,11 @@ export default function BuilderLayout({
         flex/grid layouts that depend on height work correctly.
       */}
       <div className="h-full">
-        {children}
+        {isCheckingSession ? (
+          <StatusLoader embedded message="Checking vendor session..." />
+        ) : (
+          children
+        )}
       </div>
     </WebsiteBuilderShell>
   );

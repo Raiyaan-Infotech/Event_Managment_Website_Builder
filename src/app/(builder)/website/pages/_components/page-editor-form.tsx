@@ -3,6 +3,7 @@
 import { FormSection } from "../../_components/form-section";
 import { BuilderCountedInput } from "../../_components/builder-field";
 import { WebsiteRichTextEditor } from "../../_components/rich-text-editor";
+import { Switch } from "@/components/ui/switch";
 import type { PageDraft } from "../_lib/page-store";
 
 interface PageEditorFormProps {
@@ -16,7 +17,16 @@ const card =
 export function PageEditorForm({ draft, onChange }: PageEditorFormProps) {
   return (
     <div className="space-y-3">
-      <FormSection title="Page Title" className={card}>
+      <FormSection
+        title="Page Title"
+        className={card}
+        actions={
+          <Switch
+            checked={draft.enabled}
+            onCheckedChange={(enabled) => onChange({ ...draft, enabled })}
+          />
+        }
+      >
         <BuilderCountedInput
           value={draft.title}
           onChange={(title) => onChange({ ...draft, title })}

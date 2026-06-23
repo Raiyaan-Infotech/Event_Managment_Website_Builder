@@ -9,6 +9,7 @@ A Next.js frontend for an event vendor dashboard and website builder. The app gi
 - TypeScript
 - Tailwind CSS 4
 - Lucide React icons
+- Iconify social icons
 
 ## Getting Started
 
@@ -56,9 +57,20 @@ src/
 - `/bookings`, `/leads`, `/customers`, `/payments`
 - `/website/header`, `/website/menu`, `/website/hero-section`
 - `/website/simple-slider`, `/website/advance-slider`
-- `/website/gallery`, `/website/testimonials`, `/website/footer`
+- `/website/gallery`, `/website/gallery/categories`, `/website/testimonials`, `/website/footer`
 - `/website/seo`, `/website/pages`, `/website/preview-publish`
 - `/settings`, `/analytics`, `/reviews`
+
+## Reusable Status Pages
+
+Shared status page layouts live in `src/components/status-pages/status-page.tsx`.
+
+- `/404`
+- `/no-internet`
+- `/no-content`
+- `/maintenance`
+
+The real Next.js not-found route is also wired through `src/app/not-found.tsx`.
 
 ## Design System Notes
 
@@ -77,4 +89,5 @@ The interface is designed as a dense operational builder, not a landing page. Ke
 - Tightened sidebar navigation with clearer active states and consistent row sizing.
 - Improved dashboard responsiveness for stat cards, setup progress, analytics, and recent activity.
 - Updated the Hero Section builder to a compact single-view editor inspired by the supplied mockup, with smaller controls and a larger live preview.
+- Added reusable 404, no internet, no content, and maintenance design pages for later routing.
 - Replaced the placeholder README with project setup, route, and design guidance.

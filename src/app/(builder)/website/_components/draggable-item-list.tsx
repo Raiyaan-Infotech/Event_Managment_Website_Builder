@@ -2,10 +2,11 @@
 
 import * as React from "react";
 import type { LucideIcon } from "lucide-react";
-import { GripVertical, Link, Plus, Trash2, X } from "lucide-react";
+import { GripVertical, Link, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { MultiSelectPages } from "./multi-select-pages";
+import { ConfirmDeleteButton } from "./confirm-delete-button";
 
 export interface ChildMenuItem {
   id: string;
@@ -148,16 +149,13 @@ function ChildRow({
         ) : null}
       </div>
 
-      <Button
-        type="button"
-        variant="outline"
+      <ConfirmDeleteButton
         size="icon-sm"
-        onClick={onDelete}
+        onConfirm={onDelete}
+        itemLabel={child.label}
         className="shrink-0 text-rose-500 hover:text-rose-600"
         aria-label={`Remove ${child.label}`}
-      >
-        <Trash2 className="h-3.5 w-3.5" />
-      </Button>
+      />
     </div>
   );
 }
@@ -298,16 +296,13 @@ export function DraggableItemList({
               </Button> ) : null}
 
               {onDelete ? (
-                <Button
-                  type="button"
-                  variant="outline"
+                <ConfirmDeleteButton
                   size="icon-sm"
-                  onClick={() => onDelete(item)}
+                  onConfirm={() => onDelete(item)}
+                  itemLabel={item.label}
                   className="shrink-0 text-rose-500 hover:text-rose-600"
                   aria-label={`Delete ${item.label}`}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                />
               ) : null}
             </div>
 

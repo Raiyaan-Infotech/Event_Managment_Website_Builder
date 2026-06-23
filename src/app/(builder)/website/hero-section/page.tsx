@@ -28,6 +28,11 @@ import {
   DesktopMobileToggle,
   type PreviewDevice,
 } from "../_components/desktop-mobile-toggle";
+import {
+  useSaveHeroSection,
+  useWebsiteBuilderData,
+} from "@/hooks/use-website-builder";
+import { useToast } from "@/components/ui/toast";
 
 type ButtonStyle  = "Primary" | "Outline" | "Ghost";
 type ButtonLayout = "left" | "center" | "right" | "space-between" | "stack";
@@ -59,8 +64,6 @@ const buttonLinkOptions: Array<{ label: string; value: string }> = [
   { label: "/contact",  value: "/contact"  },
   { label: "/book-now", value: "/book-now" },
 ];
-
-// ─── Button Layout options (rendered with custom buttons below) ───────────────
 
 const buttonLayoutOptions: Array<{ value: ButtonLayout; label: string; icon: React.ReactNode }> = [
   {
@@ -139,7 +142,26 @@ function ButtonColorField({ value, onChange }: ButtonColorFieldProps) {
   );
 }
 
+/** Watches the pixel width of a DOM element via ResizeObserver */
+function useContainerWidth(ref: React.RefObject<HTMLDivElement | null>) {
+  const [width, setWidth] = React.useState(0);
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([entry]) => {
+      setWidth(entry.contentRect.width);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [ref]);
+  return width;
+}
+
 export default function HeroSectionPage() {
+  const { data: builderData } = useWebsiteBuilderData();
+  const saveHeroSection = useSaveHeroSection();
+  const { showToast } = useToast();
+  const loadedFromApiRef = React.useRef(false);
   const [badgeText, setBadgeText]     = React.useState("Best Event Management");
   const [title, setTitle]             = React.useState("We Create Unforgettable Moments");
   const [description, setDescription] = React.useState(
@@ -164,14 +186,109 @@ export default function HeroSectionPage() {
   const [mobileNavOpen, setMobileNavOpen]       = React.useState(false);
   const [isSaving, setIsSaving]                 = React.useState(false);
 
-  // Close the mobile nav dropdown whenever the preview device changes
+  // ResizeObserver on the preview container
+  const previewRef = React.useRef<HTMLDivElement>(null);
+  const previewWidth = useContainerWidth(previewRef);
+
+  // The preview panel is "narrow" when it's physically below 600px,
+  // regardless of the Desktop/Mobile toggle. Below this width we show
+  // a hamburger nav instead of the full horizontal nav links.
+  const isNarrowPreview = previewWidth > 0 && previewWidth < 600;
+
+  // Use hamburger nav when: toggle is mobile OR container is physically narrow
+  const useHamburgerNav = previewDevice === "mobile" || isNarrowPreview;
+
+  // Close the mobile nav dropdown whenever the preview device or width changes
   React.useEffect(() => {
     setMobileNavOpen(false);
-  }, [previewDevice]);
+  }, [previewDevice, isNarrowPreview]);
 
-  const handleSave = () => {
+  React.useEffect(() => {
+    if (loadedFromApiRef.current || !builderData?.heroSection) return;
+
+    const hero = builderData.heroSection;
+    setBadgeText(String(hero.badge_text || badgeText));
+    setTitle(String(hero.title || title));
+    setDescription(String(hero.description || description));
+    setHeroHeight(String(hero.hero_height || heroHeight));
+    setOverlayEnabled(Boolean(hero.overlay_enabled ?? overlayEnabled));
+    setOverlayColor(String(hero.overlay_color || overlayColor));
+    setOverlayOpacity(Number(hero.overlay_opacity ?? overlayOpacity));
+    setButtonLayout(String(hero.button_layout || buttonLayout) as ButtonLayout);
+    setContentAlign(String(hero.content_align || contentAlign) as ContentAlign);
+    setHideBtn2Mobile(Boolean(hero.hide_button_2_mobile ?? hideBtn2Mobile));
+    setCenterMobile(Boolean(hero.center_content_mobile ?? centerMobile));
+    setMobileHeroHeight(String(hero.mobile_hero_height || mobileHeroHeight));
+    setBtn1({
+      enabled: Boolean(hero.primary_button_enabled ?? btn1.enabled),
+      label: String(hero.primary_button_label || btn1.label),
+      link: String(hero.primary_button_link || btn1.link),
+      style: String(hero.primary_button_style || btn1.style) as ButtonStyle,
+      color: String(hero.primary_button_color || btn1.color),
+    });
+    setBtn2({
+      enabled: Boolean(hero.secondary_button_enabled ?? btn2.enabled),
+      label: String(hero.secondary_button_label || btn2.label),
+      link: String(hero.secondary_button_link || btn2.link),
+      style: String(hero.secondary_button_style || btn2.style) as ButtonStyle,
+      color: String(hero.secondary_button_color || btn2.color),
+    });
+
+    loadedFromApiRef.current = true;
+  }, [
+    badgeText,
+    btn1.color,
+    btn1.enabled,
+    btn1.label,
+    btn1.link,
+    btn1.style,
+    btn2.color,
+    btn2.enabled,
+    btn2.label,
+    btn2.link,
+    btn2.style,
+    builderData,
+    buttonLayout,
+    centerMobile,
+    contentAlign,
+    description,
+    heroHeight,
+    hideBtn2Mobile,
+    mobileHeroHeight,
+    overlayColor,
+    overlayEnabled,
+    overlayOpacity,
+    title,
+  ]);
+
+  const handleSave = async () => {
     setIsSaving(true);
-    setTimeout(() => setIsSaving(false), 800);
+    try {
+      await saveHeroSection.mutateAsync({
+        badgeText,
+        title,
+        description,
+        heroHeight,
+        overlayEnabled,
+        overlayColor,
+        overlayOpacity,
+        btn1,
+        btn2,
+        buttonLayout,
+        contentAlign,
+        hideBtn2Mobile,
+        centerMobile,
+        mobileHeroHeight,
+      });
+      showToast("Hero section saved");
+    } catch (error) {
+      showToast(
+        error instanceof Error ? error.message : "Unable to save hero section",
+        "error",
+      );
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleCancel = () => {
@@ -488,17 +605,16 @@ export default function HeroSectionPage() {
   );
 
   // ---------------------------------------------------------------------------
-  // Live preview — a simple mock of what the hero looks like on the website.
-  // Replace the inner markup with your real preview iframe / component later.
+  // Live preview
   // ---------------------------------------------------------------------------
   const effectiveContentAlign: ContentAlign =
-    previewDevice === "mobile" && centerMobile ? "center" : contentAlign;
+    useHamburgerNav && centerMobile ? "center" : contentAlign;
 
   const effectiveButtonLayout: ButtonLayout =
-    previewDevice === "mobile" && centerMobile ? "center" : buttonLayout;
+    useHamburgerNav && centerMobile ? "center" : buttonLayout;
 
   const effectiveHeroMinHeight =
-    previewDevice === "mobile"
+    useHamburgerNav
       ? mobileHeroHeight === "small-300"
         ? 300
         : mobileHeroHeight === "large-700"
@@ -515,15 +631,19 @@ export default function HeroSectionPage() {
       : 360;
 
   const previewContent = (
-    <div className="h-full w-full overflow-hidden rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)]">
+    <div
+      ref={previewRef}
+      className="h-full w-full overflow-hidden rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)]"
+    >
       {/* Simulated top bar */}
-      <div className="flex items-center justify-between gap-2 bg-[#0B0D17] px-4 py-2 text-[10px] text-white/70">
-        <div className="flex items-center gap-3 overflow-hidden">
-          <span className="whitespace-nowrap">📞 +91 98765 43210</span>
-          {previewDevice === "desktop" && (
+      <div className="flex items-center justify-between gap-2 bg-[#0B0D17] px-4 py-2 text-[10px] text-white/70 overflow-hidden">
+        <div className="flex items-center gap-2 min-w-0 overflow-hidden">
+          <span className="whitespace-nowrap shrink-0">📞 +91 98765 43210</span>
+          {/* Only show email on wide preview */}
+          {!isNarrowPreview && previewDevice === "desktop" && (
             <>
-              <span>|</span>
-              <span className="whitespace-nowrap">✉ hello@eventify.com</span>
+              <span className="shrink-0">|</span>
+              <span className="whitespace-nowrap shrink-0">✉ hello@eventify.com</span>
             </>
           )}
         </div>
@@ -533,19 +653,26 @@ export default function HeroSectionPage() {
       </div>
 
       {/* Simulated nav */}
-      <div className="flex items-center justify-between bg-white px-4 py-2 shadow-sm">
-        <span className="text-[12px] font-black text-[#6C47FF]">⬛ Eventify</span>
-        {previewDevice === "desktop" ? (
+      <div className="flex items-center justify-between bg-white px-4 py-2 shadow-sm overflow-hidden">
+        <span className="text-[12px] font-black text-[#6C47FF] shrink-0">⬛ Eventify</span>
+
+        {/* Desktop nav — only shown when preview panel is wide enough */}
+        {!useHamburgerNav ? (
           <>
-            <div className="flex items-center gap-3 text-[10px] text-gray-700 font-medium">
-              <span>Home</span><span>About Us</span><span>Services ▾</span>
-              <span>Events</span><span>Gallery</span><span>Contact Us</span>
+            <div className="flex items-center gap-2 text-[10px] text-gray-700 font-medium overflow-hidden mx-2">
+              <span className="whitespace-nowrap">Home</span>
+              <span className="whitespace-nowrap">About</span>
+              <span className="whitespace-nowrap">Services ▾</span>
+              <span className="whitespace-nowrap">Events</span>
+              <span className="whitespace-nowrap">Gallery</span>
+              <span className="whitespace-nowrap">Contact</span>
             </div>
-            <div className="rounded-md bg-[#6C47FF] px-3 py-1 text-[10px] font-bold text-white">
+            <div className="shrink-0 rounded-md bg-[#6C47FF] px-3 py-1 text-[10px] font-bold text-white whitespace-nowrap">
               Book Now
             </div>
           </>
         ) : (
+          /* Hamburger nav — shown when narrow */
           <button
             type="button"
             onClick={() => setMobileNavOpen((open) => !open)}
@@ -559,7 +686,7 @@ export default function HeroSectionPage() {
       </div>
 
       {/* Mobile nav dropdown */}
-      {previewDevice === "mobile" && mobileNavOpen && (
+      {useHamburgerNav && mobileNavOpen && (
         <div className="flex flex-col gap-2 border-t border-[var(--vendor-border)] bg-white px-4 py-3 text-[11px] font-medium text-gray-700">
           <span>Home</span>
           <span>About Us</span>
@@ -612,7 +739,7 @@ export default function HeroSectionPage() {
           )}
           <h2
             className="text-white font-black leading-tight"
-            style={{ fontSize: previewDevice === "mobile" ? "22px" : "32px" }}
+            style={{ fontSize: useHamburgerNav ? "22px" : "32px" }}
           >
             {title}
           </h2>
@@ -655,7 +782,7 @@ export default function HeroSectionPage() {
                 {btn1.label}
               </button>
             )}
-            {btn2.enabled && !(previewDevice === "mobile" && hideBtn2Mobile) && (
+            {btn2.enabled && !(useHamburgerNav && hideBtn2Mobile) && (
               <button
                 type="button"
                 className="rounded-md px-4 py-1.5 text-[11px] font-bold transition"

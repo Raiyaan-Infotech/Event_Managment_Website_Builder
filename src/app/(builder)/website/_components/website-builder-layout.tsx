@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { HelpCircle } from "lucide-react";
+import { HelpCircle, Loader2 } from "lucide-react";
 import { OutlineButton, PrimaryButton } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { PageBreadcrumbs } from "./page-breadcrumbs";
@@ -27,6 +27,7 @@ const pageSubtitles: Record<string, string> = {
   "Basic Information": "Manage your website basic information and Basic Information settings.",
   "Footer Settings": "Manage your website footer settings and Footer Settings settings.",
   Gallery: "Manage your website gallery and Gallery settings.",
+  " Categories": "Create and manage categories that organize your gallery images.",
   "Hero Section": "Manage your website hero section and Hero Section settings.",
   "Legal Pages": "Manage your website legal pages and Legal Pages settings.",
   "Nav Menu": "Manage your website navigation menu and Nav Menu settings.",
@@ -78,7 +79,7 @@ export function WebsiteBuilderLayout({
   preview,
   previewTitle = "Live Preview",
   previewSubtitle = "This is how your section will appear on your website.",
-  saveLabel = "Save Changes",
+  saveLabel = " ",
   cancelLabel = "Cancel",
   howItWorksLabel = "How It Works",
   onSave,
@@ -105,6 +106,7 @@ export function WebsiteBuilderLayout({
   const [internalDevice, setInternalDevice] = React.useState<PreviewDevice>("desktop");
   const activeDevice = previewDeviceProp ?? internalDevice;
   const resolvedSubtitle = subtitle ?? (title ? pageSubtitles[title] : undefined);
+  const showLoadingOverlay = primaryButton?.isLoading ?? isSaving;
   const handleDeviceChange = (d: PreviewDevice) => {
     setInternalDevice(d);
     onPreviewDeviceChange?.(d);
@@ -113,7 +115,7 @@ export function WebsiteBuilderLayout({
   return (
     <div
       className={cn(
-        "flex flex-col overflow-hidden bg-[var(--vendor-page-bg)]",
+        "relative flex flex-col overflow-hidden bg-[var(--vendor-page-bg)]",
         "px-2 py-1.5 sm:px-3",
         "h-full",
         className,
@@ -150,15 +152,19 @@ export function WebsiteBuilderLayout({
                 <span className="hidden sm:inline">{howItWorksLabel}</span>
               </OutlineButton>
             )}
-            {primaryButton && (
+            {(primaryButton || onSave) && (
               <PrimaryButton
                 type="button"
                 size="sm"
-                onClick={primaryButton.onClick}
-                disabled={primaryButton.disabled || primaryButton.isLoading}
+                onClick={primaryButton?.onClick ?? onSave}
+                disabled={
+                  primaryButton
+                    ? primaryButton.disabled || primaryButton.isLoading
+                    : disableSave || isSaving
+                }
                 className="h-8 shrink-0 px-3 text-[11px]"
               >
-                {primaryButton.isLoading ? "Loading…" : primaryButton.label}
+                {primaryButton?.label ?? saveLabel}
               </PrimaryButton>
             )}
           </div>
@@ -167,7 +173,7 @@ export function WebsiteBuilderLayout({
 
       <div
         className={cn(
-          "grid min-h-0 min-w-0 flex-1 gap-2 overflow-hidden",
+          "website-builder-content-grid grid min-h-0 min-w-0 flex-1 gap-2 overflow-hidden",
           preview
             ? [
                 // Mobile/tablet: stack vertically; each panel gets natural height
@@ -273,6 +279,23 @@ export function WebsiteBuilderLayout({
           </aside>
         )}
       </div>
+
+      {showLoadingOverlay ? (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/72 backdrop-blur-[2px]">
+          <div className="flex min-w-[220px] flex-col items-center rounded-[20px] border border-[var(--vendor-border)] bg-white px-8 py-7 text-center shadow-lg">
+            <div className="relative flex h-16 w-16 items-center justify-center rounded-[20px] bg-[#f2f3ff]">
+              <div className="absolute inset-2 rounded-[16px] border border-[#d8d4ff]" />
+              <Loader2 className="h-7 w-7 animate-spin text-[var(--vendor-primary-btn)]" />
+            </div>
+            <p className="mt-4 text-[14px] font-black text-[var(--vendor-text)]">
+              Saving changes...
+            </p>
+            <p className="mt-1 text-[11px] font-medium text-[var(--vendor-text-muted)]">
+              Please wait while we update your website builder data.
+            </p>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

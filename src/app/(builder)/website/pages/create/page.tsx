@@ -3,34 +3,40 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { WebsiteBuilderLayout } from "../../_components/website-builder-layout";
-import { DEFAULT_PAGE_CONTENT, createPageId, createSlug, useWebsitePages } from "../_lib/page-store";
+import {
+  buildPagePayload,
+  mergeWebsitePages,
+} from "../_lib/page-store";
 import { PageEditorForm } from "../_components/page-editor-form";
+import {
+  useCreateWebsitePage,
+  useWebsitePages,
+} from "@/hooks/use-website-builder";
+import { useToast } from "@/components/ui/toast";
 
 export default function CreatePage() {
   const router = useRouter();
-  const { pages, savePages } = useWebsitePages();
+  const { data: pageRecords = [] } = useWebsitePages();
+  const createPage = useCreateWebsitePage();
+  const { showToast } = useToast();
   const [draft, setDraft] = React.useState({
     title: "",
-    content: DEFAULT_PAGE_CONTENT,
+    content: "",
+    enabled: true,
   });
-  const [isSaving, setIsSaving] = React.useState(false);
+  const pages = React.useMemo(() => mergeWebsitePages(pageRecords), [pageRecords]);
+  const isSaving = createPage.isPending;
 
-  const handleSave = () => {
-    const cleanTitle = draft.title.trim() || "Untitled Page";
-    const id = createPageId(cleanTitle, pages);
-
-    setIsSaving(true);
-    savePages([
-      ...pages,
-      {
-        id,
-        title: cleanTitle,
-        slug: createSlug(cleanTitle),
-        content: draft.content,
-        enabled: true,
-      },
-    ]);
-    router.push("/website/pages");
+  const handleSave = async () => {
+    try {
+      const created = await createPage.mutateAsync(buildPagePayload(draft, pages));
+      router.push(`/website/pages/${encodeURIComponent(String(created.id))}/edit`);
+    } catch (error) {
+      showToast(
+        error instanceof Error ? error.message : "Unable to create page",
+        "error",
+      );
+    }
   };
 
   return (
@@ -39,7 +45,6 @@ export default function CreatePage() {
       breadcrumbs={[
         { label: "Dashboard", href: "/" },
         { label: "Website Builder", href: "/website" },
-        { label: "Pages", href: "/website/pages" },
         { label: "Create Page" },
       ]}
       form={<PageEditorForm draft={draft} onChange={setDraft} />}

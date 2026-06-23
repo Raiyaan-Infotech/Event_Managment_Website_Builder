@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Image from "next/image";
-import { Edit2, GripVertical, Plus, Trash2 } from "lucide-react";
+import { Edit2, GripVertical, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { ConfirmDeleteButton } from "./confirm-delete-button";
 
 export interface SliderManagementRow {
   id: string | number;
@@ -239,15 +240,11 @@ export function SliderManagementTable({
                         </Button>
                       ) : null}
                       {onDelete ? (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon-xs"
-                          onClick={() => onDelete(row)}
+                        <ConfirmDeleteButton
+                          onConfirm={() => onDelete(row)}
+                          itemLabel={row.title}
                           className="text-rose-500 hover:text-rose-600"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
+                        />
                       ) : null}
                     </div>
                   </TableCell>

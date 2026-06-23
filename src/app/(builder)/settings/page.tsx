@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import * as React from "react";
-import { Camera, Globe, Key, LogOut, Mail, Save, User } from "lucide-react";
+import { Camera, Globe, Key, Mail, Save, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -42,9 +42,7 @@ export default function SettingsPage() {
     setNewPassword("");
   }
 
-  function handleLogout() {
-    router.push("/login");
-  }
+
 
   return (
     <div className="space-y-6 p-4 sm:p-6">
@@ -195,28 +193,6 @@ export default function SettingsPage() {
               </Button>
             </div>
           </SectionCard>
-        </div>
-
-        {/* ── Account / Logout ── */}
-        <div className="space-y-6">
-          <Card>
-            <CardContent className="p-5">
-              <h2 className="text-[16px] font-semibold text-[var(--color-text)]">
-                Account
-              </h2>
-              <p className="mt-1 text-[13px] text-[var(--color-text-secondary)]">
-                Sign out of your account
-              </p>
-              <Button
-                onClick={handleLogout}
-                variant="outline"
-                className="mt-4 h-10 w-full text-[var(--color-danger)] border-red-200 hover:bg-red-50 hover:text-[var(--color-danger)]"
-              >
-                <LogOut className="h-4 w-4" />
-                Logout
-              </Button>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>

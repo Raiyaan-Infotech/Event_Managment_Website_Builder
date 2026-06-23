@@ -1,7 +1,7 @@
 "use client";
 
 import type * as React from "react";
-import { Save, X } from "lucide-react";
+import { Loader2, Save, X } from "lucide-react";
 import { OutlineButton, PrimaryButton } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -59,8 +59,12 @@ export function FormActions({
         disabled={disableSave || isSaving}
         className="h-9 w-full text-[11px] shadow-sm sm:w-auto whitespace-nowrap"
       >
-        <Save className="h-4 w-4 shrink-0" />
-        {isSaving ? "Saving…" : saveLabel}
+        {isSaving ? (
+          <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
+        ) : (
+          <Save className="h-4 w-4 shrink-0" />
+        )}
+        {isSaving ? "Saving..." : saveLabel}
       </PrimaryButton>
     </div>
   );

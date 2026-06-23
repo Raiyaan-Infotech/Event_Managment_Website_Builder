@@ -3,38 +3,48 @@
 import * as React from "react";
 import { useParams, useRouter } from "next/navigation";
 import { WebsiteBuilderLayout } from "../../../_components/website-builder-layout";
-import { createSlug, useWebsitePages } from "../../_lib/page-store";
+import {
+  buildPagePayload,
+  mergeWebsitePages,
+  toPageDraft,
+} from "../../_lib/page-store";
 import { PageEditorForm } from "../../_components/page-editor-form";
+import {
+  useCreateWebsitePage,
+  useUpdateWebsitePage,
+  useWebsitePages,
+} from "@/hooks/use-website-builder";
+import { useToast } from "@/components/ui/toast";
 
 export default function EditPage() {
   const router = useRouter();
   const params = useParams<{ pageId: string }>();
   const pageId = decodeURIComponent(params.pageId);
-  const { pages, savePages, isLoaded } = useWebsitePages();
-  const page = pages.find((item) => item.id === pageId);
+  const { data: pageRecords = [], isLoading } = useWebsitePages();
+  const updatePage = useUpdateWebsitePage();
+  const createPage = useCreateWebsitePage();
+  const { showToast } = useToast();
+  const pages = React.useMemo(() => mergeWebsitePages(pageRecords), [pageRecords]);
+  const page = pages.find((item) => item.routeKey === pageId);
   const [draft, setDraft] = React.useState({
     title: "",
     content: "",
+    enabled: true,
   });
-  const [isSaving, setIsSaving] = React.useState(false);
+  const isSaving = updatePage.isPending || createPage.isPending;
 
   React.useEffect(() => {
     if (!page) return;
-
-    setDraft({
-      title: page.title,
-      content: page.content,
-    });
+    setDraft(toPageDraft(page));
   }, [page]);
 
-  if (!page && !isLoaded) {
+  if (!page && isLoading) {
     return (
       <WebsiteBuilderLayout
         title="Edit Page"
         breadcrumbs={[
           { label: "Dashboard", href: "/" },
           { label: "Website Builder", href: "/website" },
-          { label: "Pages", href: "/website/pages" },
           { label: "Edit Page" },
         ]}
         form={
@@ -55,7 +65,6 @@ export default function EditPage() {
         breadcrumbs={[
           { label: "Dashboard", href: "/" },
           { label: "Website Builder", href: "/website" },
-          { label: "Pages", href: "/website/pages" },
           { label: "Edit Page" },
         ]}
         form={
@@ -66,30 +75,32 @@ export default function EditPage() {
         onCancel={() => router.push("/website/pages")}
         leftClassName="border-0 bg-transparent p-0 shadow-none"
         primaryButton={{
-          label: "Back to Pages",
-          onClick: () => router.push("/website/pages"),
+          label: "Create Page",
+          onClick: () => router.push("/website/pages/create"),
         }}
       />
     );
   }
 
-  const handleSave = () => {
-    const cleanTitle = draft.title.trim() || "Untitled Page";
+  const handleSave = async () => {
+    try {
+      const payload = buildPagePayload(draft, pages, {
+        page,
+        isSystem: page.isSystem,
+      });
 
-    setIsSaving(true);
-    savePages((currentPages) =>
-      currentPages.map((item) =>
-        item.id === page.id
-          ? {
-              ...item,
-              title: cleanTitle,
-              slug: createSlug(cleanTitle),
-              content: draft.content,
-            }
-          : item,
-      ),
-    );
-    router.push("/website/pages");
+      if (page.isPersisted) {
+        await updatePage.mutateAsync({ id: page.id, payload });
+      } else {
+        const created = await createPage.mutateAsync(payload);
+        router.replace(`/website/pages/${encodeURIComponent(String(created.id))}/edit`);
+      }
+    } catch (error) {
+      showToast(
+        error instanceof Error ? error.message : "Unable to save page",
+        "error",
+      );
+    }
   };
 
   return (
@@ -98,7 +109,6 @@ export default function EditPage() {
       breadcrumbs={[
         { label: "Dashboard", href: "/" },
         { label: "Website Builder", href: "/website" },
-        { label: "Pages", href: "/website/pages" },
         { label: "Edit Page" },
       ]}
       form={<PageEditorForm draft={draft} onChange={setDraft} />}

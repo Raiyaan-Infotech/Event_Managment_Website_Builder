@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/toast";
+import { AppQueryProvider } from "@/components/providers/query-provider";
+import { NetworkStatusGuard } from "@/components/status-pages/network-status-guard";
 
 export const metadata: Metadata = {
   title: "EventCraft Website Builder",
@@ -15,7 +17,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <ToastProvider>{children}</ToastProvider>
+        <AppQueryProvider>
+          <ToastProvider>
+            <NetworkStatusGuard>{children}</NetworkStatusGuard>
+          </ToastProvider>
+        </AppQueryProvider>
       </body>
     </html>
   );
