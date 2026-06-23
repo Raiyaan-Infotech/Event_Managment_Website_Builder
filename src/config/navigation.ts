@@ -5,8 +5,11 @@ import {
   FileText,
   Folder,
   GalleryHorizontal,
+  LogIn,
+  Mail,
   Menu,
   Monitor,
+  Palette,
   Search,
   Settings,
   Star,
@@ -27,9 +30,15 @@ export interface NavSection {
 
 export const navSections: NavSection[] = [
   {
-    title: "Website Setup",
+    title: "Website Builder",
     items: [
-      { label: "Basic Information", icon: FileText, href: "/website/basic-information" },
+      { label: "Header", icon: FileText, href: "/website/basic-information" },
+      { label: "Nav Menu", icon: Menu, href: "/website/menu" },
+      { label: "Login Page", icon: LogIn, href: "/website/login-page" },
+      { label: "Web UI Block", icon: Monitor, href: "/website/ui-block" },
+      { label: "SEO Settings", icon: Search, href: "/website/seo" },
+      { label: "Footer Settings", icon: Settings, href: "/website/footer" },
+      { label: "Theme Color", icon: Palette, href: "/website/theme-color" },
     ],
   },
   {
@@ -42,14 +51,22 @@ export const navSections: NavSection[] = [
         children: [
           { label: "Create Page", icon: FileText, href: "/website/pages/create" },
           { label: "About Us", icon: FileText, href: "/website/pages/about-us/edit" },
-          { label: "Services", icon: FileText, href: "/website/pages/services/edit" },
+          { label: "Service", icon: FileText, href: "/website/pages/service/edit" },
         ],
       },
-      { label: "Nav Menu", icon: Menu, href: "/website/menu" },
-      { label: "Web UI Block", icon: Monitor, href: "/website/ui-block" },
+      {
+        label: "Contact Us",
+        icon: Mail,
+        href: "/website/contact-us",
+        children: [
+          { label: "Contact Settings", icon: Mail, href: "/website/contact-us" },
+          { label: "Categories", icon: Folder, href: "/website/contact-us/categories" },
+          { label: "Contact List", icon: FileText, href: "/website/contact-us/list" },
+        ],
+      },
       { label: "Hero Section", icon: Monitor, href: "/website/hero-section" },
       {
-        label : "Slider",
+        label: "Slider",
         icon: Folder,
         href: "/website/slider",
         children: [
@@ -57,28 +74,23 @@ export const navSections: NavSection[] = [
           { label: "Advance Slider", icon: Calendar, href: "/website/advance-slider" },
         ],
       },
-      { label: "Gallery", icon: GalleryHorizontal, href: "/website/gallery" },
+      {
+        label: "Gallery",
+        icon: GalleryHorizontal,
+        href: "/website/gallery",
+        children: [
+          { label: "Gallery Images", icon: GalleryHorizontal, href: "/website/gallery" },
+          { label: "Gallery Categories", icon: Folder, href: "/website/gallery/categories" },
+        ],
+      },
       { label: "Testimonials", icon: Star, href: "/website/testimonials" },
     ],
   },
   {
     title: "Portfolio",
     items: [
-      { label: "Clients", icon: Users, href: "/website/portfolio/clients" },
       { label: "Sponsors", icon: Award, href: "/website/portfolio/sponsors" },
-    ],
-  },
-  {
-    title: "Footer",
-    items: [
-      { label: "Footer Settings", icon: Settings, href: "/website/footer" },
-      { label: "Legal Pages", icon: FileText, href: "/website/legal-pages" },
-    ],
-  },
-  {
-    title: "Settings",
-    items: [
-      { label: "SEO Settings", icon: Search, href: "/website/seo" },
+      { label: "Clients", icon: Users, href: "/website/portfolio/clients" },
     ],
   },
 ];

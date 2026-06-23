@@ -23,6 +23,7 @@ interface MultiSelectPagesProps {
   tagClassName?: string;
   triggerClassName?: string;
   contentClassName?: string;
+  lockedValues?: string[];
 }
 
 export function MultiSelectPages({
@@ -37,6 +38,7 @@ export function MultiSelectPages({
   disabled = false,
   className,
   tagClassName,
+  lockedValues = [],
 }: MultiSelectPagesProps) {
   const [inputValue, setInputValue] = React.useState("");
   const [isOpen, setIsOpen] = React.useState(false);
@@ -71,7 +73,16 @@ export function MultiSelectPages({
     onChange([...value, normalized]);
   };
 
+  const lockedValueSet = React.useMemo(
+    () => new Set(lockedValues.map((item) => item.toLowerCase())),
+    [lockedValues],
+  );
+
+  const isLockedValue = (nextValue: string) =>
+    lockedValueSet.has(nextValue.toLowerCase());
+
   const removeValue = (nextValue: string) => {
+    if (isLockedValue(nextValue)) return;
     onChange(value.filter((item) => item !== nextValue));
   };
 
@@ -84,7 +95,8 @@ export function MultiSelectPages({
         setIsOpen(false);
       }
     } else if (event.key === "Backspace" && !inputValue && value.length > 0) {
-      removeValue(value[value.length - 1]);
+      const lastRemovable = [...value].reverse().find((item) => !isLockedValue(item));
+      if (lastRemovable) removeValue(lastRemovable);
     }
   };
 
@@ -110,7 +122,9 @@ export function MultiSelectPages({
             disabled && "pointer-events-none opacity-50"
           )}
         >
-          {selectedOptions.map((option) => (
+          {selectedOptions.map((option) => {
+            const isLocked = isLockedValue(option.value);
+            return (
             <span
               key={option.value}
               className={cn(
@@ -125,14 +139,21 @@ export function MultiSelectPages({
                   e.stopPropagation();
                   removeValue(option.value);
                 }}
-                disabled={disabled}
-                className="rounded p-0.5 text-[var(--vendor-primary-btn)] hover:bg-[var(--vendor-primary-btn)]/20 disabled:cursor-not-allowed"
-                aria-label={`Remove ${option.label}`}
+                disabled={disabled || isLocked}
+                className={cn(
+                  "rounded p-0.5 text-[var(--vendor-primary-btn)] hover:bg-[var(--vendor-primary-btn)]/20 disabled:cursor-not-allowed",
+                  isLocked && "text-rose-500 hover:bg-transparent disabled:opacity-100",
+                )}
+                aria-label={
+                  isLocked ? `${option.label} cannot be removed` : `Remove ${option.label}`
+                }
+                title={isLocked ? "Required item cannot be removed" : undefined}
               >
                 <X className="h-3 w-3" />
               </button>
             </span>
-          ))}
+          );
+          })}
 
           <input
             ref={inputRef}

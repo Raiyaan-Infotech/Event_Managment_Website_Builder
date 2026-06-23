@@ -5,6 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import { WebsiteBuilderLayout } from "../../../_components/website-builder-layout";
 import {
   buildPagePayload,
+  isFixedPage,
+  isPageDraftComplete,
   mergeWebsitePages,
   toPageDraft,
 } from "../../_lib/page-store";
@@ -25,7 +27,12 @@ export default function EditPage() {
   const createPage = useCreateWebsitePage();
   const { showToast } = useToast();
   const pages = React.useMemo(() => mergeWebsitePages(pageRecords), [pageRecords]);
-  const page = pages.find((item) => item.routeKey === pageId);
+  const page = pages.find(
+    (item) =>
+      String(item.id) === pageId ||
+      String(item.routeKey) === pageId ||
+      item.slug === pageId,
+  );
   const [draft, setDraft] = React.useState({
     title: "",
     content: "",
@@ -52,7 +59,7 @@ export default function EditPage() {
             Loading page...
           </div>
         }
-        onCancel={() => router.push("/website/pages")}
+        onCancel={() => router.push("/website/pages/create")}
         leftClassName="border-0 bg-transparent p-0 shadow-none"
       />
     );
@@ -72,7 +79,7 @@ export default function EditPage() {
             Page not found.
           </div>
         }
-        onCancel={() => router.push("/website/pages")}
+        onCancel={() => router.push("/website/pages/create")}
         leftClassName="border-0 bg-transparent p-0 shadow-none"
         primaryButton={{
           label: "Create Page",
@@ -82,25 +89,36 @@ export default function EditPage() {
     );
   }
 
-  const handleSave = async () => {
+  const handleSave = async (publish: boolean) => {
+    if (!isPageDraftComplete(draft)) {
+      showToast("Please fill all mandatory fields.", "error");
+      return;
+    }
     try {
-      const payload = buildPagePayload(draft, pages, {
+      const payload = buildPagePayload({ ...draft, enabled: publish }, pages, {
         page,
-        isSystem: page.isSystem,
+        isSystem: isFixedPage(page),
       });
 
       if (page.isPersisted) {
         await updatePage.mutateAsync({ id: page.id, payload });
       } else {
-        const created = await createPage.mutateAsync(payload);
-        router.replace(`/website/pages/${encodeURIComponent(String(created.id))}/edit`);
+        await createPage.mutateAsync(payload);
       }
+      showToast(publish ? "Page published" : "Page saved as draft");
+      // After saving, return to the Pages List.
+      router.push("/website/pages/list");
     } catch (error) {
       showToast(
         error instanceof Error ? error.message : "Unable to save page",
         "error",
       );
     }
+  };
+
+  // Reset reverts the form to the last saved version of the page.
+  const handleReset = () => {
+    if (page) setDraft(toPageDraft(page));
   };
 
   return (
@@ -111,12 +129,29 @@ export default function EditPage() {
         { label: "Website Builder", href: "/website" },
         { label: "Edit Page" },
       ]}
-      form={<PageEditorForm draft={draft} onChange={setDraft} />}
-      onCancel={() => router.push("/website/pages")}
+      form={
+        <PageEditorForm
+          draft={draft}
+          onChange={setDraft}
+          showActive={!isFixedPage(page)}
+        />
+      }
       leftClassName="border-0 bg-transparent p-0 shadow-none"
+      // Fixed (system) pages: Reset (revert to saved) + Update & Publish.
+      // Dynamic (custom) pages: Save as Draft + Save & Publish.
+      onReset={isFixedPage(page) ? handleReset : undefined}
+      secondaryButton={
+        isFixedPage(page)
+          ? undefined
+          : {
+              label: "Save as Draft",
+              onClick: () => handleSave(false),
+              isLoading: isSaving,
+            }
+      }
       primaryButton={{
-        label: "Update Page",
-        onClick: handleSave,
+        label: isFixedPage(page) ? "Update & Publish" : "Save & Publish",
+        onClick: () => handleSave(true),
         isLoading: isSaving,
       }}
       howItWorksLabel="How It Works"

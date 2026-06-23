@@ -489,6 +489,16 @@ export default function GalleryCategoriesPage() {
       title=" Categories"
       subtitle="Create and manage categories that organize your gallery images."
       form={formContent}
+      onReset={startAdd}
+      onDelete={editingId ? () => handleDelete(editingId) : undefined}
+      deleteDisabled={!editingId}
+      deleteItemLabel={form.name || "gallery category"}
+      primaryButton={{
+        label: editingId ? "Update Category" : "Save Category",
+        onClick: saveCategory,
+        isLoading: isSaving,
+        disabled: !form.name.trim() || !toSlug(form.slug || form.name),
+      }}
       leftClassName="border-0 bg-transparent p-0 shadow-none"
     />
   );

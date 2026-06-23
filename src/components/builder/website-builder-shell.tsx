@@ -2,22 +2,76 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
-  ChevronDown,
+  ArrowLeft,
   Eye,
   Globe,
-  LogOut,
   Monitor,
   MoreVertical,
   PanelLeft,
-  Save,
   Smartphone,
-  User,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { StatusLoader } from "@/components/status-pages/status-loader";
+import {
+  useSaveWebsiteSettings,
+  useWebsiteBuilderData,
+} from "@/hooks/use-website-builder";
+import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 import { Sidebar } from "./sidebar";
+
+/** Publish / Unpublish segmented radio for the builder header. */
+function PublishToggle({
+  isPublished,
+  onChange,
+  loading,
+}: {
+  isPublished: boolean;
+  onChange: (publish: boolean) => void;
+  loading?: boolean;
+}) {
+  return (
+    <div
+      role="radiogroup"
+      aria-label="Website publish status"
+      className="flex shrink-0 items-center rounded-[var(--radius-button)] border border-[var(--color-border)] bg-gray-50 p-0.5"
+    >
+      <button
+        type="button"
+        role="radio"
+        aria-checked={isPublished}
+        disabled={loading}
+        onClick={() => onChange(true)}
+        className={cn(
+          "flex h-6 items-center gap-1 rounded-md px-2.5 text-[12px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60",
+          isPublished
+            ? "bg-[var(--color-primary)] text-white shadow-sm"
+            : "text-gray-500 hover:text-gray-700",
+        )}
+      >
+        <Globe className="h-3 w-3" />
+        Published
+      </button>
+      <button
+        type="button"
+        role="radio"
+        aria-checked={!isPublished}
+        disabled={loading}
+        onClick={() => onChange(false)}
+        className={cn(
+          "flex h-6 items-center rounded-md px-2.5 text-[12px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60",
+          !isPublished
+            ? "bg-red-600 text-white shadow-sm"
+            : "text-gray-500 hover:text-gray-700",
+        )}
+      >
+        Unpublished
+      </button>
+    </div>
+  );
+}
 
 export function WebsiteBuilderShell({
   children,
@@ -28,17 +82,47 @@ export function WebsiteBuilderShell({
   const showWebsiteActions = pathname.startsWith("/website");
   const [device, setDevice] = useState<"desktop" | "mobile">("desktop");
   const [collapsed, setCollapsed] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
   const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
+  const [isNavigating, setIsNavigating] = useState(false);
   const actionsMenuRef = useRef<HTMLDivElement>(null);
+  const navigationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isMobileWorkspace = device === "mobile";
+
+  const { data: builderData } = useWebsiteBuilderData();
+  const saveWebsiteSettings = useSaveWebsiteSettings();
+  const { showToast } = useToast();
+  const websiteStatus = String(
+    (builderData?.website as Record<string, unknown> | undefined)?.status || "draft",
+  );
+  const isPublished = websiteStatus === "published";
+
+  function setPublished(publish: boolean) {
+    const nextStatus = publish ? "published" : "maintenance";
+    if (nextStatus === websiteStatus || saveWebsiteSettings.isPending) return;
+    setActionsMenuOpen(false);
+    saveWebsiteSettings.mutate(
+      { status: nextStatus },
+      {
+        onSuccess: () =>
+          showToast(
+            publish
+              ? "Website published."
+              : "Website unpublished — visitors will see the maintenance page.",
+          ),
+        onError: (error) =>
+          showToast(
+            error instanceof Error
+              ? error.message
+              : "Unable to update publish status.",
+            "error",
+          ),
+      },
+    );
+  }
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node))
-        setMenuOpen(false);
       if (actionsMenuRef.current && !actionsMenuRef.current.contains(e.target as Node))
         setActionsMenuOpen(false);
     }
@@ -52,9 +136,38 @@ export function WebsiteBuilderShell({
 
   useEffect(() => {
     setMobileSidebarOpen(false);
-    setMenuOpen(false);
     setActionsMenuOpen(false);
+    if (navigationTimerRef.current) {
+      clearTimeout(navigationTimerRef.current);
+      navigationTimerRef.current = null;
+    }
+    setIsNavigating(false);
   }, [pathname, device]);
+
+  useEffect(
+    () => () => {
+      if (navigationTimerRef.current) {
+        clearTimeout(navigationTimerRef.current);
+      }
+    },
+    [],
+  );
+
+  function handleCloseMobileSidebar() {
+    setMobileSidebarOpen(false);
+  }
+
+  function handleNavigationStart(href: string) {
+    setMobileSidebarOpen(false);
+    setActionsMenuOpen(false);
+
+    if (href !== pathname) {
+      if (navigationTimerRef.current) clearTimeout(navigationTimerRef.current);
+      navigationTimerRef.current = setTimeout(() => {
+        setIsNavigating(true);
+      }, 180);
+    }
+  }
 
   function toggleSidebar() {
     if (isMobileWorkspace || window.matchMedia("(max-width: 639px)").matches) {
@@ -66,6 +179,11 @@ export function WebsiteBuilderShell({
       localStorage.setItem("wb-sidebar-collapsed", next ? "1" : "0");
       return next;
     });
+  }
+
+  function openWebsitePreview() {
+    setActionsMenuOpen(false);
+    window.open("/preview", "_blank", "noopener,noreferrer");
   }
 
   return (
@@ -108,17 +226,6 @@ export function WebsiteBuilderShell({
 
           {/* Left: mobile toggle + logo */}
           <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
-
-            {/* Mobile toggle (hamburger) */}
-            <button
-              type="button"
-              onClick={toggleSidebar}
-              aria-label="Toggle navigation panel"
-              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[var(--radius-button)] border border-[var(--color-border)] bg-white text-gray-500 shadow-sm transition-colors hover:bg-gray-100 hover:text-[var(--color-text)] sm:hidden"
-            >
-              <PanelLeft className="h-3.5 w-3.5" />
-            </button>
-
             {/* Logo */}
             <div className={cn("flex min-w-0 items-center gap-1 sm:gap-1.5", !isMobileWorkspace && "sm:hidden")}>
               <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[var(--radius-button)] bg-[var(--color-primary)] text-white">
@@ -180,26 +287,17 @@ export function WebsiteBuilderShell({
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-7 shrink-0 gap-1.5 px-2 text-[12px] font-medium sm:px-2.5"
-                >
-                  <Save className="h-3 w-3" />
-                  <span>Save Draft</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
+                  onClick={openWebsitePreview}
                   className="h-7 shrink-0 gap-1.5 border-[var(--color-primary)]/30 px-2 text-[12px] font-medium text-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 sm:px-2.5"
                 >
                   <Eye className="h-3 w-3" />
                   <span>Preview Website</span>
                 </Button>
-                <Button
-                  size="sm"
-                  className="h-7 shrink-0 gap-1.5 bg-[var(--color-primary)] px-2 text-[12px] font-semibold hover:bg-[var(--color-primary)]/90 sm:px-3"
-                >
-                  <Globe className="h-3 w-3" />
-                  <span>Publish Website</span>
-                </Button>
+                <PublishToggle
+                  isPublished={isPublished}
+                  onChange={setPublished}
+                  loading={saveWebsiteSettings.isPending}
+                />
                 <div className="h-6 w-px shrink-0 bg-[var(--color-border)]" />
               </div>
             ) : null}
@@ -249,75 +347,39 @@ export function WebsiteBuilderShell({
                     style={{ top: "var(--header-height)" }}
                   >
                     <button
-                      onClick={() => setActionsMenuOpen(false)}
-                      className="flex w-full items-center gap-2.5 px-3 py-2.5 text-[13px] font-medium text-[var(--color-text)] transition-colors hover:bg-gray-50"
-                    >
-                      <Save className="h-4 w-4 text-[var(--color-text-secondary)]" />
-                      Save Draft
-                    </button>
-                    <button
-                      onClick={() => setActionsMenuOpen(false)}
+                      onClick={openWebsitePreview}
                       className="flex w-full items-center gap-2.5 px-3 py-2.5 text-[13px] font-medium text-[var(--color-text)] transition-colors hover:bg-gray-50"
                     >
                       <Eye className="h-4 w-4 text-[var(--color-text-secondary)]" />
                       Preview Website
                     </button>
-                    <button
-                      onClick={() => setActionsMenuOpen(false)}
-                      className="flex w-full items-center gap-2.5 px-3 py-2.5 text-[13px] font-semibold text-white transition-colors bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 mx-1 rounded-[var(--radius-button)] w-[calc(100%-8px)]"
-                    >
-                      <Globe className="h-4 w-4" />
-                      Publish Website
-                    </button>
+                    <div className="px-3 py-2.5">
+                      <PublishToggle
+                        isPublished={isPublished}
+                        onChange={setPublished}
+                        loading={saveWebsiteSettings.isPending}
+                      />
+                    </div>
                   </div>
                 )}
               </div>
             ) : null}
 
-            {/* User menu */}
-            <div ref={menuRef} className="relative shrink-0">
-              <button
+            <Link
+              href="/dashboard"
+              onClick={() => handleNavigationStart("/dashboard")}
+              className="shrink-0"
+            >
+              <Button
                 type="button"
-                onClick={() => setMenuOpen(!menuOpen)}
-                className="flex h-9 items-center gap-2 rounded-[var(--radius-button)] px-1.5 py-1 transition-colors hover:bg-gray-50 sm:px-2"
+                variant="outline"
+                size="sm"
+                className="h-8 gap-1.5 px-2.5 text-[12px] font-semibold"
               >
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary)] text-[10px] font-bold text-white">
-                  RK
-                </div>
-                <div className="hidden min-w-0 text-left lg:block">
-                  <p className="truncate text-[12px] font-semibold leading-4 text-[var(--color-text)]">
-                    Royal Kraft
-                  </p>
-                  <p className="truncate text-[10px] leading-3 text-[var(--color-text-secondary)]">
-                    View Profile
-                  </p>
-                </div>
-                <ChevronDown className="h-3.5 w-3.5 shrink-0 text-[var(--color-text-secondary)]" />
-              </button>
-              {menuOpen && (
-                <div
-                  className="fixed right-3 z-50 mt-1 w-48 rounded-[var(--radius-input)] border border-[var(--color-border)] bg-white py-1 shadow-lg"
-                  style={{ top: "var(--header-height)" }}
-                >
-                  <Link
-                    href="/settings"
-                    onClick={() => setMenuOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 text-[13px] font-medium text-[var(--color-text)] transition-colors hover:bg-gray-50"
-                  >
-                    <User className="h-4 w-4 text-[var(--color-text-secondary)]" />
-                    Profile
-                  </Link>
-                  <Link
-                    href="/login"
-                    onClick={() => setMenuOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 text-[13px] font-medium text-[var(--color-danger)] transition-colors hover:bg-red-50"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    Logout
-                  </Link>
-                </div>
-              )}
-            </div>
+                <ArrowLeft className="h-3.5 w-3.5" />
+                <span>Back to Dashboard</span>
+              </Button>
+            </Link>
           </div>
         </div>
       </header>
@@ -347,7 +409,8 @@ export function WebsiteBuilderShell({
           mobilePreview={isMobileWorkspace}
           mobileOpen={mobileSidebarOpen}
           mobileActionsVisible={showWebsiteActions}
-          onNavigate={() => setMobileSidebarOpen(false)}
+          onCloseMobile={handleCloseMobileSidebar}
+          onNavigate={handleNavigationStart}
         />
 
         <button
@@ -375,6 +438,15 @@ export function WebsiteBuilderShell({
             isMobileWorkspace && "bg-slate-100 p-2 sm:p-3",
           )}
         >
+          {isNavigating ? (
+            <div className="absolute inset-0 z-50 bg-white/88 backdrop-blur-[2px]">
+              <StatusLoader
+                embedded
+                message="Loading page..."
+                className="h-full min-h-0 bg-transparent"
+              />
+            </div>
+          ) : null}
           <div
             className={cn(
               "h-full min-w-0",

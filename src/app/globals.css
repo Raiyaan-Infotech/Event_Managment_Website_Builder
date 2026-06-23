@@ -88,6 +88,70 @@
   --vendor-radius-control: 4px;
 }
 
+.quill-editor-wrapper {
+  overflow: hidden;
+  border: 1px solid var(--vendor-border);
+  border-radius: var(--vendor-radius-panel);
+  background: var(--vendor-panel-bg);
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.quill-editor-wrapper:focus-within {
+  border-color: color-mix(in srgb, var(--vendor-primary-btn) 40%, white);
+  box-shadow: 0 0 0 3px rgb(36 87 214 / 0.08);
+}
+
+.ql-toolbar.ql-snow {
+  border: 0 !important;
+  border-bottom: 1px solid var(--vendor-border) !important;
+  background: #f8fafc;
+  padding: 10px 12px !important;
+}
+
+.ql-container.ql-snow {
+  border: 0 !important;
+}
+
+.ql-editor {
+  min-height: inherit !important;
+  padding: 14px 16px !important;
+  color: var(--vendor-text);
+  font-family: Inter, "Inter Fallback", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: var(--vendor-form-input-text);
+  font-weight: 500;
+  line-height: 1.6 !important;
+}
+
+.ql-editor.ql-blank::before {
+  left: 16px !important;
+  color: var(--vendor-text-muted) !important;
+  font-style: italic;
+}
+
+.ql-snow .ql-picker {
+  color: var(--vendor-text);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.ql-snow .ql-stroke {
+  stroke: #64748b !important;
+}
+
+.ql-snow .ql-fill {
+  fill: #64748b !important;
+}
+
+.ql-snow.ql-toolbar button:hover .ql-stroke,
+.ql-snow.ql-toolbar button.ql-active .ql-stroke {
+  stroke: var(--vendor-primary-btn) !important;
+}
+
+.ql-snow.ql-toolbar button:hover .ql-fill,
+.ql-snow.ql-toolbar button.ql-active .ql-fill {
+  fill: var(--vendor-primary-btn) !important;
+}
+
 * {
   box-sizing: border-box;
 }

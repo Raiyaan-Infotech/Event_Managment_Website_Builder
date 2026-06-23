@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { WebsiteBuilderLayout } from "../../_components/website-builder-layout";
 import {
   buildPagePayload,
+  isPageDraftComplete,
   mergeWebsitePages,
 } from "../_lib/page-store";
 import { PageEditorForm } from "../_components/page-editor-form";
@@ -27,10 +28,18 @@ export default function CreatePage() {
   const pages = React.useMemo(() => mergeWebsitePages(pageRecords), [pageRecords]);
   const isSaving = createPage.isPending;
 
-  const handleSave = async () => {
+  const handleSave = async (publish: boolean) => {
+    if (!isPageDraftComplete(draft)) {
+      showToast("Please fill all mandatory fields.", "error");
+      return;
+    }
     try {
-      const created = await createPage.mutateAsync(buildPagePayload(draft, pages));
-      router.push(`/website/pages/${encodeURIComponent(String(created.id))}/edit`);
+      await createPage.mutateAsync(
+        buildPagePayload({ ...draft, enabled: publish }, pages),
+      );
+      showToast(publish ? "Page published" : "Page saved as draft");
+      // After creating, go to the Pages List where it now appears.
+      router.push("/website/pages/list");
     } catch (error) {
       showToast(
         error instanceof Error ? error.message : "Unable to create page",
@@ -48,11 +57,15 @@ export default function CreatePage() {
         { label: "Create Page" },
       ]}
       form={<PageEditorForm draft={draft} onChange={setDraft} />}
-      onCancel={() => router.push("/website/pages")}
       leftClassName="border-0 bg-transparent p-0 shadow-none"
+      secondaryButton={{
+        label: "Save as Draft",
+        onClick: () => handleSave(false),
+        isLoading: isSaving,
+      }}
       primaryButton={{
-        label: "Create Page",
-        onClick: handleSave,
+        label: "Save & Publish",
+        onClick: () => handleSave(true),
         isLoading: isSaving,
       }}
       howItWorksLabel="How It Works"

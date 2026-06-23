@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
+import { StatusLoader } from "@/components/status-pages/status-loader";
 
 interface LoaderProps {
   size?: "sm" | "md" | "lg";
@@ -26,16 +27,7 @@ interface PageLoaderProps {
 }
 
 export function PageLoader({ message, className }: PageLoaderProps) {
-  return (
-    <div className={cn("flex h-[calc(100vh-120px)] items-center justify-center", className)}>
-      <div className="flex flex-col items-center gap-4">
-        <Spinner size="lg" />
-        {message ? (
-          <p className="text-[14px] font-medium text-[var(--color-text-secondary)]">{message}</p>
-        ) : null}
-      </div>
-    </div>
-  );
+  return <StatusLoader embedded message={message || "Loading..."} className={className} />;
 }
 
 interface InlineLoaderProps {

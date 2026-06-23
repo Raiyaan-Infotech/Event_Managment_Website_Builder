@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { HelpCircle, Loader2 } from "lucide-react";
+import { HelpCircle, Loader2, RotateCcw, Save } from "lucide-react";
 import { OutlineButton, PrimaryButton } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { PageBreadcrumbs } from "./page-breadcrumbs";
@@ -9,6 +9,7 @@ import {
   DesktopMobileToggle,
   type PreviewDevice,
 } from "./desktop-mobile-toggle";
+import { ConfirmDeleteButton } from "./confirm-delete-button";
 
 export interface WebsiteBuilderBreadcrumbItem {
   label: string;
@@ -24,15 +25,18 @@ export interface WebsiteBuilderPrimaryButtonProps {
 
 const pageSubtitles: Record<string, string> = {
   "Advanced Slider": "Manage your website advanced slider and Advanced Slider settings.",
-  "Basic Information": "Manage your website basic information and Basic Information settings.",
+  Header: "Manage your website header and Header settings.",
   "Footer Settings": "Manage your website footer settings and Footer Settings settings.",
   Gallery: "Manage your website gallery and Gallery settings.",
   " Categories": "Create and manage categories that organize your gallery images.",
   "Hero Section": "Manage your website hero section and Hero Section settings.",
-  "Legal Pages": "Manage your website legal pages and Legal Pages settings.",
   "Nav Menu": "Manage your website navigation menu and Nav Menu settings.",
+  "Contact Us": "Create and manage your contact form. Choose a method to build your form.",
+  "Contact Categories": "Create categories used by the dynamic contact form.",
+  "Contact List": "View and manage contact form messages.",
   Pages: "Manage your website pages and Pages settings.",
   "SEO Settings": "Manage your website SEO settings and SEO Settings settings.",
+  "Theme Color": "Manage your website theme colors and Theme Color settings.",
   "Simple Slider": "Manage your website simple slider and Simple Slider settings.",
   Testimonials: "Manage your website testimonials and Testimonials settings.",
   "Web UI Block": "Manage your website UI blocks and UI Block settings.",
@@ -53,8 +57,14 @@ interface WebsiteBuilderLayoutProps {
   onCancel?: () => void;
   onPreview?: () => void;
   onHowItWorks?: () => void;
+  onDelete?: () => void | Promise<void>;
+  onReset?: () => void;
   isSaving?: boolean;
   disableSave?: boolean;
+  deleteDisabled?: boolean;
+  resetDisabled?: boolean;
+  deleteItemLabel?: string;
+  showFormActions?: boolean;
   topActions?: React.ReactNode;
   previewHeaderAction?: React.ReactNode;
   previewDevice?: PreviewDevice;
@@ -68,6 +78,7 @@ interface WebsiteBuilderLayoutProps {
   sidebarClassName?: string;
   hideHeader?: boolean;
   primaryButton?: WebsiteBuilderPrimaryButtonProps;
+  secondaryButton?: WebsiteBuilderPrimaryButtonProps;
   previewTip?: string;
 }
 
@@ -86,8 +97,14 @@ export function WebsiteBuilderLayout({
   onCancel,
   onPreview,
   onHowItWorks,
+  onDelete,
+  onReset,
   isSaving = false,
   disableSave = false,
+  deleteDisabled = false,
+  resetDisabled = false,
+  deleteItemLabel,
+  showFormActions,
   topActions,
   previewHeaderAction,
   previewDevice: previewDeviceProp,
@@ -101,12 +118,16 @@ export function WebsiteBuilderLayout({
   sidebarClassName,
   hideHeader = false,
   primaryButton,
+  secondaryButton,
   previewTip = "Changes you make on the left will reflect in the live preview instantly.",
 }: WebsiteBuilderLayoutProps) {
   const [internalDevice, setInternalDevice] = React.useState<PreviewDevice>("desktop");
   const activeDevice = previewDeviceProp ?? internalDevice;
   const resolvedSubtitle = subtitle ?? (title ? pageSubtitles[title] : undefined);
   const showLoadingOverlay = primaryButton?.isLoading ?? isSaving;
+  const shouldShowFormActions =
+    showFormActions ?? Boolean(primaryButton || secondaryButton || onSave || onReset || onDelete);
+  const resetHandler = onReset ?? onCancel;
   const handleDeviceChange = (d: PreviewDevice) => {
     setInternalDevice(d);
     onPreviewDeviceChange?.(d);
@@ -141,32 +162,79 @@ export function WebsiteBuilderLayout({
 
           <div className="flex shrink-0 items-center gap-1.5">
             {topActions}
-            {onHowItWorks && (
+            {shouldShowFormActions ? (
+              <>
               <OutlineButton
                 type="button"
                 size="sm"
-                onClick={onHowItWorks}
+                onClick={
+                  onHowItWorks ??
+                  (() =>
+                    window.alert(
+                      `Complete the ${title ?? "page"} form, use Reset to clear its fields, and Save when ready.`,
+                    ))
+                }
                 className="h-8 shrink-0 px-2.5 text-[11px] sm:px-3"
               >
                 <HelpCircle className="h-3.5 w-3.5 shrink-0" />
                 <span className="hidden sm:inline">{howItWorksLabel}</span>
               </OutlineButton>
-            )}
-            {(primaryButton || onSave) && (
+
+              {onDelete ? (
+                <ConfirmDeleteButton
+                  size="sm"
+                  onConfirm={onDelete}
+                  disabled={deleteDisabled || showLoadingOverlay}
+                  itemLabel={deleteItemLabel ?? title}
+                  title="Delete current item?"
+                  description="Saved records are deleted permanently; unsaved drafts are removed from the current form."
+                  className="h-8 shrink-0 px-2.5 text-[11px] text-rose-600 hover:text-rose-700 sm:px-3"
+                >
+                  Delete
+                </ConfirmDeleteButton>
+              ) : resetHandler ? (
+                <OutlineButton
+                  type="button"
+                  size="sm"
+                  onClick={resetHandler}
+                  disabled={resetDisabled || showLoadingOverlay}
+                  className="h-8 shrink-0 border-rose-200 px-2.5 text-[11px] text-rose-600 hover:bg-rose-50 hover:text-rose-700 sm:px-3"
+                >
+                  <RotateCcw className="h-3.5 w-3.5 shrink-0" />
+                  Reset
+                </OutlineButton>
+              ) : null}
+
+              {secondaryButton ? (
+                <OutlineButton
+                  type="button"
+                  size="sm"
+                  onClick={secondaryButton.onClick}
+                  disabled={secondaryButton.disabled || secondaryButton.isLoading}
+                  className="h-8 shrink-0 px-3 text-[11px]"
+                >
+                  {secondaryButton.label}
+                </OutlineButton>
+              ) : null}
+
               <PrimaryButton
                 type="button"
                 size="sm"
                 onClick={primaryButton?.onClick ?? onSave}
                 disabled={
-                  primaryButton
-                    ? primaryButton.disabled || primaryButton.isLoading
-                    : disableSave || isSaving
+                  !primaryButton && !onSave
+                    ? true
+                    : primaryButton
+                      ? primaryButton.disabled || primaryButton.isLoading
+                      : disableSave || isSaving
                 }
                 className="h-8 shrink-0 px-3 text-[11px]"
               >
+                <Save className="h-3.5 w-3.5 shrink-0" />
                 {primaryButton?.label ?? saveLabel}
               </PrimaryButton>
-            )}
+              </>
+            ) : null}
           </div>
         </header>
       )}

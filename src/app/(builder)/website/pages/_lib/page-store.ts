@@ -23,6 +23,7 @@ export interface PageDraft {
 }
 
 export const DEFAULT_PAGE_CONTENT = "<p> </p>";
+export const MAINTENANCE_PAGE_SLUG = "maintenance";
 
 const SYSTEM_PAGES: Array<{
   routeKey: string;
@@ -40,11 +41,11 @@ const SYSTEM_PAGES: Array<{
     pageType: "system",
   },
   {
-    routeKey: "services",
-    title: "Services",
-    slug: "services",
+    routeKey: "service",
+    title: "Service",
+    slug: "service",
     content:
-      "<h2>Our Services</h2><p>Describe the event services, packages, and experiences you offer.</p>",
+      "<h2>Our Service</h2><p>Describe the event service, packages, and experiences you offer.</p>",
     pageType: "system",
   },
   {
@@ -55,7 +56,46 @@ const SYSTEM_PAGES: Array<{
       "<h2>Events</h2><p>Showcase weddings, corporate events, celebrations, and other event categories.</p>",
     pageType: "system",
   },
+  {
+    routeKey: "terms-conditions",
+    title: "Terms & Conditions",
+    slug: "terms-conditions",
+    content:
+      "<h2>Terms &amp; Conditions</h2><p>Add the terms and conditions visitors agree to when signing up or using your website.</p>",
+    pageType: "system",
+  },
+  {
+    routeKey: "privacy-policy",
+    title: "Privacy Policy",
+    slug: "privacy-policy",
+    content:
+      "<h2>Privacy Policy</h2><p>Explain how you collect, use, and protect your visitors' personal information.</p>",
+    pageType: "system",
+  },
+  {
+    routeKey: MAINTENANCE_PAGE_SLUG,
+    title: "Maintenance",
+    slug: MAINTENANCE_PAGE_SLUG,
+    content:
+      "<p>We're currently performing some upgrades to improve your experience.</p><p>Please check back soon.</p>",
+    pageType: "system",
+  },
 ];
+
+// Canonical slugs of the built-in fixed pages.
+export const SYSTEM_PAGE_SLUGS = new Set(
+  SYSTEM_PAGES.map((page) => page.slug.toLowerCase()),
+);
+
+// A page is "fixed" if the backend flagged it system, its type is system, OR its
+// slug matches a known built-in page (covers rows saved before is_system existed).
+export function isFixedPage(page: WebsitePage) {
+  return (
+    page.isSystem ||
+    page.pageType === "system" ||
+    SYSTEM_PAGE_SLUGS.has(String(page.slug || "").replace(/^\/+/, "").toLowerCase())
+  );
+}
 
 export const INITIAL_PAGES: WebsitePage[] = SYSTEM_PAGES.map((page, index) => ({
   id: page.routeKey,
@@ -102,6 +142,12 @@ export function createUniqueSlug(title: string, pages: WebsitePage[], excludeId?
   }
 
   return nextSlug;
+}
+
+// A page is only saveable when BOTH the title and the (rich-text) content have
+// real text — an "empty" editor still produces markup like "<p> </p>".
+export function isPageDraftComplete(draft: PageDraft) {
+  return draft.title.trim().length > 0 && stripHtml(draft.content || "").length > 0;
 }
 
 export function toPageDraft(page: WebsitePage): PageDraft {
@@ -157,10 +203,16 @@ export function buildPagePayload(
 ) {
   const cleanTitle = draft.title.trim() || "Untitled Page";
   const currentPage = options?.page;
-  const slug = createUniqueSlug(cleanTitle, pages, currentPage?.id);
   const content = draft.content.trim() || DEFAULT_PAGE_CONTENT;
   const description = stripHtml(content).slice(0, 160);
   const isSystem = options?.isSystem ?? currentPage?.isSystem ?? false;
+  // System pages have stable route identities. Their visible title may be
+  // edited, but changing it must not break menu links or special rendering
+  // such as the unpublished-site Maintenance page.
+  const slug =
+    isSystem && currentPage
+      ? currentPage.slug
+      : createUniqueSlug(cleanTitle, pages, currentPage?.id);
 
   return {
     title: cleanTitle,

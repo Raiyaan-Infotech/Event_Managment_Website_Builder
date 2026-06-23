@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { createPortal } from "react-dom";
 import { Check, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -10,6 +11,7 @@ interface SelectContextValue {
   open: boolean;
   setOpen: (open: boolean) => void;
   onValueChange?: (value: string) => void;
+  triggerRef: React.RefObject<HTMLButtonElement | null>;
 }
 
 const SelectContext = React.createContext<SelectContextValue | null>(null);
@@ -31,10 +33,11 @@ interface SelectProps {
 
 export function Select({ value, disabled, onValueChange, children }: SelectProps) {
   const [open, setOpen] = React.useState(false);
+  const triggerRef = React.useRef<HTMLButtonElement | null>(null);
 
   return (
-    <SelectContext.Provider value={{ value, disabled, open, setOpen, onValueChange }}>
-      <div className="relative w-full flex">{children}</div>
+    <SelectContext.Provider value={{ value, disabled, open, setOpen, onValueChange, triggerRef }}>
+      <div className="relative flex w-full">{children}</div>
     </SelectContext.Provider>
   );
 }
@@ -44,10 +47,11 @@ export function SelectTrigger({
   children,
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
-  const { disabled, open, setOpen } = useSelect();
+  const { disabled, open, setOpen, triggerRef } = useSelect();
 
   return (
     <button
+      ref={triggerRef}
       type="button"
       disabled={disabled}
       aria-expanded={open}
@@ -81,19 +85,58 @@ export function SelectContent({
   className?: string;
   children: React.ReactNode;
 }) {
-  const { open } = useSelect();
+  const { open, setOpen, triggerRef } = useSelect();
+  const contentRef = React.useRef<HTMLDivElement | null>(null);
+  const [rect, setRect] = React.useState<DOMRect | null>(null);
 
-  if (!open) return null;
+  // Position the dropdown via fixed coordinates from the trigger so it escapes
+  // any `overflow` ancestor (e.g. scrollable tables) instead of being clipped.
+  React.useLayoutEffect(() => {
+    if (!open) return;
+    const update = () => {
+      if (triggerRef.current) setRect(triggerRef.current.getBoundingClientRect());
+    };
+    update();
+    window.addEventListener("scroll", update, true);
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update, true);
+      window.removeEventListener("resize", update);
+    };
+  }, [open, triggerRef]);
 
-  return (
+  React.useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (triggerRef.current?.contains(target)) return;
+      if (contentRef.current?.contains(target)) return;
+      setOpen(false);
+    };
+    document.addEventListener("mousedown", onPointerDown);
+    return () => document.removeEventListener("mousedown", onPointerDown);
+  }, [open, setOpen, triggerRef]);
+
+  if (!open || !rect || typeof document === "undefined") return null;
+
+  return createPortal(
     <div
+      ref={contentRef}
+      style={{
+        position: "fixed",
+        top: rect.bottom + 4,
+        left: rect.left,
+        minWidth: rect.width,
+        zIndex: 1000,
+      }}
       className={cn(
-        "absolute left-0 top-[calc(100%+0.25rem)] z-50 min-w-full overflow-hidden rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-1 text-[var(--vendor-text)] shadow-lg",
+        "max-h-[260px] overflow-auto rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-1 text-[var(--vendor-text)] shadow-lg",
         className,
       )}
     >
       {children}
-    </div>
+    </div>,
+    document.body,
   );
 }
 

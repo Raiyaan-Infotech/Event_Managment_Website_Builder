@@ -1,14 +1,18 @@
 "use client";
 
 import * as React from "react";
+import { Plus, X } from "lucide-react";
 import { WebsiteBuilderLayout } from "../_components/website-builder-layout";
 import { FormSection } from "../_components/form-section";
-import { BuilderCountedInput } from "../_components/builder-field";
+import {
+  BuilderCountedInput,
+  BuilderCountedTextarea,
+} from "../_components/builder-field";
 import {
   MultiImageUpload,
   type MultiImageUploadItem,
 } from "../_components/multi-image-upload";
-import { ImageCropper } from "../_components/image-cropper";
+import { ImageCropper } from "../_components/image-cropper-lazy";
 import {
   Select,
   SelectContent,
@@ -18,13 +22,20 @@ import {
 } from "@/components/ui/select";
 import {
   useCreateGalleryItem,
+  useCreateGalleryCategory,
   useDeleteGalleryItem,
   useGalleryCategories,
   useGalleryItems,
   useUploadVendorMedia,
 } from "@/hooks/use-website-builder";
+import { Switch } from "@/components/ui/switch";
+import { useToast } from "@/components/ui/toast";
 import { resolveMediaUrl } from "@/lib/utils";
-import { buildGalleryFilterOptions, mapGalleryCategories } from "./_lib/gallery-categories";
+import {
+  buildGalleryFilterOptions,
+  mapGalleryCategories,
+  toSlug,
+} from "./_lib/gallery-categories";
 
 const card =
   "rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-3 shadow-sm";
@@ -39,12 +50,21 @@ function GalleryPreview({
   images,
   filters,
   selectedFilterValue,
+  onSave,
+  saveDisabled,
+  isSaving,
+  onAddCategory,
 }: {
   images: GalleryEditorImage[];
   filters: Array<{ label: string; value: string }>;
   selectedFilterValue?: string | null;
+  onSave?: () => void;
+  saveDisabled?: boolean;
+  isSaving?: boolean;
+  onAddCategory: () => void;
 }) {
   const [activeFilter, setActiveFilter] = React.useState("all");
+  const [confirmOpen, setConfirmOpen] = React.useState(false);
 
   const filterOptions = React.useMemo(
     () => [{ label: "All", value: "all" }, ...filters],
@@ -70,6 +90,24 @@ function GalleryPreview({
         <span className="min-w-0 flex-1 text-[11px] leading-4 text-[var(--vendor-text-muted)]">
           This is how your gallery will appear on the website.
         </span>
+        {onSave ? (
+          <button
+            type="button"
+            onClick={() => setConfirmOpen(true)}
+            disabled={saveDisabled || isSaving}
+            className="shrink-0 rounded-md bg-[var(--vendor-primary-btn)] px-3 py-1.5 text-[11px] font-bold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isSaving ? "Saving…" : "Save Gallery"}
+          </button>
+        ) : null}
+        <button
+          type="button"
+          onClick={onAddCategory}
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-[var(--vendor-primary-btn)] px-3 py-1.5 text-[11px] font-bold text-white transition hover:opacity-90"
+        >
+          <Plus className="h-3.5 w-3.5" />
+          Add Category
+        </button>
       </div>
 
       <div className="flex flex-wrap gap-1.5">
@@ -90,28 +128,231 @@ function GalleryPreview({
       </div>
 
       {visibleImages.length > 0 ? (
-        <div className="[column-count:3] [column-gap:2px] overflow-hidden rounded-[var(--vendor-radius-control)] bg-slate-200">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {visibleImages.map((img) => (
-            <div key={img.id} className="mb-[2px] break-inside-avoid overflow-hidden">
+            <div
+              key={img.id}
+              className="aspect-[4/3] overflow-hidden rounded-[12px] bg-slate-100"
+            >
               <img
                 src={img.imageUrl}
                 alt={img.alt ?? "Gallery image"}
-                className="block w-full object-cover"
+                className="h-full w-full object-cover"
               />
             </div>
           ))}
         </div>
       ) : (
-        <div className="[column-count:3] [column-gap:2px] overflow-hidden rounded-[var(--vendor-radius-control)] bg-slate-100">
-          {[180, 120, 150, 140, 160, 110, 130, 170, 125].map((height, index) => (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {Array.from({ length: 8 }).map((_, index) => (
             <div
               key={index}
-              className="mb-[2px] break-inside-avoid bg-slate-200"
-              style={{ height }}
+              className="aspect-[4/3] rounded-[12px] bg-slate-200"
             />
           ))}
         </div>
       )}
+
+      {confirmOpen ? (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4"
+          onClick={() => setConfirmOpen(false)}
+        >
+          <div
+            className="w-full max-w-sm rounded-[12px] bg-white p-5 shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h3 className="text-[15px] font-black text-[var(--vendor-text)]">
+              Save gallery?
+            </h3>
+            <p className="mt-1.5 text-[12px] text-[var(--vendor-text-muted)]">
+              The selected images will be saved and shown on your website gallery.
+            </p>
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setConfirmOpen(false)}
+                className="rounded-md border border-[var(--vendor-border)] px-3 py-1.5 text-[12px] font-semibold text-[var(--vendor-text-muted)] transition hover:bg-slate-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setConfirmOpen(false);
+                  onSave?.();
+                }}
+                className="rounded-md bg-[var(--vendor-primary-btn)] px-4 py-1.5 text-[12px] font-bold text-white transition hover:opacity-90"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+type GalleryCategoryDraft = {
+  name: string;
+  slug: string;
+  description: string;
+  active: boolean;
+  order: number;
+};
+
+function GalleryCategoryModal({
+  open,
+  nextOrder,
+  isSaving,
+  onClose,
+  onSave,
+}: {
+  open: boolean;
+  nextOrder: number;
+  isSaving: boolean;
+  onClose: () => void;
+  onSave: (draft: GalleryCategoryDraft) => Promise<void>;
+}) {
+  const [draft, setDraft] = React.useState<GalleryCategoryDraft>({
+    name: "",
+    slug: "",
+    description: "",
+    active: true,
+    order: nextOrder,
+  });
+
+  React.useEffect(() => {
+    if (!open) return;
+    setDraft({
+      name: "",
+      slug: "",
+      description: "",
+      active: true,
+      order: nextOrder,
+    });
+  }, [nextOrder, open]);
+
+  if (!open) return null;
+
+  const canSave = Boolean(draft.name.trim() && toSlug(draft.slug || draft.name));
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/55 p-4 backdrop-blur-[2px]"
+      onClick={() => !isSaving && onClose()}
+    >
+      <form
+        className="w-full max-w-2xl rounded-[12px] border border-[var(--vendor-border)] bg-white p-5 shadow-2xl"
+        onClick={(event) => event.stopPropagation()}
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (canSave && !isSaving) void onSave(draft);
+        }}
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-[16px] font-black text-[var(--vendor-text)]">
+              Add Gallery Category
+            </h2>
+            <p className="mt-1 text-[11px] text-[var(--vendor-text-muted)]">
+              Create a category without leaving the Gallery Images page.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={isSaving}
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--vendor-radius-control)] text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 disabled:opacity-50"
+            aria-label="Close category modal"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <BuilderCountedInput
+            label="Category Name"
+            required
+            value={draft.name}
+            onChange={(name) =>
+              setDraft((current) => ({
+                ...current,
+                name,
+                slug: toSlug(name),
+              }))
+            }
+            maxLength={80}
+            placeholder="e.g. Wedding"
+          />
+          <BuilderCountedInput
+            label="Slug"
+            required
+            value={draft.slug}
+            onChange={(slug) =>
+              setDraft((current) => ({ ...current, slug: toSlug(slug) }))
+            }
+            maxLength={80}
+            placeholder="e.g. wedding"
+          />
+          <BuilderCountedTextarea
+            label="Description (Optional)"
+            value={draft.description}
+            onChange={(description) =>
+              setDraft((current) => ({ ...current, description }))
+            }
+            maxLength={180}
+            placeholder="Write a short description..."
+            textareaClassName="min-h-[92px]"
+            className="sm:col-span-2"
+          />
+          <div className="space-y-1.5">
+            <p className="text-[10px] font-semibold text-slate-600">Status</p>
+            <div className="flex h-9 items-center justify-between rounded-[var(--vendor-radius-control)] border border-[var(--vendor-border)] bg-white px-3 shadow-xs">
+              <span className="text-[11px] font-bold text-slate-700">
+                {draft.active ? "Active" : "Inactive"}
+              </span>
+              <Switch
+                checked={draft.active}
+                onCheckedChange={(active) =>
+                  setDraft((current) => ({ ...current, active }))
+                }
+              />
+            </div>
+          </div>
+          <BuilderCountedInput
+            label="Display Order"
+            value={String(draft.order)}
+            onChange={(value) =>
+              setDraft((current) => ({
+                ...current,
+                order: Math.max(1, Number(value.replace(/\D/g, "")) || 1),
+              }))
+            }
+            maxLength={3}
+            showCount={false}
+          />
+        </div>
+
+        <div className="mt-5 flex justify-end gap-2 border-t border-[var(--vendor-border)] pt-4">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={isSaving}
+            className="h-9 rounded-[var(--vendor-radius-control)] border border-[var(--vendor-border)] px-4 text-[12px] font-semibold text-[var(--vendor-text-muted)] transition hover:bg-slate-50 disabled:opacity-50"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={!canSave || isSaving}
+            className="h-9 rounded-[var(--vendor-radius-control)] bg-[var(--vendor-primary-btn)] px-4 text-[12px] font-bold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isSaving ? "Saving..." : "Save Gallery Category"}
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
@@ -119,9 +360,11 @@ function GalleryPreview({
 export default function GalleryPage() {
   const { data: categoryRecords = [] } = useGalleryCategories();
   const { data: galleryItemRecords = [] } = useGalleryItems();
+  const createGalleryCategory = useCreateGalleryCategory();
   const createGalleryItem = useCreateGalleryItem();
   const deleteGalleryItem = useDeleteGalleryItem();
   const uploadVendorMedia = useUploadVendorMedia();
+  const { showToast } = useToast();
 
   const [eventName, setEventName] = React.useState("");
   const [selectedCategoryId, setSelectedCategoryId] = React.useState("");
@@ -138,6 +381,10 @@ export default function GalleryPage() {
     Array<{ file: File; dataUrl: string; categoryValue?: string }>
   >([]);
   const [isSaving, setIsSaving] = React.useState(false);
+  const [categoryModalOpen, setCategoryModalOpen] = React.useState(false);
+  const [isCategorySaving, setIsCategorySaving] = React.useState(false);
+  const categoryInitializedRef = React.useRef(false);
+  const galleryDetailsInitializedRef = React.useRef(false);
 
   const categories = React.useMemo(
     () => mapGalleryCategories(categoryRecords, galleryItemRecords),
@@ -149,19 +396,44 @@ export default function GalleryPage() {
     [categories],
   );
 
-  React.useEffect(() => {
-    if (!selectedCategoryId && activeCategoryOptions.length) {
-      setSelectedCategoryId(String(activeCategoryOptions[0].id));
+  const handleCreateCategory = async (draft: GalleryCategoryDraft) => {
+    setIsCategorySaving(true);
+    try {
+      const created = await createGalleryCategory.mutateAsync({
+        name: draft.name.trim(),
+        slug: toSlug(draft.slug || draft.name),
+        description: draft.description.trim(),
+        sort_order: draft.order,
+        is_active: draft.active,
+      });
+      setSelectedCategoryId(String(created.id));
+      setCategoryModalOpen(false);
+      showToast("Gallery category saved");
+    } catch (error) {
+      showToast(
+        error instanceof Error ? error.message : "Unable to save gallery category",
+        "error",
+      );
+    } finally {
+      setIsCategorySaving(false);
     }
-  }, [activeCategoryOptions, selectedCategoryId]);
+  };
 
   React.useEffect(() => {
-    if ((eventName || city || selectedCategoryId) || !galleryItemRecords.length) return;
+    if (!categoryInitializedRef.current && activeCategoryOptions.length) {
+      categoryInitializedRef.current = true;
+      setSelectedCategoryId(String(activeCategoryOptions[0].id));
+    }
+  }, [activeCategoryOptions]);
+
+  React.useEffect(() => {
+    if (galleryDetailsInitializedRef.current || !galleryItemRecords.length) return;
+    galleryDetailsInitializedRef.current = true;
     const firstItem = galleryItemRecords[0];
     if (firstItem.event_name) setEventName(firstItem.event_name);
     if (firstItem.city) setCity(firstItem.city);
     if (firstItem.category_id) setSelectedCategoryId(String(firstItem.category_id));
-  }, [city, eventName, galleryItemRecords, selectedCategoryId]);
+  }, [galleryItemRecords]);
 
   const selectedCategory = React.useMemo(
     () =>
@@ -226,11 +498,8 @@ export default function GalleryPage() {
       files.map(
         (file) =>
           new Promise<{ file: File; dataUrl: string; categoryValue?: string }>((resolve, reject) => {
-            if (file.size > 5 * 1024 * 1024) {
-              reject(new Error(`${file.name} is too large.`));
-              return;
-            }
-
+            // Size limit is enforced centrally by <MultiImageUpload maxSizeMb />,
+            // so only valid (<= limit) image files reach here.
             const reader = new FileReader();
             reader.onloadend = () =>
               resolve({
@@ -255,7 +524,8 @@ export default function GalleryPage() {
             }> => result.status === "fulfilled",
           )
           .map((result) => result.value);
-        openNextInQueue(items);
+
+        if (items.length) openNextInQueue(items);
       });
   };
 
@@ -355,9 +625,8 @@ export default function GalleryPage() {
   const handleCancel = () => {
     setEventName("");
     setCity("");
-    if (activeCategoryOptions.length) {
-      setSelectedCategoryId(String(activeCategoryOptions[0].id));
-    }
+    setSelectedCategoryId("");
+    setCategoryModalOpen(false);
     resetPendingImages();
   };
 
@@ -425,10 +694,11 @@ export default function GalleryPage() {
             onAdd={addImages}
             onRemove={removeImage}
             maxItems={50}
+            maxSizeMb={5}
             tileSize={72}
             variant="fullwidth"
             uploadHeight={120}
-            hint="PNG, JPG up to 5MB"
+            hint="Recommended: 1200x900px gallery image (Max. 5MB each)"
           />
         </FormSection>
       </div>
@@ -440,6 +710,7 @@ export default function GalleryPage() {
           value: category.value,
         }))}
         selectedFilterValue={selectedCategory?.value || "all"}
+        onAddCategory={() => setCategoryModalOpen(true)}
       />
     </div>
   );
@@ -466,6 +737,13 @@ export default function GalleryPage() {
             !selectedCategory ||
             !pendingImages.some((item) => item.file),
         }}
+      />
+      <GalleryCategoryModal
+        open={categoryModalOpen}
+        nextOrder={categories.length + 1}
+        isSaving={isCategorySaving}
+        onClose={() => setCategoryModalOpen(false)}
+        onSave={handleCreateCategory}
       />
       <ImageCropper
         open={cropperOpen}

@@ -8,9 +8,14 @@ interface ImageUploadProps {
   value?: string;
   recommendedSize?: string;
   maxFileSize?: string;
+  /** Maximum allowed image size in MB. Larger files are rejected. Default 2. */
+  maxSizeMb?: number;
   onFileSelect?: (file: File) => void;
   onRemove?: () => void;
   className?: string;
+  previewClassName?: string;
+  uploadClassName?: string;
+  alt?: string;
 }
 
 export function ImageUpload({
@@ -18,24 +23,44 @@ export function ImageUpload({
   value,
   recommendedSize,
   maxFileSize,
+  maxSizeMb = 2,
   onFileSelect,
   onRemove,
   className,
+  previewClassName,
+  uploadClassName,
+  alt = "Uploaded image",
 }: ImageUploadProps) {
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const [error, setError] = React.useState("");
+
+  const maxBytes = maxSizeMb > 0 ? maxSizeMb * 1024 * 1024 : Infinity;
+  const sizeHint = maxFileSize ?? (maxSizeMb > 0 ? `${maxSizeMb}MB` : undefined);
 
   const handleClick = () => inputRef.current?.click();
 
+  const acceptFile = (file?: File | null) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setError("Please choose an image file.");
+      return;
+    }
+    if (file.size > maxBytes) {
+      setError(`Image is too large. Maximum ${maxSizeMb}MB.`);
+      return;
+    }
+    setError("");
+    onFileSelect?.(file);
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && onFileSelect) onFileSelect(file);
+    acceptFile(e.target.files?.[0]);
     e.target.value = "";
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
-    const file = e.dataTransfer.files?.[0];
-    if (file && onFileSelect) onFileSelect(file);
+    acceptFile(e.dataTransfer.files?.[0]);
   };
 
   return (
@@ -51,8 +76,8 @@ export function ImageUpload({
         <div className="relative rounded-[var(--vendor-radius-control)] overflow-hidden border border-[var(--vendor-border)]">
           <img
             src={value}
-            alt="Slide"
-            className="w-full h-24 object-cover"
+            alt={alt}
+            className={cn("w-full h-24 object-cover", previewClassName)}
           />
           <button
             type="button"
@@ -71,7 +96,10 @@ export function ImageUpload({
           onKeyDown={(e) => e.key === "Enter" && handleClick()}
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}
-          className="flex flex-col items-center justify-center gap-1 rounded-[var(--vendor-radius-control)] border border-dashed border-[var(--vendor-border)] bg-slate-50/60 px-4 py-4 text-center cursor-pointer hover:bg-slate-100/60 transition-colors"
+          className={cn(
+            "flex flex-col items-center justify-center gap-1 rounded-[var(--vendor-radius-control)] border border-dashed border-[var(--vendor-border)] bg-slate-50/60 px-4 py-4 text-center cursor-pointer hover:bg-slate-100/60 transition-colors",
+            uploadClassName,
+          )}
         >
           <CloudUpload className="h-6 w-6 text-[var(--vendor-text-muted)] mb-0.5" />
           <p className="text-[11px] font-semibold text-[var(--vendor-text)]">
@@ -80,13 +108,17 @@ export function ImageUpload({
           <p className="text-[10px] text-[var(--vendor-text-muted)]">
             or drag and drop
           </p>
-          {(recommendedSize || maxFileSize) && (
+          {(recommendedSize || sizeHint) && (
             <p className="text-[10px] text-[var(--vendor-text-muted)] mt-0.5 leading-tight">
               {recommendedSize && <>Recommended: {recommendedSize}<br /></>}
-              {maxFileSize && `(Max: ${maxFileSize})`}
+              {sizeHint && `(Max: ${sizeHint})`}
             </p>
           )}
         </div>
+      )}
+
+      {error && (
+        <p className="text-[10px] font-medium text-rose-500">{error}</p>
       )}
 
       <input

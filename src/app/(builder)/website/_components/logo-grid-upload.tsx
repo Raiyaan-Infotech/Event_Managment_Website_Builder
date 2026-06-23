@@ -46,7 +46,7 @@ export function LogoGridUpload({
               alt={item.alt ?? "Uploaded logo"}
               width={160}
               height={90}
-              className="max-h-full w-auto object-contain"
+              className="max-h-full w-auto rounded-[var(--vendor-radius-control)] object-contain"
               unoptimized
             />
             {onRemove ? (

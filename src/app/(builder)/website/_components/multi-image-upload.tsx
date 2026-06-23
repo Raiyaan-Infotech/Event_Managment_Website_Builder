@@ -21,6 +21,8 @@ interface MultiImageUploadProps {
   tileSize?: number;
   recommendedSize?: string;
   maxFileSize?: string;
+  /** Maximum allowed image size in MB. Larger files are skipped. Default 2. */
+  maxSizeMb?: number;
   hint?: string;
   variant?: "tile" | "fullwidth";
   uploadHeight?: number;
@@ -42,6 +44,7 @@ export function MultiImageUpload({
   tileSize = 92,
   recommendedSize,
   maxFileSize,
+  maxSizeMb = 2,
   hint,
   variant = "tile",
   uploadHeight = 180,
@@ -54,22 +57,38 @@ export function MultiImageUpload({
   const inputRef = React.useRef<HTMLInputElement>(null);
   const inputId = React.useId();
   const [isDragging, setIsDragging] = React.useState(false);
+  const [error, setError] = React.useState("");
   const canAdd = !disabled && items.length < maxItems;
+  const maxBytes = maxSizeMb > 0 ? maxSizeMb * 1024 * 1024 : Infinity;
 
   const addFiles = (fileList: FileList | File[] | null | undefined) => {
     if (!fileList || !canAdd) return;
     const availableSlots = Math.max(maxItems - items.length, 0);
-    const files = Array.from(fileList)
-      .filter((file) => file.type.startsWith("image/"))
+    const images = Array.from(fileList).filter((file) =>
+      file.type.startsWith("image/"),
+    );
+    const tooBig = images.filter((file) => file.size > maxBytes);
+    const files = images
+      .filter((file) => file.size <= maxBytes)
       .slice(0, availableSlots);
+
+    if (tooBig.length) {
+      setError(
+        `${tooBig.length === 1 ? "1 image is" : `${tooBig.length} images are`} larger than ${maxSizeMb}MB and ${tooBig.length === 1 ? "was" : "were"} skipped.`,
+      );
+    } else {
+      setError("");
+    }
+
     if (files.length) onAdd?.(files);
   };
 
+  const sizeHint = maxFileSize ?? (maxSizeMb > 0 ? `${maxSizeMb}MB` : undefined);
   const hintText = hint ?? (
     recommendedSize
-      ? `${recommendedSize}${maxFileSize ? ` (Max: ${maxFileSize})` : ""}`
-      : maxFileSize
-      ? `(Max: ${maxFileSize})`
+      ? `${recommendedSize}${sizeHint ? ` (Max: ${sizeHint})` : ""}`
+      : sizeHint
+      ? `(Max: ${sizeHint})`
       : null
   );
 
@@ -215,6 +234,10 @@ export function MultiImageUpload({
             />
           </label>
         </div>
+      )}
+
+      {error && (
+        <p className="text-[11px] font-medium text-rose-500">{error}</p>
       )}
 
       <p className="text-[12px] font-medium text-[var(--vendor-text-muted)]">

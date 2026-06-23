@@ -9,22 +9,31 @@ import type { PageDraft } from "../_lib/page-store";
 interface PageEditorFormProps {
   draft: PageDraft;
   onChange: (draft: PageDraft) => void;
+  // Fixed pages are always published, so the active toggle is hidden for them.
+  showActive?: boolean;
 }
 
 const card =
   "rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-3 shadow-sm";
 
-export function PageEditorForm({ draft, onChange }: PageEditorFormProps) {
+export function PageEditorForm({ draft, onChange, showActive = true }: PageEditorFormProps) {
   return (
     <div className="space-y-3">
       <FormSection
         title="Page Title"
         className={card}
         actions={
-          <Switch
-            checked={draft.enabled}
-            onCheckedChange={(enabled) => onChange({ ...draft, enabled })}
-          />
+          showActive ? (
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-semibold text-[var(--vendor-text-muted)]">
+                {draft.enabled ? "Active" : "Inactive"}
+              </span>
+              <Switch
+                checked={draft.enabled}
+                onCheckedChange={(enabled) => onChange({ ...draft, enabled })}
+              />
+            </div>
+          ) : undefined
         }
       >
         <BuilderCountedInput

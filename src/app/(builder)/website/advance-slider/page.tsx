@@ -3,6 +3,7 @@ import * as React from "react";
 import { WebsiteBuilderLayout } from "../_components/website-builder-layout";
 import { FormSection } from "../_components/form-section";
 import { ImageUpload } from "../_components/image-upload";
+import { ImageCropper } from "../_components/image-cropper-lazy";
 import { ColorPickerInput } from "../_components/color-picker-input";
 import { ToggleField } from "../_components/toggle-field";
 import {
@@ -12,22 +13,31 @@ import {
 import {
   BuilderCountedInput,
   BuilderCountedTextarea,
+  BuilderSelectField,
 } from "../_components/builder-field";
+import { BuilderLinkTargetField } from "../_components/builder-link-target-field";
 import { RangeSliderInput } from "../_components/range-slider-input";
 import { FormActions } from "../_components/form-actions";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  List,
-  SlidersHorizontal,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import {
+  useCreateSlider,
+  useReplaceSliderItems,
+  useUpdateSlider,
+  useUploadVendorMedia,
+  useWebsiteBuilderData,
+  useWebsitePages,
+} from "@/hooks/use-website-builder";
+import { useToast } from "@/components/ui/toast";
+import {
+  buildPageLinkOptions,
+  normalizeLinkTarget,
+  resolveLinkTargetHref,
+  type LinkTargetValue,
+} from "../_lib/link-target";
+import { dataUrlToFile, fileToDataUrl } from "@/lib/utils";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface Slide {
@@ -35,11 +45,13 @@ interface Slide {
   title: string;
   description: string;
   buttonLabel: string;
-  buttonPage: string;
   buttonColor: string;
   buttonTextColor: string;
   imageUrl: string;
   status: boolean;
+  linkType: LinkTargetValue["linkType"];
+  pageId: string;
+  customUrl: string;
 }
 
 const initialSlides: Slide[] = [
@@ -49,33 +61,39 @@ const initialSlides: Slide[] = [
     description:
       "From elegant weddings to corporate events, we handle every detail with creativity and perfection. Let us bring your dream event to life.",
     buttonLabel: "Explore Events",
-    buttonPage: "events",
     buttonColor: "#6C47FF",
     buttonTextColor: "#FFFFFF",
     imageUrl: "",
     status: true,
+    linkType: "custom",
+    pageId: "",
+    customUrl: "/events",
   },
   {
     id: "2",
     title: "Perfect Events, Lasting Memories",
     description: "We create beautiful moments that last forever.",
     buttonLabel: "View Services",
-    buttonPage: "services",
     buttonColor: "#6C47FF",
     buttonTextColor: "#FFFFFF",
     imageUrl: "",
     status: true,
+    linkType: "custom",
+    pageId: "",
+    customUrl: "/services",
   },
   {
     id: "3",
     title: "We Plan. You Celebrate.",
     description: "Leave the planning to us and enjoy your special day.",
     buttonLabel: "Contact Us",
-    buttonPage: "contact",
     buttonColor: "#6C47FF",
     buttonTextColor: "#FFFFFF",
     imageUrl: "",
     status: true,
+    linkType: "custom",
+    pageId: "",
+    customUrl: "/contact",
   },
 ];
 
@@ -158,22 +176,22 @@ function LivePreviewSlider({
           style={{ backgroundColor: `rgba(0,0,0,${overlayOpacity / 100})` }}
         />
 
-        <div className="relative z-10 flex h-full flex-col justify-center px-10 py-6 max-w-[60%]">
+        <div className="slider-preview-content relative z-10 flex h-full max-w-[60%] flex-col justify-center px-10 py-6">
           <h2
-            className="font-bold text-2xl leading-tight mb-3 drop-shadow"
+            className="slider-preview-title mb-3 text-2xl font-bold leading-tight drop-shadow"
             style={{ color: titleColor }}
           >
             {slide.title}
           </h2>
           <p
-            className="text-[13px] leading-relaxed mb-5 line-clamp-3"
+            className="slider-preview-description mb-5 line-clamp-3 text-[13px] leading-relaxed"
             style={{ color: descriptionColor }}
           >
             {slide.description}
           </p>
           <div>
             <button
-              className="rounded px-5 py-2.5 text-[12px] font-semibold shadow-lg transition-opacity hover:opacity-90"
+              className="slider-preview-button rounded px-5 py-2.5 text-[12px] font-semibold shadow-lg transition-opacity hover:opacity-90"
               style={{
                 backgroundColor: slide.buttonColor,
                 color: slide.buttonTextColor,
@@ -221,6 +239,18 @@ function LivePreviewSlider({
 
 // ─── Page ──────────────────────────────────────────────────────────────────────
 export default function AdvancedSliderPage() {
+  const { data: builderData } = useWebsiteBuilderData();
+  const pagesQuery = useWebsitePages();
+  const createSlider = useCreateSlider();
+  const updateSlider = useUpdateSlider();
+  const replaceSliderItems = useReplaceSliderItems();
+  const uploadMedia = useUploadVendorMedia();
+  const { showToast } = useToast();
+  const loadedFromApiRef = React.useRef(false);
+  const pageOptions = React.useMemo(
+    () => buildPageLinkOptions(pagesQuery.data || []),
+    [pagesQuery.data],
+  );
   const [slides, setSlides] = React.useState<Slide[]>(initialSlides);
   const [sliderTitle, setSliderTitle] = React.useState(
     "Home Page Advanced Slider",
@@ -232,13 +262,110 @@ export default function AdvancedSliderPage() {
   const [brightness, setBrightness] = React.useState(90);
   const [blur, setBlur] = React.useState(0);
   const [isSaving, setIsSaving] = React.useState(false);
+  const [sliderId, setSliderId] = React.useState<string | null>(null);
+  const [imageToCrop, setImageToCrop] = React.useState("");
+  const [pendingImageFile, setPendingImageFile] = React.useState<File | null>(null);
 
   const editing = slides[editingIndex] ?? slides[0];
+
+  React.useEffect(() => {
+    if (loadedFromApiRef.current || !builderData || !pagesQuery.isSuccess) return;
+
+    const sliders = Array.isArray(builderData.sliders) ? builderData.sliders : [];
+    const sliderItems = Array.isArray(builderData.sliderItems) ? builderData.sliderItems : [];
+    const advancedSlider = sliders.find(
+      (slider) => String((slider as Record<string, unknown>).slider_type || "") === "advanced",
+    ) as Record<string, unknown> | undefined;
+
+    if (advancedSlider) {
+      const nextSliderId = String(advancedSlider.id || "");
+      const config =
+        advancedSlider.config_json && typeof advancedSlider.config_json === "object"
+          ? (advancedSlider.config_json as Record<string, unknown>)
+          : {};
+      const nextSlides = sliderItems
+        .filter((item) => String((item as Record<string, unknown>).slider_id || "") === nextSliderId)
+        .sort(
+          (left, right) =>
+            Number((left as Record<string, unknown>).sort_order || 0) -
+            Number((right as Record<string, unknown>).sort_order || 0),
+        )
+        .map((item, index) => {
+          const record = item as Record<string, unknown>;
+          return {
+            id: String(record.id || `slide-${index + 1}`),
+            title: String(record.title || "New slide title"),
+            description: String(record.description || ""),
+            buttonLabel: String(record.button_label || ""),
+            buttonColor: String(record.button_color || "#6C47FF"),
+            buttonTextColor: String(record.button_text_color || "#FFFFFF"),
+            imageUrl: String(record.image_url || ""),
+            status: Boolean(record.is_active ?? record.status === "active"),
+            ...normalizeLinkTarget(
+              {
+                linkType: record.button_page_id ? "page" : "custom",
+                pageId: String(record.button_page_id ?? ""),
+                customUrl: String(record.button_url ?? ""),
+              },
+              pageOptions,
+              "/",
+            ),
+          };
+        });
+
+      setSliderId(nextSliderId);
+      setSliderTitle(String(advancedSlider.title || "Home Page Advanced Slider"));
+      setTitleColor(String(config.titleColor || "#FFFFFF"));
+      setDescriptionColor(String(config.descriptionColor || "#E6E6E6"));
+      setOverlayOpacity(Number(config.overlayOpacity ?? 60));
+      setBrightness(Number(config.brightness ?? 90));
+      setBlur(Number(config.blur ?? 0));
+      if (nextSlides.length > 0) {
+        setSlides(nextSlides);
+      }
+    }
+
+    loadedFromApiRef.current = true;
+  }, [builderData, pageOptions, pagesQuery.isSuccess]);
 
   const updateEditing = (patch: Partial<Slide>) =>
     setSlides((prev) =>
       prev.map((s, i) => (i === editingIndex ? { ...s, ...patch } : s)),
     );
+
+  const handleSlideImageSelect = async (file: File) => {
+    try {
+      setPendingImageFile(file);
+      setImageToCrop(await fileToDataUrl(file));
+    } catch {
+      showToast("Unable to read slide image", "error");
+    }
+  };
+
+  const handleSlideImageCropComplete = async (croppedBase64: string) => {
+    const sourceFile = pendingImageFile;
+    setImageToCrop("");
+    setPendingImageFile(null);
+    if (!sourceFile) return;
+
+    try {
+      const extension = sourceFile.name.includes(".")
+        ? sourceFile.name.slice(sourceFile.name.lastIndexOf("."))
+        : ".jpg";
+      const croppedFile = await dataUrlToFile(
+        croppedBase64,
+        `${sourceFile.name.replace(/\.[^.]+$/, "")}-advanced-slider${extension}`,
+        sourceFile.type || "image/jpeg",
+      );
+      const uploaded = await uploadMedia.mutateAsync({
+        file: croppedFile,
+        folder: "website/sliders/advanced",
+      });
+      updateEditing({ imageUrl: uploaded.url });
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : "Image upload failed", "error");
+    }
+  };
 
   const handleSlideReorder = (rows: SliderManagementRow[]) => {
     const activeSlideId = slides[editingIndex]?.id;
@@ -252,24 +379,99 @@ export default function AdvancedSliderPage() {
     setEditingIndex(nextEditingIndex >= 0 ? nextEditingIndex : 0);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsSaving(true);
-    setTimeout(() => setIsSaving(false), 800);
+    try {
+      const payload = {
+        slider_type: "advanced",
+        title: sliderTitle,
+        slider_height: "large",
+        autoplay: true,
+        autoplay_speed: 5000,
+        config_json: {
+          titleColor,
+          descriptionColor,
+          overlayOpacity,
+          brightness,
+          blur,
+        },
+        is_active: true,
+      };
+
+      const savedSlider = sliderId
+        ? await updateSlider.mutateAsync({ id: sliderId, payload })
+        : await createSlider.mutateAsync(payload);
+
+      const nextSliderId = String(savedSlider.id);
+      setSliderId(nextSliderId);
+
+      await replaceSliderItems.mutateAsync({
+        sliderId: nextSliderId,
+        items: slides.map((slide, index) => ({
+          title: slide.title,
+          description: slide.description,
+          imageUrl: slide.imageUrl,
+          buttonLabel: slide.buttonLabel,
+          buttonPageId: slide.linkType === "page" ? slide.pageId : null,
+          buttonUrl:
+            slide.linkType === "custom"
+              ? resolveLinkTargetHref(slide, pageOptions)
+              : null,
+          buttonColor: slide.buttonColor,
+          buttonTextColor: slide.buttonTextColor,
+          sortOrder: index + 1,
+          status: slide.status ? "published" : "draft",
+          is_active: slide.status,
+        })),
+      });
+
+      showToast("Advanced slider saved");
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : "Failed to save advanced slider", "error");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleCancel = () => {
-    setSlides(initialSlides);
-    setSliderTitle("Home Page Advanced Slider");
+    setSlides([
+      {
+        id: "draft-1",
+        title: "",
+        description: "",
+        buttonLabel: "",
+        buttonColor: "#6C47FF",
+        buttonTextColor: "#FFFFFF",
+        imageUrl: "",
+        status: false,
+        linkType: "custom",
+        pageId: "",
+        customUrl: "",
+      },
+    ]);
+    setSliderTitle("");
     setEditingIndex(0);
     setTitleColor("#FFFFFF");
     setDescriptionColor("#E6E6E6");
-    setOverlayOpacity(60);
-    setBrightness(90);
+    setOverlayOpacity(0);
+    setBrightness(0);
     setBlur(0);
+    setImageToCrop("");
+    setPendingImageFile(null);
+  };
+
+  const handleDeleteCurrent = () => {
+    const currentId = slides[editingIndex]?.id;
+    if (!currentId || slides.length <= 1) {
+      handleCancel();
+      return;
+    }
+    setSlides((current) => current.filter((slide) => slide.id !== currentId));
+    setEditingIndex(0);
   };
 
   const form = (
-    <div className="grid gap-3 grid-cols-1 lg:grid-cols-[400px_1fr] items-start">
+    <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-[minmax(0,400px)_minmax(0,1fr)]">
       {/* ── Left: Single stacked form ── */}
       <div className={`${card} space-y-3`}>
         <p className="text-[11px] font-bold text-[var(--vendor-text)] flex items-center gap-1.5">
@@ -310,23 +512,13 @@ export default function AdvancedSliderPage() {
           className="space-y-0.5"
         />
 
-        <SectionLabel number={5} label="Button Page" />
-        <Select
-          value={editing.buttonPage}
-          onValueChange={(v) => updateEditing({ buttonPage: v })}
-        >
-          <SelectTrigger className="h-9 w-full text-[11px] px-2 font-semibold">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="home">Home</SelectItem>
-            <SelectItem value="about">About Us</SelectItem>
-            <SelectItem value="services">Services</SelectItem>
-            <SelectItem value="events">Events</SelectItem>
-            <SelectItem value="gallery">Gallery</SelectItem>
-            <SelectItem value="contact">Contact Us</SelectItem>
-          </SelectContent>
-        </Select>
+        <SectionLabel number={5} label="Button Link" />
+        <BuilderLinkTargetField
+          value={editing}
+          onChange={(value) => updateEditing(value)}
+          pageOptions={pageOptions}
+          pageLabel="Button Page"
+        />
 
         <div className="border-t border-[var(--vendor-border)] pt-2">
           <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--vendor-text-muted)] mb-2">
@@ -352,45 +544,6 @@ export default function AdvancedSliderPage() {
           </div>
         </div>
 
-        <div className="border-t border-[var(--vendor-border)] pt-2">
-          <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--vendor-text-muted)] mb-2">
-            Colors
-          </p>
-          <div className="grid grid-cols-2 gap-2">
-            <ColorPickerInput
-              label="9. Title Color"
-              value={titleColor}
-              onChange={setTitleColor}
-              compact
-            />
-            <ColorPickerInput
-              label="10. Description Color"
-              value={descriptionColor}
-              onChange={setDescriptionColor}
-              compact
-            />
-          </div>
-        </div>
-
-        <div className="border-t border-[var(--vendor-border)] pt-2">
-          <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--vendor-text-muted)] mb-2">
-            Button Settings
-          </p>
-          <div className="grid grid-cols-2 gap-2">
-            <ColorPickerInput
-              label="11. Background Color"
-              value={editing.buttonColor}
-              onChange={(c) => updateEditing({ buttonColor: c })}
-              compact
-            />
-            <ColorPickerInput
-              label="12. Text Color"
-              value={editing.buttonTextColor}
-              onChange={(c) => updateEditing({ buttonTextColor: c })}
-              compact
-            />
-          </div>
-        </div>
 
         <div className="border-t border-[var(--vendor-border)] pt-2 space-y-2">
           <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--vendor-text-muted)] mb-1">
@@ -400,10 +553,12 @@ export default function AdvancedSliderPage() {
             value={editing.imageUrl}
             recommendedSize="1920x800px"
             maxFileSize="2MB"
-            onFileSelect={(file) =>
-              updateEditing({ imageUrl: URL.createObjectURL(file) })
-            }
+            maxSizeMb={2}
+            onFileSelect={handleSlideImageSelect}
             onRemove={() => updateEditing({ imageUrl: "" })}
+            alt="Advanced slider image"
+            previewClassName="h-32"
+            uploadClassName="min-h-32"
           />
         </div>
 
@@ -424,8 +579,8 @@ export default function AdvancedSliderPage() {
           <FormActions
             saveLabel="Update Slide"
             onCancel={() => setEditingIndex(0)}
-            onSave={handleSave}
-            isSaving={isSaving}
+            onSave={() => undefined}
+            isSaving={false}
             layout="default"
           />
         </div>
@@ -469,11 +624,13 @@ export default function AdvancedSliderPage() {
                   title: "New slide title",
                   description: "Describe what this slide is about.",
                   buttonLabel: "Learn More",
-                  buttonPage: "home",
                   buttonColor: "#6C47FF",
                   buttonTextColor: "#FFFFFF",
                   imageUrl: "",
                   status: true,
+                  linkType: "custom",
+                  pageId: "",
+                  customUrl: "/",
                 },
               ]);
               setEditingIndex(slides.length);
@@ -502,14 +659,34 @@ export default function AdvancedSliderPage() {
   );
 
   return (
-    <WebsiteBuilderLayout
-      title="Advanced Slider"
-      form={form}
-      saveLabel="Save Changes"
-      onSave={handleSave}
-      onCancel={handleCancel}
-      isSaving={isSaving}
-      leftClassName="border-0 bg-transparent p-0 shadow-none"
-    />
+    <>
+      <WebsiteBuilderLayout
+        title="Advanced Slider"
+        form={form}
+        onCancel={handleCancel}
+        onDelete={handleDeleteCurrent}
+        deleteItemLabel={editing?.title || "slide"}
+        isSaving={isSaving}
+        primaryButton={{
+          label: sliderId ? "Update" : "Save",
+          onClick: handleSave,
+          isLoading: isSaving,
+        }}
+        leftClassName="border-0 bg-transparent p-0 shadow-none"
+      />
+      <ImageCropper
+        open={Boolean(imageToCrop)}
+        imageSrc={imageToCrop}
+        onClose={() => {
+          setImageToCrop("");
+          setPendingImageFile(null);
+        }}
+        onCropComplete={handleSlideImageCropComplete}
+        aspectRatio={12 / 5}
+        outputWidth={1920}
+        outputHeight={800}
+        title="Crop Slide Image"
+      />
+    </>
   );
 }

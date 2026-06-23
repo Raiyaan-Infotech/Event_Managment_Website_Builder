@@ -9,7 +9,6 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
@@ -195,10 +194,12 @@ export function BuilderSelectField<T extends string>({
   options,
   onChange,
   label,
-  placeholder,
+  placeholder = "Select a value",
   className,
   triggerClassName,
 }: BuilderSelectFieldProps<T>) {
+  const selectedOption = options.find((option) => option.value === value);
+
   return (
     <div className={cn("w-full space-y-1", className)}>
       {label ? <BuilderLabel>{label}</BuilderLabel> : null}
@@ -209,7 +210,9 @@ export function BuilderSelectField<T extends string>({
             triggerClassName,
           )}
         >
-          <SelectValue placeholder={placeholder} />
+          <span className="line-clamp-1">
+            {selectedOption?.label ?? value ?? placeholder}
+          </span>
         </SelectTrigger>
         <SelectContent>
           {options.map((option) => (

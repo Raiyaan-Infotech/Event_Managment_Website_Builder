@@ -1,23 +1,28 @@
 "use client";
 
 import * as React from "react";
+import dynamic from "next/dynamic";
 import { Icon } from "@iconify/react";
-import { Trash2 } from "lucide-react";
-import { Button, OutlineButton, PrimaryButton } from "@/components/ui/button";
+import { OutlineButton } from "@/components/ui/button";
 import { WebsiteBuilderLayout } from "../_components/website-builder-layout";
 import { FormSection } from "../_components/form-section";
-import { ImageUpload } from "../_components/image-upload";
-import {
-  BuilderCountedInput,
-  BuilderCountedTextarea,
-  BuilderSegmentedControl,
-} from "../_components/builder-field";
+import { BuilderCountedInput } from "../_components/builder-field";
 import { ColorPickerInput } from "../_components/color-picker-input";
-import { IconPickerDialog } from "../_components/icon-picker-dialog";
+import { ConfirmDeleteButton } from "../_components/confirm-delete-button";
+import { ToggleField } from "../_components/toggle-field";
+import {
+  useSaveBasicInformation,
+  useSaveSocialLinks,
+  useWebsiteBuilderData,
+} from "@/hooks/use-website-builder";
+import { useToast } from "@/components/ui/toast";
 
-// ── Types ─────────────────────────────────────────────────────────────────────
-
-type ContactType = "default" | "alternative";
+// The icon picker is a modal only opened on demand — load it lazily so its
+// icon-grid/search code stays out of this page's initial route chunk.
+const IconPickerDialog = dynamic(
+  () => import("../_components/icon-picker-dialog").then((m) => m.IconPickerDialog),
+  { ssr: false },
+);
 
 interface SocialLink {
   id: string;
@@ -27,40 +32,52 @@ interface SocialLink {
   iconName: string;
 }
 
-// ── Initial Data ──────────────────────────────────────────────────────────────
+function mapBuilderSocialLinks(
+  links: Array<{
+    id?: string | number | null;
+    icon_key?: string | null;
+    label?: string | null;
+    url?: string | null;
+    icon_color?: string | null;
+  }> = [],
+): SocialLink[] {
+  return links.map((link, index) => ({
+    id: String(link.id || link.icon_key || `social-${index + 1}`),
+    label: String(link.label || ""),
+    url: String(link.url || ""),
+    color: String(link.icon_color || "#1877F2"),
+    iconName: String(link.icon_key || "simple-icons:linktree"),
+  }));
+}
 
-const initialSocialLinks: SocialLink[] = [
-  {
-    id: "whatsapp",
-    label: "WhatsApp",
-    url: "https://wa.me/919876543210",
-    color: "#25D366",
-    iconName: "simple-icons:whatsapp",
-  },
-  {
-    id: "instagram",
-    label: "Instagram",
-    url: "https://instagram.com/royalmoments",
-    color: "#E4405F",
-    iconName: "simple-icons:instagram",
-  },
-  {
-    id: "facebook",
-    label: "Facebook",
-    url: "https://facebook.com/royalmoments",
-    color: "#1877F2",
-    iconName: "simple-icons:facebook",
-  },
-  {
-    id: "youtube",
-    label: "YouTube",
-    url: "https://youtube.com/@royalmoments",
-    color: "#FF0000",
-    iconName: "simple-icons:youtube",
-  },
-];
+function parseHeaderSettings(value: unknown) {
+  const record = parseHeaderSettingsRecord(value);
+  const fallback = {
+    showSocialIcons: true,
+  };
 
-// ── Shared table header ───────────────────────────────────────────────────────
+  return {
+    showSocialIcons: Boolean(
+      record.show_social_icons ??
+        record.showSocialIcons ??
+        fallback.showSocialIcons,
+    ),
+  };
+}
+
+function parseHeaderSettingsRecord(value: unknown) {
+  if (!value) return {};
+
+  try {
+    const parsed = typeof value === "string" ? JSON.parse(value) : value;
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      return {};
+    }
+    return parsed as Record<string, unknown>;
+  } catch {
+    return {};
+  }
+}
 
 const SocialTableHead = () => (
   <thead>
@@ -68,13 +85,13 @@ const SocialTableHead = () => (
       <th className="py-1.5 pl-1 pr-2 text-left text-[10px] font-semibold text-[var(--vendor-text-muted)]">
         Icon
       </th>
-      <th className="py-1.5 px-2 text-left text-[10px] font-semibold text-[var(--vendor-text-muted)]">
+      <th className="px-2 py-1.5 text-left text-[10px] font-semibold text-[var(--vendor-text-muted)]">
         Icon Color
       </th>
-      <th className="py-1.5 px-2 text-left text-[10px] font-semibold text-[var(--vendor-text-muted)]">
+      <th className="px-2 py-1.5 text-left text-[10px] font-semibold text-[var(--vendor-text-muted)]">
         Label
       </th>
-      <th className="py-1.5 px-2 text-left text-[10px] font-semibold text-[var(--vendor-text-muted)]">
+      <th className="px-2 py-1.5 text-left text-[10px] font-semibold text-[var(--vendor-text-muted)]">
         URL
       </th>
       <th className="py-1.5 pl-2 pr-1 text-left text-[10px] font-semibold text-[var(--vendor-text-muted)]">
@@ -84,28 +101,17 @@ const SocialTableHead = () => (
   </thead>
 );
 
-// ── Active status badge ──────────────────────────────────────────────────────
-
-const ActiveStatusBadge = () => (
-  <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-[var(--vendor-radius-control)] border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 sm:right-4 sm:top-4">
-    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-    Active
-  </span>
-);
-
-// ── Page ──────────────────────────────────────────────────────────────────────
-
 export default function WebsiteBasicInformationPage() {
-  const [companyName, setCompanyName] = React.useState("Royal Moments Events");
-  const [city, setCity] = React.useState("New Delhi, India");
-  const [contactType, setContactType] = React.useState<ContactType>("default");
-  const [mobile, setMobile] = React.useState("98765 43210");
-  const [email, setEmail] = React.useState("info@royalmoments.com");
-  const [address, setAddress] = React.useState(
-    "123, Wedding Avenue, Connaught Place, New Delhi - 110001",
-  );
-  const [socialLinks, setSocialLinks] =
-    React.useState<SocialLink[]>(initialSocialLinks);
+  const { data: builderData } = useWebsiteBuilderData();
+  const saveBasicInformation = useSaveBasicInformation();
+  const saveSocialLinks = useSaveSocialLinks();
+  const { showToast } = useToast();
+
+  const loadedHeaderRef = React.useRef(false);
+  const [showSocialIcons, setShowSocialIcons] = React.useState(true);
+  const [mobileNumber, setMobileNumber] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [socialLinks, setSocialLinks] = React.useState<SocialLink[]>([]);
   const [iconPickerLinkId, setIconPickerLinkId] = React.useState<string | null>(null);
   const [isSaving, setIsSaving] = React.useState(false);
 
@@ -114,6 +120,26 @@ export default function WebsiteBasicInformationPage() {
   const rightLinks = socialLinks.slice(5, 10);
   const hasRightPanel = socialLinks.length > 5;
   const canAddMore = socialLinks.length < MAX_LINKS;
+
+  const applyBuilderData = React.useCallback(() => {
+    const basicInformation = builderData?.basicInformation as
+      | Record<string, unknown>
+      | null
+      | undefined;
+    const settings = parseHeaderSettings(
+      basicInformation?.social_links_json,
+    );
+    setShowSocialIcons(Boolean(basicInformation?.show_social_icons ?? settings.showSocialIcons));
+    setMobileNumber(String(basicInformation?.mobile || ""));
+    setEmail(String(basicInformation?.email || "").toLowerCase());
+    setSocialLinks(mapBuilderSocialLinks(builderData?.socialLinks));
+  }, [builderData]);
+
+  React.useEffect(() => {
+    if (loadedHeaderRef.current || !builderData) return;
+    applyBuilderData();
+    loadedHeaderRef.current = true;
+  }, [applyBuilderData, builderData]);
 
   const updateSocialLink = (id: string, patch: Partial<SocialLink>) => {
     setSocialLinks((prev) =>
@@ -139,195 +165,146 @@ export default function WebsiteBasicInformationPage() {
     ]);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsSaving(true);
-    setTimeout(() => setIsSaving(false), 800);
+    try {
+      await Promise.all([
+        saveBasicInformation.mutateAsync({
+          mobile_country_code: "+91",
+          mobile: mobileNumber.trim(),
+          email: email.trim().toLowerCase(),
+          show_social_icons: showSocialIcons,
+          social_links_json: {
+            ...parseHeaderSettingsRecord(
+              (builderData?.basicInformation as Record<string, unknown> | null | undefined)
+                ?.social_links_json,
+            ),
+            show_social_icons: showSocialIcons,
+          },
+          is_active: true,
+        }),
+        saveSocialLinks.mutateAsync(
+          socialLinks.map((link, index) => ({
+            icon: link.iconName,
+            color: link.color,
+            label: link.label,
+            url: link.url,
+            sort_order: index + 1,
+            is_active: true,
+          })),
+        ),
+      ]);
+      showToast("Header saved");
+    } catch (error) {
+      showToast(
+        error instanceof Error ? error.message : "Unable to save header",
+        "error",
+      );
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleCancel = () => {
-    setCompanyName("Royal Moments Events");
-    setCity("New Delhi, India");
-    setContactType("default");
-    setMobile("98765 43210");
-    setEmail("info@royalmoments.com");
-    setAddress("123, Wedding Avenue, Connaught Place, New Delhi - 110001");
-    setSocialLinks(initialSocialLinks);
+    setShowSocialIcons(false);
+    setMobileNumber("");
+    setEmail("");
+    setSocialLinks([]);
+    setIconPickerLinkId(null);
   };
 
   const handleIconSelect = (iconName: string) => {
     if (!iconPickerLinkId) return;
-    updateSocialLink(iconPickerLinkId, {
-      iconName,
-    });
+    updateSocialLink(iconPickerLinkId, { iconName });
   };
 
-  // ── Render rows helper (inline, no custom component) ─────────────────────
-
   const renderRows = (rows: SocialLink[]) =>
-    rows.map((item) => {
-      return (
-        <tr key={item.id} className="group">
-          {/* Icon badge */}
-          <td className="py-2 pl-1 pr-2">
-            <button
-              type="button"
-              onClick={() => setIconPickerLinkId(item.id)}
-              title="Choose icon"
-              className="flex h-7 w-7 items-center justify-center rounded-[6px] text-white transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[var(--vendor-primary-btn)]/30"
-              style={{ backgroundColor: item.color }}
-            >
-              <Icon icon={item.iconName} className="h-3.5 w-3.5" />
-            </button>
-          </td>
-
-          {/* Icon Color */}
-          <td className="py-2 px-2 align-top">
-            <ColorPickerInput
-              value={item.color}
-              onChange={(val) => updateSocialLink(item.id, { color: val })}
-              compact
-              className="w-full"
-            />
-          </td>
-
-          {/* Label */}
-          <td className="py-2 px-2 align-top">
-            <BuilderCountedInput
-              value={item.label}
-              onChange={(val) => updateSocialLink(item.id, { label: val })}
-              maxLength={40}
-              className="space-y-0"
-              inputClassName="h-7 min-w-0 rounded-[var(--vendor-radius-control)] border border-[var(--vendor-border)] bg-white pl-2 pr-12 shadow-xs"
-            />
-          </td>
-
-          {/* URL */}
-          <td className="py-2 px-2">
-            <BuilderCountedInput
-              value={item.url}
-              onChange={(val) => updateSocialLink(item.id, { url: val })}
-              maxLength={300}
-              className="space-y-0"
-              inputClassName="h-7 min-w-0 rounded-[var(--vendor-radius-control)] border border-[var(--vendor-border)] bg-white pl-2 pr-14 shadow-xs"
-            />
-          </td>
-
-          {/* Action */}
-          <td className="py-2 pl-2 pr-1">
-            <div className="flex items-center gap-1">
-              <Button
-                type="button"
-                variant="outline"
-                size="icon-xs"
-                className="text-rose-500 hover:text-rose-600"
-                onClick={() => deleteSocialLink(item.id)}
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-              </Button>
-            </div>
-          </td>
-        </tr>
-      );
-    });
-
-  // ── Form ──────────────────────────────────────────────────────────────────
+    rows.map((item) => (
+      <tr key={item.id} className="group">
+        <td className="py-2 pl-1 pr-2">
+          <button
+            type="button"
+            onClick={() => setIconPickerLinkId(item.id)}
+            title="Choose icon"
+            className="flex h-7 w-7 items-center justify-center rounded-[6px] text-white transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[var(--vendor-primary-btn)]/30"
+            style={{ backgroundColor: item.color }}
+          >
+            <Icon icon={item.iconName} className="h-3.5 w-3.5" />
+          </button>
+        </td>
+        <td className="px-2 py-2 align-top">
+          <ColorPickerInput
+            value={item.color}
+            onChange={(val) => updateSocialLink(item.id, { color: val })}
+            compact
+            className="w-full"
+          />
+        </td>
+        <td className="px-2 py-2 align-top">
+          <BuilderCountedInput
+            value={item.label}
+            onChange={(val) => updateSocialLink(item.id, { label: val })}
+            maxLength={40}
+            className="space-y-0"
+            inputClassName="h-7 min-w-0 rounded-[var(--vendor-radius-control)] border border-[var(--vendor-border)] bg-white pl-2 pr-12 shadow-xs"
+          />
+        </td>
+        <td className="px-2 py-2">
+          <BuilderCountedInput
+            value={item.url}
+            onChange={(val) => updateSocialLink(item.id, { url: val })}
+            maxLength={300}
+            className="space-y-0"
+            inputClassName="h-7 min-w-0 rounded-[var(--vendor-radius-control)] border border-[var(--vendor-border)] bg-white pl-2 pr-14 shadow-xs"
+          />
+        </td>
+        <td className="py-2 pl-2 pr-1">
+          <ConfirmDeleteButton
+            className="text-rose-500 hover:text-rose-600"
+            itemLabel={item.label || "Social link"}
+            onConfirm={() => deleteSocialLink(item.id)}
+          />
+        </td>
+      </tr>
+    ));
 
   const form = (
     <div className="space-y-4">
-      {/* ── 1 & 2. Header Information + Contact Information — combined row ── */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        {/* Header Information */}
-        <FormSection
-          title="Header Information"
-          className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-3 shadow-sm sm:p-4"
-        >
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-[140px_1fr] sm:items-start">
-            <div className="flex flex-col items-center">
-              <ImageUpload
-                label="Company Logo"
-                recommendedSize="200x200px"
-                maxFileSize="2MB"
-              />
-            </div>
-
-            <div className="space-y-3">
-              <BuilderCountedInput
-                label="Company Name"
-                required
-                value={companyName}
-                onChange={setCompanyName}
-                maxLength={100}
-                className="space-y-0.5"
-              />
-              <BuilderCountedInput
-                label="City"
-                required
-                value={city}
-                onChange={setCity}
-                maxLength={100}
-                className="space-y-0.5"
-              />
-            </div>
-          </div>
-        </FormSection>
-
-        {/* Contact Information */}
-        <FormSection
-          title="Contact Information"
-          className="relative rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-3 shadow-sm space-y-3 sm:p-4"
-        >
-          <ActiveStatusBadge />
-
-          <BuilderSegmentedControl
-            label="Type"
-            value={contactType}
-            onChange={(v) => setContactType(v as ContactType)}
-            options={[
-              { label: "Default", value: "default" },
-              { label: "Alternative", value: "alternative" },
-            ]}
+      <FormSection
+        title="Header Settings"
+        className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-3 shadow-sm sm:p-4"
+      >
+        <div className="grid gap-3">
+          <ToggleField
+            label="Social Icons"
+            description="Show or hide social icons in the website header."
+            checked={showSocialIcons}
+            onCheckedChange={setShowSocialIcons}
           />
-
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:items-start">
-            <BuilderCountedInput
-              label="Mobile"
-              required
-              value={mobile}
-              onChange={setMobile}
-              maxLength={20}
-              className="space-y-0.5"
-              inputPrefix={
-                <div className="flex h-full shrink-0 items-center gap-1 border-r border-[var(--vendor-border)] bg-[var(--vendor-input-bg)] px-2">
-                  <span className="text-[13px]">🇮🇳</span>
-                  <span className="text-[10px] font-semibold text-[var(--vendor-text)]">
-                    +91
-                  </span>
-                </div>
-              }
-            />
-            <BuilderCountedInput
-              label="Email"
-              required
-              value={email}
-              onChange={setEmail}
-              maxLength={100}
-              className="space-y-0.5"
-            />
-          </div>
-
-          <BuilderCountedTextarea
-            label="Address"
-            required
-            value={address}
-            onChange={setAddress}
-            maxLength={200}
-            textareaClassName="min-h-[64px] resize-y"
-            className="space-y-0.5"
+        </div>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <BuilderCountedInput
+            label="Mobile Number"
+            value={mobileNumber}
+            onChange={setMobileNumber}
+            maxLength={20}
+            inputPrefix={
+              <div className="flex h-full shrink-0 items-center gap-1 border-r border-[var(--vendor-border)] bg-[var(--vendor-input-bg)] px-2">
+                <span className="text-[10px] font-semibold text-[var(--vendor-text)]">
+                  +91
+                </span>
+              </div>
+            }
           />
-        </FormSection>
-      </div>
+          <BuilderCountedInput
+            label="Email"
+            value={email}
+            onChange={setEmail}
+            maxLength={100}
+          />
+        </div>
+      </FormSection>
 
-      {/* ── 3. Social Links ── */}
       <FormSection
         title="Social Links"
         className="rounded-[var(--vendor-radius-panel)] border border-[var(--vendor-border)] bg-[var(--vendor-panel-bg)] p-3 shadow-sm sm:p-4"
@@ -344,7 +321,6 @@ export default function WebsiteBasicInformationPage() {
                 : "grid-cols-1"
             }`}
           >
-            {/* Left panel — rows 1–5 */}
             <div className={hasRightPanel ? "lg:pr-3" : ""}>
               <div className="overflow-x-auto rounded-[var(--vendor-radius-control)]">
                 <table className="w-full min-w-[700px] table-fixed text-[11px]">
@@ -363,8 +339,7 @@ export default function WebsiteBasicInformationPage() {
               </div>
             </div>
 
-            {/* Right panel — rows 6–10 */}
-            {hasRightPanel && (
+            {hasRightPanel ? (
               <div className="lg:pl-3">
                 <div className="overflow-x-auto rounded-[var(--vendor-radius-control)]">
                   <table className="w-full min-w-[700px] table-fixed text-[11px]">
@@ -382,18 +357,17 @@ export default function WebsiteBasicInformationPage() {
                   </table>
                 </div>
               </div>
-            )}
+            ) : null}
           </div>
         )}
 
-        {/* Footer: + Add button + count */}
-        <div className="pt-2 flex items-center justify-between">
+        <div className="flex items-center justify-between pt-2">
           <OutlineButton
             type="button"
             size="xs"
             onClick={addSocialLink}
             disabled={!canAddMore}
-            className="text-[11px] font-semibold text-[var(--vendor-primary)] border-[var(--vendor-primary)]/30 hover:bg-[var(--vendor-primary)]/5 hover:border-[var(--vendor-primary)]/50 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="border-[var(--vendor-primary)]/30 text-[11px] font-semibold text-[var(--vendor-primary)] hover:border-[var(--vendor-primary)]/50 hover:bg-[var(--vendor-primary)]/5 disabled:cursor-not-allowed disabled:opacity-40"
           >
             + Add Social Link
           </OutlineButton>
@@ -403,28 +377,23 @@ export default function WebsiteBasicInformationPage() {
           </span>
         </div>
       </FormSection>
-
-      <div className="flex justify-end gap-2 mt-2">
-        <PrimaryButton
-          type="button"
-          onClick={handleSave}
-          disabled={isSaving}
-        >
-          {isSaving ? "Saving..." : "Save Changes"}
-        </PrimaryButton>
-      </div>
     </div>
   );
 
   return (
     <>
       <WebsiteBuilderLayout
-        title="Basic Information"
+        title="Header"
         form={form}
         onSave={handleSave}
         onCancel={handleCancel}
         isSaving={isSaving}
         leftClassName="border-0 bg-transparent p-0 shadow-none"
+        primaryButton={{
+          label: "Save Changes",
+          onClick: handleSave,
+          isLoading: isSaving,
+        }}
       />
       <IconPickerDialog
         open={Boolean(iconPickerLinkId)}
