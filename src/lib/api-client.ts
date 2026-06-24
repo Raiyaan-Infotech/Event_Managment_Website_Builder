@@ -20,7 +20,11 @@ export async function apiRequest<T>(
   options: RequestOptions = {},
 ): Promise<T> {
   const { skipAuthRedirect, ...requestOptions } = options;
-  const response = await fetch(`${getApiBaseUrl()}${path}`, {
+  // In the browser, go through the builder's own same-origin proxy so the
+  // vendor auth cookie (first-party to this domain) is sent. On the server
+  // there is no cookie context, so call the backend directly.
+  const baseUrl = typeof window !== "undefined" ? "/api/proxy/v1" : getApiBaseUrl();
+  const response = await fetch(`${baseUrl}${path}`, {
     ...requestOptions,
     credentials: "include",
     headers: {
