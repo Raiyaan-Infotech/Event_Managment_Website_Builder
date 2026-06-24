@@ -30,11 +30,12 @@ import {
   useSaveVendorAbout,
   useVendorAbout,
   useWebsiteBuilderData,
+  useWebsitePages,
 } from "@/hooks/use-website-builder";
 import { useToast } from "@/components/ui/toast";
 import { fileToDataUrl, resolveMediaUrl } from "@/lib/utils";
 import type { VendorAboutData } from "@/lib/website-builder-api";
-import { MAINTENANCE_PAGE_SLUG } from "../pages/_lib/page-store";
+import { MAINTENANCE_PAGE_SLUG, mergeWebsitePages } from "../pages/_lib/page-store";
 
 type ContactType = "default" | "alternative";
 
@@ -125,6 +126,14 @@ function getStringArray(value: unknown) {
 export default function FooterPage() {
   const { data: builderData } = useWebsiteBuilderData();
   const { data: vendorData } = useVendorAbout();
+  // Source Add Pages options from the dedicated pages endpoint (same as the Menu
+  // builder) so newly created pages always appear — builderData.pages can be
+  // empty/stale, which left this dropdown blank on the live backend.
+  const { data: pageRecords = [] } = useWebsitePages();
+  const websitePages = React.useMemo(
+    () => mergeWebsitePages(pageRecords),
+    [pageRecords],
+  );
   const saveFooter = useSaveFooter();
   const saveVendorAbout = useSaveVendorAbout();
   const { showToast } = useToast();
@@ -162,7 +171,7 @@ export default function FooterPage() {
     contactType === "alternative" ? alternativeContact : defaultContact;
 
   const pageOptions: PageOption[] = [];
-  for (const page of builderData?.pages ?? []) {
+  for (const page of websitePages) {
     const slug = typeof page.slug === "string" ? page.slug.trim() : "";
     if (
       !slug ||
@@ -230,7 +239,10 @@ export default function FooterPage() {
         ? getStringArray(footer.add_pages_json)
         : getStringArray(footer.selected_pages);
     setSelectedPages(
-      normalizeSavedPages(savedPages, builderData?.pages ?? []),
+      normalizeSavedPages(
+        savedPages,
+        websitePages as unknown as Array<Record<string, unknown>>,
+      ),
     );
 
     setNewsletterEnabled(
@@ -238,7 +250,7 @@ export default function FooterPage() {
     );
 
     loadedFooterRef.current = true;
-  }, [builderData]);
+  }, [builderData, websitePages]);
 
   const handleLogoSelect = async (file: File) => {
     try {

@@ -130,7 +130,7 @@ const initialBlocks: UiBlockItem[] = [
     description: "Contact form builder module.",
     icon: Mail,
     visible: true,
-    locked: true,
+    locked: false,
     required: true,
   },
   {
@@ -139,7 +139,7 @@ const initialBlocks: UiBlockItem[] = [
     description: "Homepage hero section content.",
     icon: Monitor,
     visible: true,
-    locked: true,
+    locked: false,
     required: true,
   },
   {
@@ -166,7 +166,7 @@ const initialBlocks: UiBlockItem[] = [
     description: "Gallery image management.",
     icon: GalleryHorizontal,
     visible: true,
-    locked: true,
+    locked: false,
     required: true,
   },
   {
@@ -264,7 +264,7 @@ function buildUiBlockPayload(items: UiBlockItem[]) {
     is_visible: block.required || UI_BLOCK_REQUIRED_KEYS.has(block.id) ? true : block.visible,
     sort_order: index + 1,
     config_json: {
-      lockPosition: block.locked || UI_BLOCK_REQUIRED_KEYS.has(block.id),
+      lockPosition: block.locked,
       requiredBlock: block.required || UI_BLOCK_REQUIRED_KEYS.has(block.id),
     },
     is_active: true,
@@ -303,7 +303,9 @@ function buildBlocksFromApi(
           ? fallback.label
           : savedLabel || fallback.label,
       visible: isRequired ? true : coerceUiBlockVisible(block.is_visible, fallback.visible),
-      locked: isRequired || Boolean(config.lockPosition ?? fallback.locked),
+      // Position-lock is independent of "required": a block can be required
+      // (always visible) yet still be reorderable (e.g. Hero, Gallery, Contact).
+      locked: Boolean(config.lockPosition ?? fallback.locked),
       required: isRequired,
     });
   });

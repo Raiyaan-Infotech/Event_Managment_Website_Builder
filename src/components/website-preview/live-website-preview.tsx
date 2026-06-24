@@ -108,25 +108,27 @@ export function LiveWebsitePreview({
 
   const activePage = findPageForViewKey(activeKey, legalPages);
 
-  const homeMain = (
-    <>
-      <HeroSection hero={hero} theme={theme} />
+  const sliderNode =
+    slides.length > 0 && sliderMeta ? (
+      <SliderSection slides={slides} meta={sliderMeta} theme={theme} />
+    ) : null;
 
-      {slides.length > 0 && sliderMeta ? (
-        <SliderSection slides={slides} meta={sliderMeta} theme={theme} />
-      ) : null}
-
+  // Home middle sections keyed by their Web UI Block key. The order the vendor
+  // saves on the Web UI Block page (sort_order) drives the order shown here.
+  // Header + Nav stay pinned at the top and Footer at the bottom (rendered
+  // outside this block), so only these middle sections are reorderable.
+  const homeSectionByKey: Record<string, React.ReactNode> = {
+    "hero-section": <HeroSection hero={hero} theme={theme} />,
+    "advance-slider": sliderNode,
+    "basic-slider": sliderNode,
+    "gallery-images": (
       <GallerySection categories={galleryCategories} items={galleryItems} theme={theme} />
-
-      <TestimonialsSection testimonials={testimonials} theme={theme} />
-
-      {/* Portfolio — client + sponsor logo walls */}
-      <LogoWallSection
-        title="Our Clients"
-        members={clients}
-        theme={theme}
-        kind="clients"
-      />
+    ),
+    testimonials: <TestimonialsSection testimonials={testimonials} theme={theme} />,
+    "basic-clients": (
+      <LogoWallSection title="Our Clients" members={clients} theme={theme} kind="clients" />
+    ),
+    "basic-sponsors": (
       <LogoWallSection
         title="Our Sponsors"
         members={sponsors}
@@ -134,10 +136,48 @@ export function LiveWebsitePreview({
         kind="sponsors"
         muted
       />
+    ),
+    contact_us: contact ? <ContactSection contact={contact} theme={theme} /> : null,
+  };
 
-      {contact ? <ContactSection contact={contact} theme={theme} /> : null}
-    </>
-  );
+  // Default order when no saved block order is available.
+  const defaultHomeOrder = [
+    "hero-section",
+    "advance-slider",
+    "gallery-images",
+    "testimonials",
+    "basic-clients",
+    "basic-sponsors",
+    "contact_us",
+  ];
+
+  const orderedHomeKeys = (() => {
+    const blocks =
+      (builderData?.uiBlocks as Array<Record<string, unknown>> | undefined) ?? [];
+    const saved = blocks
+      .slice()
+      .sort((a, b) => (Number(a.sort_order) || 0) - (Number(b.sort_order) || 0))
+      .map((block) => String(block.block_key || ""))
+      .filter((key) => key in homeSectionByKey);
+    if (!saved.length) return defaultHomeOrder;
+    const seen = new Set(saved);
+    return [...saved, ...defaultHomeOrder.filter((key) => !seen.has(key))];
+  })();
+
+  const homeSections: React.ReactNode[] = [];
+  let sliderShown = false;
+  for (const key of orderedHomeKeys) {
+    const node = homeSectionByKey[key];
+    if (!node) continue;
+    // advance-slider and basic-slider share one slider slot — render once.
+    if (key === "advance-slider" || key === "basic-slider") {
+      if (sliderShown) continue;
+      sliderShown = true;
+    }
+    homeSections.push(<React.Fragment key={key}>{node}</React.Fragment>);
+  }
+
+  const homeMain = <>{homeSections}</>;
 
   let mainContent: React.ReactNode;
   if (activeKey === "gallery") {
