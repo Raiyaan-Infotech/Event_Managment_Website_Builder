@@ -111,7 +111,6 @@ export type VendorWebsiteContactMessageRecord = {
   name: string | null;
   email: string | null;
   phone: string | null;
-  subject: string | null;
   message: string | null;
   status: string | null;
   metadata_json: Record<string, unknown> | null;

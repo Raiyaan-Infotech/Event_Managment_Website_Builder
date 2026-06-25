@@ -51,7 +51,6 @@ type ContactFieldType =
   | "email"
   | "phone"
   | "message"
-  | "subject"
   | "dropdown"
   | "checkbox"
   | "radio"

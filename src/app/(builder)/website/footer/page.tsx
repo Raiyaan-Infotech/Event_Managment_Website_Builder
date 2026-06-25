@@ -50,12 +50,6 @@ type PageOption = {
   value: string;
 };
 
-// Footer quick-link options are sourced entirely from the vendor's real pages
-// (API), so newly added custom pages appear here automatically. Title-cases a
-// stored slug only as a display fallback when a page no longer exists.
-const titleCaseSlug = (value: string) =>
-  value.replace(/[-_]+/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
-
 const normKey = (value: unknown) =>
   String(value ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
 
@@ -170,25 +164,38 @@ export default function FooterPage() {
   const activeContact =
     contactType === "alternative" ? alternativeContact : defaultContact;
 
-  const pageOptions: PageOption[] = [];
-  for (const page of websitePages) {
-    const slug = typeof page.slug === "string" ? page.slug.trim() : "";
-    if (
-      !slug ||
-      slug === MAINTENANCE_PAGE_SLUG ||
-      pageOptions.some((option) => option.value === slug)
-    ) continue;
+  const footerPages = React.useMemo(
+    () =>
+      websitePages.filter((page) => {
+        const slug = typeof page.slug === "string" ? page.slug.trim() : "";
+        return (
+          Boolean(slug) &&
+          slug !== MAINTENANCE_PAGE_SLUG &&
+          page.enabled &&
+          page.status !== "draft"
+        );
+      }),
+    [websitePages],
+  );
 
-    const title =
-      typeof page.title === "string" && page.title.trim().length > 0
-        ? page.title.trim()
-        : slug;
+  const pageOptions = React.useMemo<PageOption[]>(() => {
+    const options: PageOption[] = [];
+    for (const page of footerPages) {
+      const slug = typeof page.slug === "string" ? page.slug.trim() : "";
+      if (!slug || options.some((option) => option.value === slug)) continue;
 
-    pageOptions.push({ label: title, value: slug });
-  }
+      const title =
+        typeof page.title === "string" && page.title.trim().length > 0
+          ? page.title.trim()
+          : slug;
+
+      options.push({ label: title, value: slug });
+    }
+    return options;
+  }, [footerPages]);
 
   const quickLinkLabels = selectedPages
-    .map((value) => pageOptions.find((option) => option.value === value)?.label ?? titleCaseSlug(value))
+    .map((value) => pageOptions.find((option) => option.value === value)?.label)
     .filter(Boolean);
 
   const copyright = vendorData?.copywrite || "";
@@ -241,7 +248,7 @@ export default function FooterPage() {
     setSelectedPages(
       normalizeSavedPages(
         savedPages,
-        websitePages as unknown as Array<Record<string, unknown>>,
+        footerPages as unknown as Array<Record<string, unknown>>,
       ),
     );
 
@@ -250,7 +257,14 @@ export default function FooterPage() {
     );
 
     loadedFooterRef.current = true;
-  }, [builderData, websitePages]);
+  }, [builderData, footerPages]);
+
+  React.useEffect(() => {
+    const activeValues = new Set(pageOptions.map((option) => option.value));
+    setSelectedPages((current) =>
+      current.filter((value) => activeValues.has(value)),
+    );
+  }, [pageOptions]);
 
   const handleLogoSelect = async (file: File) => {
     try {
@@ -284,7 +298,9 @@ export default function FooterPage() {
 
       await saveFooter.mutateAsync({
         topListHeading: topListHeading.trim(),
-        selectedPages,
+        selectedPages: selectedPages.filter((value) =>
+          pageOptions.some((option) => option.value === value),
+        ),
         newsletterEnabled,
         showSocialLinks,
       });

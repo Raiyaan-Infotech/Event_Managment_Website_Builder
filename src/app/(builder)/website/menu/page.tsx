@@ -3,7 +3,6 @@
 import * as React from "react";
 import {
   Calendar,
-  ChevronDown,
   FileText,
   GalleryHorizontal,
   Home,
@@ -287,10 +286,6 @@ function buildInitialMenuItems(websitePages: WebsitePage[]) {
       id: item.value,
       label: item.label,
       icon: item.icon,
-      rightContent:
-        item.value === "service" ? (
-          <ChevronDown className="h-4 w-4 text-slate-400" />
-        ) : undefined,
       children: [],
     })) satisfies DraggableItemListItem[],
   );
