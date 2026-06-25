@@ -411,21 +411,45 @@ export default function UiBlockPage() {
     if (!loadedFromApiRef.current) return;
 
     setBlocks((current) => {
-      const currentMap = new Map(current.map((item) => [item.id, item]));
-      return dedupeBlocks(
-        defaultBlocks.map((defaultBlock) => {
-          const currentBlock = currentMap.get(defaultBlock.id);
-          return currentBlock
-            ? {
-                ...defaultBlock,
-                ...currentBlock,
-                icon: defaultBlock.icon,
-                description: defaultBlock.description,
-                required: defaultBlock.required || currentBlock.required,
-              }
-            : defaultBlock;
-        }),
-      );
+      const defaultMap = new Map(defaultBlocks.map((item) => [item.id, item]));
+
+      // Keep the CURRENT (possibly custom-dragged) order. Only drop blocks whose
+      // underlying page no longer exists, and refresh icon/description/required
+      // from the defaults. This must NOT re-sort to defaultBlocks order, or a
+      // visibility toggle (which refreshes defaultBlocks via the cache) would
+      // collapse the vendor's arranged order back to default.
+      const merged = current
+        .filter((item) => defaultMap.has(item.id))
+        .map((item) => {
+          const defaultBlock = defaultMap.get(item.id)!;
+          return {
+            ...defaultBlock,
+            ...item,
+            icon: defaultBlock.icon,
+            description: defaultBlock.description,
+            required: defaultBlock.required || item.required,
+          };
+        });
+
+      // Insert any newly added blocks (e.g. a freshly created page) at their
+      // default position relative to the blocks already kept.
+      const result = [...merged];
+      const seen = new Set(result.map((item) => item.id));
+      defaultBlocks.forEach((defaultBlock, idx) => {
+        if (seen.has(defaultBlock.id)) return;
+        let insertAt = result.length;
+        for (let i = idx - 1; i >= 0; i -= 1) {
+          const pos = result.findIndex((b) => b.id === defaultBlocks[i].id);
+          if (pos >= 0) {
+            insertAt = pos + 1;
+            break;
+          }
+        }
+        result.splice(insertAt, 0, defaultBlock);
+        seen.add(defaultBlock.id);
+      });
+
+      return dedupeBlocks(result);
     });
   }, [defaultBlocks]);
 
